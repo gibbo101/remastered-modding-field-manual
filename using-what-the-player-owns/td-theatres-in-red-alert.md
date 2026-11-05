@@ -22,6 +22,7 @@ source in January 2025, so this should hold.
 When a Red Alert mod wants maps in Tiberian Dawn's desert, temperate or winter terrain, drawn with TD's own HD
 tiles. It takes a custom DLL: the theatre a map plays in is a number the DLL reports, and stock Red Alert knows only
 three. A data-only mod, or one that keeps to Red Alert's own temperate, snow and interior, doesn't need this page.
+For terrain the base game doesn't have, see [Adding a theatre of your own](../maps-and-lobby/custom-theatres.md).
 
 ## How the launcher picks a terrain tileset
 

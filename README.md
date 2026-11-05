@@ -65,6 +65,8 @@ what it does with the technique.
 - [New maps in the skirmish Official list](maps-and-lobby/new-maps-in-the-skirmish-list.md): listing maps
   with data, and launching them under an entry the game already knows.
 - [Bigger maps](maps-and-lobby/bigger-maps.md): Red Alert maps up to 255×255, and what caps them there.
+- [Adding a theatre of your own](maps-and-lobby/custom-theatres.md): new terrain beyond Red Alert's and TD's,
+  what's proven and what's still open.
 - [Custom campaigns](maps-and-lobby/custom-campaigns.md): replacing or adding to the official campaigns, and
   what launches.
 - [Per-AI lobby difficulty](maps-and-lobby/per-ai-lobby-difficulty.md): honouring each AI's lobby difficulty by
