@@ -84,8 +84,10 @@ restore the old protection, then `FlushInstructionCache`. To patch from another 
   `popfd`, replays the displaced instructions, and jumps back. This lets you read a value the launcher holds only in
   a register.
 
-Caves are runs of zero padding in ClientG's code section. Check every byte is still zero before writing, so that
-two patches never share a cave and a changed client never runs one.
+**Where the caves are.** ClientG's `.text` section ends at `0x1BE919C`, but its last memory page runs on to the
+next section at `0x1BEA000`. Windows maps that tail as zero-filled, executable memory: about 3.6 KB of room for
+code, shared by every patch you write. Plan who gets which bytes, and check every byte is still zero before writing,
+so that two patches never share a cave and a changed client never runs one.
 
 ## How it was verified
 

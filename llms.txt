@@ -29,6 +29,12 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
   (MIX/AUD to the Remastered MS-ADPCM WAVs) instead of shipping it. Conversion proven; in-game importer is design
   only.
 
+## Maps and the lobby
+
+- [New maps in the skirmish Official list](maps-and-lobby/new-maps-in-the-skirmish-list.md): list maps with
+  INSTANCES.XML and CNCMAPPREVIEWDATA.XML (RA's 128-wide grid); start them under Hastings' D6 entry, whose
+  OverrideMapName the DLL honours, by hooking ClientG's launch sends and key lookup. Fragile: one ClientG build.
+
 ## Art
 
 - [Building selection boxes](art/building-selection-boxes.md): the launcher centres a building's selection box on

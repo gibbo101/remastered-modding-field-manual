@@ -45,6 +45,10 @@ what it does with the technique.
 - [Content built from the player's own games](using-what-the-player-owns/content-from-the-players-own-games.md):
   building content the guidelines don't let you ship, such as Tiberian Sun's music, from the player's own copy.
 
+### Maps and the lobby
+- [New maps in the skirmish Official list](maps-and-lobby/new-maps-in-the-skirmish-list.md): listing maps
+  with data, and launching them under an entry the game already knows.
+
 ### Art
 - [Building selection boxes](art/building-selection-boxes.md): the launcher places the box, and your DLL only sizes
   it.
