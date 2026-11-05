@@ -53,6 +53,20 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [New maps in the skirmish Official list](maps-and-lobby/new-maps-in-the-skirmish-list.md): list maps with
   INSTANCES.XML and CNCMAPPREVIEWDATA.XML (RA's 128-wide grid); start them under Hastings' D6 entry, whose
   OverrideMapName the DLL honours, by hooking ClientG's launch sends and key lookup. Fragile: one ClientG build.
+- [Map size limit](maps-and-lobby/map-size-limit.md): the launcher's export buffer is fixed at 128x128
+  (MAX_EXPORT_CELLS), so no map can be larger; CNCTDSupportMegamaps only lifts TD to that size.
+
+## Engine
+
+- [What the launcher owns: the modding walls](engine/what-the-launcher-owns.md): each behaviour ClientG owns,
+  with its route (data, cached-record RAM, launcher code patch) or the evidence it's a real wall. Search data
+  first, then the DLL interface, then ClientG memory, then code.
+- [Adding a faction](engine/adding-a-faction.md): houses are a fixed enum, so a new side rides one of the
+  lobby's eight country rows, either remapped to HOUSE_GOOD/HOUSE_BAD or decoupled from its side mask.
+- [LAN games](engine/lan-games.md): only the host runs the simulation and the DLL; PlayerPtr switches per player,
+  sounds are addressed per house, DLL keyboard reads see the host only, and every player needs the same mods.
+- [Save versions](engine/save-versions.md): SAVEGAME_VERSION is the sum of class sizes and DLLLoad runs before
+  the version check, so lead the DLL's save data with your own marker and version.
 
 ## Art
 

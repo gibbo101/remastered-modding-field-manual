@@ -60,6 +60,14 @@ what it does with the technique.
 ### Maps and the lobby
 - [New maps in the skirmish Official list](maps-and-lobby/new-maps-in-the-skirmish-list.md): listing maps
   with data, and launching them under an entry the game already knows.
+- [Map size limit](maps-and-lobby/map-size-limit.md): why no Remastered map can be bigger than 128×128.
+
+### Engine
+- [What the launcher owns: the modding walls](engine/what-the-launcher-owns.md): what the community calls
+  impossible, and which of it isn't.
+- [Adding a faction](engine/adding-a-faction.md): a new playable side on Red Alert's eight country rows.
+- [LAN games](engine/lan-games.md): one simulation on the host, and what that means for per-player code.
+- [Save versions](engine/save-versions.md): keeping players' saves safe as your classes grow.
 
 ### Art
 - [How the launcher draws sprites](art/how-the-launcher-draws-sprites.md): canvas-centre anchoring, shape and
