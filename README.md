@@ -13,7 +13,7 @@ Techniques and facts about modding the Command & Conquer Remastered Collection, 
 them. Each page covers one fact or technique: what's true, how it was verified, and which build of the game it holds
 for. Most of what's here was found the hard way, one build and one test at a time.
 
-By the author of [Tiberian Factions](https://steamcommunity.com/sharedfiles/filedetails/?id=3729834253)
+By Gibbo101, author of [Tiberian Factions](https://steamcommunity.com/sharedfiles/filedetails/?id=3729834253)
 ([ModDB](https://www.moddb.com/mods/tiberian-factions-for-red-alert)), which adds TD's GDI and Nod and Tiberian
 Sun's GDI to Red Alert Remastered. Tiberian Factions is the worked example, not the subject: each page ends with
 what it does with the technique.
@@ -23,7 +23,7 @@ what it does with the technique.
 >
 > This manual is written and kept up to date with an AI assistant (Anthropic's Claude). It drafts each page from
 > Tiberian Factions' own notes and code. As work on the mod turns up new lessons, it adds them here and revises the
-> pages they affect. The author reviews every change, and every claim is checked against a working mod or the game's
+> pages they affect. Gibbo101 reviews every change, and every claim is checked against a working mod or the game's
 > source before it goes in. Even so, mistakes can get through. If something here is wrong, please open an issue.
 >
 > Everything here is provided as-is, with no warranty. Back up your game and saves before you try anything,

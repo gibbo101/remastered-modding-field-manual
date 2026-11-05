@@ -5,8 +5,9 @@ Tagline: *What we learned modding C&C Remastered, building Tiberian Factions*. `
 the scope and the open decisions.
 
 ## Nothing private, ever
-This repo is public. No IPs, hostnames, Steam accounts or IDs, machine paths, emails, people's names or notes on
-contacts, and none of Tiberian Factions' internal history or dated decisions. TF's docs and the private notes behind
+This repo is public. No IPs, hostnames, Steam accounts or IDs, machine paths, emails, real names or notes on
+contacts, and none of Tiberian Factions' internal history or dated decisions. Public aliases are fine: the maintainer
+is Gibbo101, and community modders are credited by their alias (DontCryJustDie). TF's docs and the private notes behind
 them are source material: read them, distil them, never copy them.
 
 ## Every page
