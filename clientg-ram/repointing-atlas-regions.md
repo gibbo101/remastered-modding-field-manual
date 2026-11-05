@@ -129,8 +129,9 @@ Example: the Allied radar crest, region `x=5698, y=1706, w=794, h=713`, is the r
 - **Two slots aimed at one target can't be told apart on the way back.** If two slots both now hold the same rect,
   restoring them needs to know which was which. Add a per-slot nudge to `u0` (`slot * 1e-6`, about 0.007 px), so
   every written record stays unique and restores to its own stock rect.
-- **It can't add widgets.** The number of buttons, where they sit, their hit tests and what they do are ClientG's
-  code plus the HUD's `.BUI` scene. This only changes which pixels an existing widget samples.
+- **It can't add widgets.** Re-pointing only changes which pixels an existing widget samples. Adding widgets is a
+  different job: a new `.BUI` scene and a code patch that binds it. See
+  [What the launcher owns](../engine/what-the-launcher-owns.md).
 
 ## Re-skinning the whole sidebar
 
@@ -149,8 +150,7 @@ whole sidebar of its own by re-pointing every region Red Alert's scene draws, at
   nudge (see Traps), or the way back can't tell them apart.
 
 The art you point at has to be in the atlas. A loose, repainted atlas can carry it: see the UI atlas page (to
-come). The atlas can't hold widgets that aren't there already, so this changes how Red Alert's sidebar looks, not
-what's on it.
+come). Re-pointing changes how Red Alert's sidebar looks, not what's on it.
 
 ## A quick test loop
 

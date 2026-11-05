@@ -5,7 +5,7 @@ tags: [engine, launcher, clientg, dll, walls, reference]
 holds_for: Steam build 21590013
 clientg_version: 1.153 (745903)
 status: verified
-unproven: [routes for the superweapon cost line and for build hotkeys on new types, which have not been tried since code patching became possible]
+unproven: [routes for the superweapon cost line and for build hotkeys on new types, and new widgets on the in-match HUD, none of which has been tried with a code patch]
 ---
 
 > [!NOTE]
@@ -45,7 +45,8 @@ cached records in memory, or through a patch to its code. This page lists each o
 | Faction-aware launcher audio and UI | **Real wall** | The launcher knows only `ALLIED` and `SOVIET`. Faction-specific behaviour has to come from the DLL choosing names before they cross. |
 | Lobby picker: row order, hiding duplicate countries | **Real wall** (observed) | Tried: reordering `FACTIONS.XML` (no effect), commenting out an entry (a blank row that still selects that country), and changing `CampaignType` (crash at boot). |
 | Picker icon pointing at a region it doesn't preload | **Real wall** (observed) | It crashes at boot. Repaint the preloaded slot icons in the UI atlas instead. |
-| New HUD buttons or widgets | **Real wall** (observed) | The widget set is compiled into ClientG plus the `.bui` scenes, which can only reshape or hide existing widgets. |
+| New front-end screens and buttons | **Code-patch lever** + data | A screen of your own as a new `.BUI` on a registered screen class no stock screen uses (`SplashScreen`), with buttons and rows cloned from stock widgets. A launcher patch adds the menu button that opens it, and binds every widget's clicks. Shipped in a released mod. No page yet. |
+| New widgets on the in-match HUD | **Open** | The `.BUI` alone can only reshape or hide existing widgets. The front-end route (a new scene and a patch that binds it) hasn't been tried on the in-match HUD. |
 | Superweapon "Cost: $N" line | **Open** | Hidden only for the launcher's own superweapon names. Not tried since code patching became possible. |
 | Build hotkeys for new buildings and units | **Open** | Each build command names one stock object. Not tried since code patching became possible. |
 
