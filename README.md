@@ -60,7 +60,7 @@ what it does with the technique.
 ### Maps and the lobby
 - [New maps in the skirmish Official list](maps-and-lobby/new-maps-in-the-skirmish-list.md): listing maps
   with data, and launching them under an entry the game already knows.
-- [Map size limit](maps-and-lobby/map-size-limit.md): why no Remastered map can be bigger than 128×128.
+- [Bigger maps](maps-and-lobby/bigger-maps.md): Red Alert maps up to 255×255, and what caps them there.
 
 ### Engine
 - [What the launcher owns: the modding walls](engine/what-the-launcher-owns.md): what the community calls

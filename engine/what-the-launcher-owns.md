@@ -41,7 +41,7 @@ cached records in memory, or through a patch to its code. This page lists each o
 | New text strings | **Data lever** | Adding records to `MASTERTEXTFILE_*.LOC` crashes the launcher at boot. Ship new strings in `Data/ModText.csv` instead. No page yet. |
 | Mod hotkey commands | **Data lever** | `CNCEnableModHotKeyGameCommands` in `GameConstants_Mod.xml` turns on four mod commands, which the DLL receives with a map cell. |
 | Default key bindings for those commands | **Real wall** | Tried: the input file in a replacement `CONFIG.MEG`, the same file loose, Restore Defaults, and a fresh profile. All four were ignored. Players bind the keys themselves. |
-| Maps larger than 128×128 | **Real wall** | The launcher's export buffer is a fixed 128×128. [Map size limit](../maps-and-lobby/map-size-limit.md) |
+| Maps larger than 128×128 | **Server code-patch lever** | Not a launcher limit: the instance server copies two fixed 128×128 export arrays, and two patched instructions point it at bigger ones. Up to 255 a side; built, not yet released. [Bigger maps](../maps-and-lobby/bigger-maps.md) |
 | Faction-aware launcher audio and UI | **Real wall** | The launcher knows only `ALLIED` and `SOVIET`. Faction-specific behaviour has to come from the DLL choosing names before they cross. |
 | Lobby picker: row order, hiding duplicate countries | **Real wall** (observed) | Tried: reordering `FACTIONS.XML` (no effect), commenting out an entry (a blank row that still selects that country), and changing `CampaignType` (crash at boot). |
 | Picker icon pointing at a region it doesn't preload | **Real wall** (observed) | It crashes at boot. Repaint the preloaded slot icons in the UI atlas instead. |

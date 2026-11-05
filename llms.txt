@@ -53,8 +53,9 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [New maps in the skirmish Official list](maps-and-lobby/new-maps-in-the-skirmish-list.md): list maps with
   INSTANCES.XML and CNCMAPPREVIEWDATA.XML (RA's 128-wide grid); start them under Hastings' D6 entry, whose
   OverrideMapName the DLL honours, by hooking ClientG's launch sends and key lookup. Fragile: one ClientG build.
-- [Map size limit](maps-and-lobby/map-size-limit.md): the launcher's export buffer is fixed at 128x128
-  (MAX_EXPORT_CELLS), so no map can be larger; CNCTDSupportMegamaps only lifts TD to that size.
+- [Bigger maps](maps-and-lobby/bigger-maps.md): maps up to 255 cells a side (253x253 playable): widen CELL to
+  32 bits with 8-bit X/Y, patch InstanceServerG's two export copies (0x59235A, 0x5982A4) to read bigger arrays,
+  re-encode offsets on the launcher's 128-wide grid, skip the legacy render. Byte cell fields cap it at 255.
 
 ## Engine
 
