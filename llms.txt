@@ -11,6 +11,19 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 
 ## Getting started
 
+- [The mod folder and ccmod.json](getting-started/the-mod-folder-and-ccmod-json.md): a mod is ccmod.json plus a
+  Data/ tree; local mods in Documents\CnCRemastered\Mods\Red_Alert (or Tiberian_Dawn); Workshop items need a named
+  subfolder; the version is two integers shown as high.low.
+- [Building the DLL on Linux](getting-started/building-the-dll-on-linux.md): cross-compile the game DLL with
+  32-bit mingw (i686 toolchain, Vanilla Conquer's remaster preset, VC_CXX_FLAGS="-w;-fpermissive"); strip it
+  before shipping.
+- [Testing under Proton and on the Steam Deck](getting-started/testing-under-proton.md): copy the mod into the
+  game's Proton prefix (compatdata/1213210) with rsync -ac --delete, with the game closed; crashes are logged in
+  log/CrashLog.txt.
+- [Publishing to the Workshop from Linux](getting-started/publishing-to-the-workshop-from-linux.md): a SteamUGC
+  uploader using EA's .workshop.json fields; restart Steam first, description at most 8000 characters, upload real
+  folders in a named subfolder.
+
 - [HD-only mods](getting-started/hd-only-mods.md): the manual assumes HD graphics mode; switch off the classic
   option with CNCDisableLegacyGraphicsOption in GameConstants_Mod.xml when new art exists only in HD.
 

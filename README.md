@@ -32,6 +32,14 @@ what it does with the technique.
 ## Pages
 
 ### Getting started
+- [The mod folder and ccmod.json](getting-started/the-mod-folder-and-ccmod-json.md): where the launcher finds
+  mods, and what each `ccmod.json` field does.
+- [Building the DLL on Linux](getting-started/building-the-dll-on-linux.md): a Remastered game DLL built on
+  Linux with mingw, no Windows needed.
+- [Testing under Proton and on the Steam Deck](getting-started/testing-under-proton.md): playing your Linux
+  build without Windows.
+- [Publishing to the Workshop from Linux](getting-started/publishing-to-the-workshop-from-linux.md): uploading
+  and updating a Workshop item without Windows.
 - [HD-only mods](getting-started/hd-only-mods.md): this manual assumes HD graphics mode, and how to switch off the
   classic option when your new art exists only in HD.
 
