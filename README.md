@@ -54,6 +54,14 @@ what it does with the technique.
 - [Mod hotkey commands](launcher-data/mod-hotkey-commands.md): the four keys EA left for modders, and why players
   have to bind them.
 
+### Front end
+- [The UI atlas](front-end/the-ui-atlas.md): repainting the launcher's UI images, picking the right region, and
+  shipping the atlas small.
+- [BUI screens](front-end/bui-screens.md): reshaping, hiding and restyling the launcher's screens, and swapping
+  whole screens.
+- [New screens and buttons](front-end/new-screens-and-buttons.md): adding main-menu buttons and whole screens the
+  launcher doesn't have.
+
 ### Using what the player already owns
 - [TD art from the base game](using-what-the-player-owns/td-art-from-the-base-game.md): drawing Tiberian Dawn's
   HD art in a Red Alert mod without shipping it.
@@ -95,6 +103,14 @@ what it does with the technique.
   frame limits, the alpha cutoff, baked shadows and beams.
 - [Building selection boxes](art/building-selection-boxes.md): the launcher places the box, and your DLL only sizes
   it.
+
+### Structuring a big mod
+- [Asset packs](structuring/asset-packs.md): splitting a big mod's art and sound into Workshop items other mods
+  can use too.
+- [A player settings page](structuring/player-settings-page.md): letting players switch each change back to
+  vanilla.
+- [New units without a DLL of your own](structuring/units-without-a-dll.md): adding a unit as data, on top of
+  another mod's DLL.
 
 ### Patching the launcher in memory (advanced)
 - [Re-pointing launcher UI art in memory](clientg-ram/repointing-atlas-regions.md): swapping which atlas region a HUD

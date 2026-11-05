@@ -45,6 +45,17 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
   GAME_COMMAND_CNC_MOD_COMMAND_1-4; the DLL gets INPUT_REQUEST_MOD_GAME_COMMAND_n_AT_POSITION with the cell under
   the mouse; players bind the keys, a mod can't ship bindings.
 
+## Front end
+
+- [The UI atlas](front-end/the-ui-atlas.md): launcher 2D UI is regions of MT_COMMANDBAR_COMMON (6871x6716) with an
+  .MTD region table; ship a full repainted copy loose, as TGA or DXT5 DDS with mips (padded to 6872 wide); region
+  boxes are fixed; per side vs per country.
+- [BUI screens](front-end/bui-screens.md): .BUI ChunkFiles ('CH', v2.1, zlib at 0x24, hash unchecked); reshape,
+  hide, retint, retexture, clone widgets; FACTIONS.XML GUIFileNames picks the screen. Loose any size.
+- [New screens and buttons](front-end/new-screens-and-buttons.md): clone a stock button in a loose RA_MAIN_MENU.BUI
+  and bind its click from a hook; a new screen is a loose .BUI on ClientG's unused SplashScreen class, opened with
+  GUIManager/Create_Scene_Instance. Fragile: one ClientG build.
+
 ## Using what the player already owns
 
 - [TD art from the base game](using-what-the-player-owns/td-art-from-the-base-game.md): draw Tiberian Dawn's HD
@@ -110,6 +121,16 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 
 - [Building selection boxes](art/building-selection-boxes.md): the launcher centres a building's selection box on
   its plot and takes only the size from the DLL; a misplaced box means the art is seated off the plot's centre.
+
+## Structuring a big mod
+
+- [Asset packs](structuring/asset-packs.md): split art and sound into Workshop items the mod depends on; a pack's
+  own XMLs never load (the mod carries the merged entries); the DLL detects a pack by a marker file found through
+  CNC_Add_Mod_Path; share frames and ZIPs to stay small.
+- [A player settings page](structuring/player-settings-page.md): every switch on by default and off meaning
+  vanilla's own code path; an INI read once per match; in LAN the host's simulation switches apply to everyone.
+- [New units without a DLL of your own](structuring/units-without-a-dll.md): stock RA has no INI route to new
+  types; DontCryJustDie's Nuke Tank sample adds one as an add-on to his Veterancy and more DLL.
 
 ## Patching the launcher in memory (advanced)
 

@@ -149,8 +149,7 @@ whole sidebar of its own by re-pointing every region Red Alert's scene draws, at
 - **Restore by slot.** With dozens of slots, two of them will often share a target rect. Use the per-slot `u0`
   nudge (see Traps), or the way back can't tell them apart.
 
-The art you point at has to be in the atlas. A loose, repainted atlas can carry it: see the UI atlas page (to
-come). Re-pointing changes how Red Alert's sidebar looks, not what's on it.
+The art you point at has to be in the atlas. A loose, repainted atlas can carry it: see [The UI atlas](../front-end/the-ui-atlas.md). Re-pointing changes how Red Alert's sidebar looks, not what's on it.
 
 ## A quick test loop
 
