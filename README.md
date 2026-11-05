@@ -54,6 +54,8 @@ what it does with the technique.
   with data, and launching them under an entry the game already knows.
 
 ### Art
+- [How the launcher draws sprites](art/how-the-launcher-draws-sprites.md): canvas-centre anchoring, shape and
+  frame limits, the alpha cutoff, baked shadows and beams.
 - [Building selection boxes](art/building-selection-boxes.md): the launcher places the box, and your DLL only sizes
   it.
 

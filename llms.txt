@@ -43,6 +43,10 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 
 ## Art
 
+- [How the launcher draws sprites](art/how-the-launcher-draws-sprites.md): an HD frame's .meta is a canvas size
+  plus a crop box, anchored by canvas centre; second draws use shapes 0-127; no rotation; alpha below ~128
+  discarded; ground shadows are baked (black, alpha 191); beam line frames 0-4 only, 3 lines per object.
+
 - [Building selection boxes](art/building-selection-boxes.md): the launcher centres a building's selection box on
   its plot and takes only the size from the DLL; a misplaced box means the art is seated off the plot's centre.
 

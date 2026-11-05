@@ -50,8 +50,8 @@ Changing the height grows the box evenly about the plot's centre. No edge stays 
 
 - **Art and box can't be separated.** `PositionY` is the art's anchor. Biasing it to slide the box only slides the
   building away from its own box, footprint and apron.
-- **Seat the art on the plot centre.** The launcher anchors a sprite by the centre of its canvas (the `size` in the
-  frame's `.meta`), not by the crop. Compose each building frame so that the plot's centre falls at the canvas
+- **Seat the art on the plot centre.** The launcher anchors a sprite by the centre of its canvas, not by the crop (see
+  [How the launcher draws sprites](how-the-launcher-draws-sprites.md)). Compose each building frame so that the plot's centre falls at the canvas
   centre, and the box will bracket it.
 - **Size the box from the art.** Take `DimensionX/Y` from the art's visible extent around the plot centre. A box
   can't be taller on one side than the other, so a building whose art reaches much further up than down gets a box
