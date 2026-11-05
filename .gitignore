@@ -1,0 +1,6 @@
+# Obsidian keeps per-user state here; the vault itself is the markdown.
+.obsidian/
+.trash/
+
+# Session hand-off, local only.
+HANDOFF.md

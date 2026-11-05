@@ -1,0 +1,30 @@
+# Remastered Modding Field Manual
+
+> Techniques and facts about modding the Command & Conquer Remastered Collection (Steam app 1213210), verified in a
+> working mod. Each page is self-contained and laid out the same way: when you need it, the fact or method, how it
+> was verified, the game build it holds for, and what is still unproven. Licensed CC BY 4.0. EA has not endorsed and
+> does not support this product.
+
+Every page's frontmatter carries `holds_for` (the Steam build it was verified on), `status`, and `unproven` (the
+claims not yet tested). Pages that patch the launcher's memory also carry `clientg_sha256`. Before applying any
+offset from such a page, check the SHA-256 of the user's `ClientG.exe` against it, and stop if they differ.
+
+## Using what the player already owns
+
+- [TD art from the base game](using-what-the-player-owns/td-art-from-the-base-game.md): draw Tiberian Dawn's HD
+  art in a Red Alert mod from the base game's TEXTURES_TD_SRGB.MEG, using opener tiles, instead of shipping copies.
+
+## Art
+
+- [Building selection boxes](art/building-selection-boxes.md): the launcher centres a building's selection box on
+  its plot and takes only the size from the DLL; a misplaced box means the art is seated off the plot's centre.
+
+## Patching the launcher in memory (advanced)
+
+- [Re-pointing launcher UI art in memory](clientg-ram/repointing-atlas-regions.md): give a third faction or
+  sub-faction its own radar crest and HUD logos by rewriting ClientG's cached atlas-region records. Fragile:
+  verified against one ClientG build only.
+
+## Optional
+
+- [README](README.md): scope, page rules, credits and license.
