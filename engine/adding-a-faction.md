@@ -109,6 +109,7 @@ need the DLL or a launcher patch:
 >
 > TF plays five factions on the eight rows: Spain is TD's GDI and Greece TD's Nod (both remapped), Germany is
 > Tiberian Sun's GDI (decoupled), England stays Allied and the USSR Soviet. The remaining three rows are labelled
-> as duplicates of Allied and Soviet. GDI, Nod and TS GDI load TD's sidebar scene.
+> as duplicates of Allied and Soviet for now, and they're where TF's next factions go: more are on the way. GDI,
+> Nod and TS GDI load TD's sidebar scene.
 >
 > <!-- screenshot: the lobby picker showing GDI, Nod, Soviet, Allies and TS GDI rows with their crests -->
