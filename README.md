@@ -35,6 +35,10 @@ what it does with the technique.
 - [HD-only mods](getting-started/hd-only-mods.md): this manual assumes HD graphics mode, and how to switch off the
   classic option when your new art exists only in HD.
 
+### Launcher data
+- [Overriding the launcher's data](launcher-data/overriding-launcher-data.md): loose files, a replacement
+  `CONFIG.MEG` and `GameConstants_Mod.xml`, and what none of them reach.
+
 ### Using what the player already owns
 - [TD art from the base game](using-what-the-player-owns/td-art-from-the-base-game.md): drawing Tiberian Dawn's
   HD art in a Red Alert mod without shipping it.

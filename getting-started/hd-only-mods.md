@@ -29,7 +29,8 @@ what the HD renderer does.
 ## The switch
 
 One launcher constant removes the classic option from the menu, along with the spacebar toggle in game. Ship it in
-your mod's `Data/XML/GameConstants_Mod.xml`, which the launcher merges over the base `GameConstants.xml`:
+your mod's `Data/XML/GameConstants_Mod.xml`, which the launcher merges over the base `GameConstants.xml` (see
+[Overriding the launcher's data](../launcher-data/overriding-launcher-data.md)):
 
 ```xml
 <GameConstants>

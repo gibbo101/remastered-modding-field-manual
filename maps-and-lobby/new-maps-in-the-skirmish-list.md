@@ -6,7 +6,7 @@ holds_for: Steam build 21590013
 clientg_version: 1.153 (745903)
 clientg_sha256: d405ed389548be51c67740bb6309de10a5f02bdfc86324a10c9ad3b663c08897
 status: verified
-unproven: [what a player sees on a client where the hooks don't install (the entries would list but not start), whether PreviewLoadingTextureName does anything for a skirmish entry]
+unproven: [whether PreviewLoadingTextureName does anything for a skirmish entry]
 ---
 
 > [!NOTE]
@@ -31,8 +31,8 @@ custom maps instead, or your mod only changes existing maps, you don't need this
 > - **What it depends on:** the launch-send function and every call to it, the two lobby IPC sends, the instance
 >   key lookup and the GUI's set-texture call. All of these are addresses in this one build.
 > - **How it fails if the client changes:** done as below, the install checks every site first and installs
->   nothing if the core sites don't match. The entries still list, because listing is data, but the server
->   won't start them. **Unproven:** exactly what the player sees then.
+>   nothing if the core sites don't match. The entries still list, because listing is data, but launching one
+>   fails at match start on the server's instance assert.
 > - **Keep it LAN-safe:** every client must resolve the carrier entry (see Traps).
 
 **Holds for:** the client in the box above. EA has stopped patching the game and archived the source in January
@@ -73,9 +73,12 @@ multiplayer base variant, whatever the entry is called:
 
 ## Why a listed map won't start
 
-The instance server (`InstanceServerG.exe`, which carries its own `\XML\Instances.xml` path) builds its list of
-instances from the base game's data before your DLL is loaded. A launch naming an entry it doesn't know never
-starts.
+The instance server (`InstanceServerG.exe`, which carries its own `\XML\Instances.xml` path) resolves instances
+and map files from the base game's data, not your mod's. A launch naming an entry it doesn't know fails at match
+start, on the server's `Creating instance %s` assert in `serveripcmessagehandler.cpp`.
+
+You can't get round this by pointing a stock entry at your map, either. An edited `<OverrideMapName>` on an
+existing entry changes nothing, because the server still loads the base game's map for it.
 
 ## Starting it: launch under an entry the server knows
 
@@ -137,8 +140,10 @@ Ship it in the mod's `CCDATA/` folder under a name of your own.
 - **The hooks:** every address and stock byte above was read from `ClientG.exe` on disk. A shipped mod lists and
   plays all 34 of TD's skirmish maps this way, from the skirmish screen and in LAN games, under Proton on Linux and
   on the Steam Deck.
-- Observed, not re-tested for this page: that the server won't start an unknown entry, and that an unresolved D6
-  stalls a match.
+- **The server's refusal:** a new instance hitting the server's assert was observed in play, and the assert text
+  and its source file are in `InstanceServerG.exe`. The ignored `OverrideMapName` edit was observed once, when a
+  hijacked community entry still loaded its stock map.
+- Observed, not re-tested for this page: that an unresolved D6 stalls a match.
 
 > [!TIP]
 > **In Tiberian Factions**

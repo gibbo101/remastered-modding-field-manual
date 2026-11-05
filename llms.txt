@@ -14,6 +14,12 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [HD-only mods](getting-started/hd-only-mods.md): the manual assumes HD graphics mode; switch off the classic
   option with CNCDisableLegacyGraphicsOption in GameConstants_Mod.xml when new art exists only in HD.
 
+## Launcher data
+
+- [Overriding the launcher's data](launcher-data/overriding-launcher-data.md): a loose file under Data/ replaces
+  its CONFIG.MEG member whole; a replacement CONFIG.MEG must keep every member's exact size; GameConstants_Mod.xml
+  merges over GameConstants.xml (overwrite="true" replaces a list). The instance server reads none of them.
+
 ## Using what the player already owns
 
 - [TD art from the base game](using-what-the-player-owns/td-art-from-the-base-game.md): draw Tiberian Dawn's HD

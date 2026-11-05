@@ -45,9 +45,9 @@ simply casts its own theatre number into it. Only the number matters.
 ## The launcher side: more slots
 
 A mod can extend Red Alert's list without repacking `CONFIG.MEG`. The launcher loads a loose
-`Data/XML/GameConstants_Mod.xml` from the mod and merges it over the base constants (`ClientG.exe` carries the path
-`\XML\GameConstants_Mod.xml` beside `\XML\GameConstants.xml`). Give the list `overwrite="true"` and write out all
-six slots:
+`Data/XML/GameConstants_Mod.xml` from the mod and merges it over the base constants (see
+[Overriding the launcher's data](../launcher-data/overriding-launcher-data.md)). Give the list `overwrite="true"`
+and write out all six slots:
 
 ```xml
 <GameConstants>
