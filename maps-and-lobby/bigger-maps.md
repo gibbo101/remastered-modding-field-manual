@@ -143,9 +143,32 @@ Three things cap a side at 256 cells, and none moves without rewriting both side
 A width of exactly 256 also wraps `Cell_To_Lepton` to 0, so clamp the map and its one-cell border to end by cell
 255. That leaves 253 × 253 playable, about four times the old 126 × 126.
 
-**Going further is possible in theory**, but it's a different project: 32-bit coordinates throughout the engine,
-a new `TARGET` encoding, and patches to every launcher reader of the byte cell fields and the 16-bit lepton
-positions. Nobody has tried it.
+### Going past 255: what would have to change
+
+> [!CAUTION]
+> **Unproven.** Nobody has built this. The list below is read from EA's source and the interface header, as a map
+> for whoever tries. It isn't a recipe.
+
+Going past 255 cells a side is possible in theory. Each limit below sits in a type, and each type would have to
+widen, on both sides of the interface:
+
+| Limit | Where it lives | What would change |
+|---|---|---|
+| A coordinate's cell part is one byte | `LEPTON` is an `unsigned short`, split into a `Cell` byte and a sub-cell `Lepton` byte (`LEPTON_COMPOSITE`). `COORDINATE` is an `unsigned long` holding an X and a Y lepton (`COORD_COMPOSITE`). | Leptons to 32 bits and `COORDINATE` to 64. That touches every function that takes, packs or compares a coordinate, and anything saved or sent with one. |
+| Targets pack a coordinate in 12 bits per axis | `TARGET` is a `long`, a type tag plus a 24-bit mantissa (`TARGET_MANTISSA`). A coordinate target packs each axis in 12 bits: 255 × 16 + 8 = 4088, inside 4095. | A new `TARGET` encoding with more bits per axis, or a wider `TARGET`, along with every place that builds or decodes one. |
+| Cells are `X:8, Y:8` | The 32-bit `CELL` already has room. Only the bitfields stop at 256. | Wider bitfields. This is the easy part. |
+| The launcher's cell fields are bytes | `CNCDynamicMapEntryStruct::CellX/CellY` and `CNCPlayerInfoStruct::HomeCellX/HomeCellY` are `unsigned char` in `DLLInterface.h`. | The structs can't grow, because the launcher reads them at fixed offsets. Every launcher function that reads these fields would need patching to take the cell from somewhere else. |
+| The launcher's positions are 16-bit leptons | `CNCObjectStruct::CenterCoordX/CenterCoordY` are `unsigned short`, in leptons. At 256 leptons a cell, cell 256 is 65,536, one past the type. | The same again: patches to every launcher reader of these fields, in code you don't have the source for. |
+| Offsets on the launcher's 128-wide grid | Occupy and placement offsets are decoded as `dy * 128 + dx` in a `short`. | Fine while a building's footprint stays small. Unaffected by map size, but worth re-checking. |
+| Events carry coordinates | Game events (`EventClass`) carry `COORDINATE` fields, and multiplayer packets are sized from `sizeof` the events. | Bigger events, so packets and recorded games change size. LAN play would need re-testing. |
+| Map files | The format-4 MapPack holds 256 × 256 cells. | Another format, carrying its size, and readers for every older one. |
+
+The engine half is large but self-contained. The launcher half is the hard part: the launcher's own code reads
+byte cells and 16-bit positions, and every one of those reads would need a patch. That's far more code-patch
+surface than anything else in this manual.
+
+**Costs grow with the area as well.** The shroud and occupier exports write an entry per cell, and the selection
+export checks every cell. A 512 × 512 map is four times the per-tick export work of 255 × 255.
 
 ## Costs
 
