@@ -1,6 +1,6 @@
 ---
 title: Re-pointing launcher UI art in memory
-description: Give a third faction or sub-faction its own radar crest and HUD logos by rewriting ClientG's cached 16-byte atlas-region records, scanned safely off the game thread.
+description: Give a third faction or sub-faction its own radar crest, HUD logos or whole sidebar skin by rewriting ClientG's cached 16-byte atlas-region records, scanned safely off the game thread.
 tags: [clientg, ram-patch, ui-atlas, advanced]
 holds_for: Steam build 21590013
 clientg_version: 1.153 (745903)
@@ -31,6 +31,12 @@ Allies' away.
 
 Sub-factions hit the same wall. England, France and Germany all draw the one Allied crest, so giving each country
 its own logo also means re-pointing, by the local player's country.
+
+**Unique sidebars are the same method at a larger scale.** First check whether you need it at all. If TD's
+sidebar will do, that's data: each faction in `FACTIONS.XML` names both TD's HUD scene and Red Alert's, and
+swapping them gives that faction TD's whole sidebar (see [Adding a faction](../engine/adding-a-faction.md)). Only a
+sidebar of your own, or Red Alert's restyled per faction, needs re-pointing. See
+[Re-skinning the whole sidebar](#re-skinning-the-whole-sidebar) below.
 
 > [!WARNING]
 > **Fragile: this patches the running launcher's memory.**
@@ -126,6 +132,26 @@ Example: the Allied radar crest, region `x=5698, y=1706, w=794, h=713`, is the r
 - **It can't add widgets.** The number of buttons, where they sit, their hit tests and what they do are ClientG's
   code plus the HUD's `.BUI` scene. This only changes which pixels an existing widget samples.
 
+## Re-skinning the whole sidebar
+
+The crest is one region. Every other piece of Red Alert's sidebar is a region too, with the same kind of cached
+record: build-bar plates, power bar, top button, tab icons, tooltip frame, small buttons. So one faction can get a
+whole sidebar of its own by re-pointing every region Red Alert's scene draws, at art for that faction.
+
+- **Find what's drawn.** Only drawn regions have a record, so scan for the record of every candidate region in
+  the `.MTD`. The hits are the pieces to re-point.
+- **Match sizes.** A region drawn into a different-shaped slot is squashed. Where the art doesn't match, sample a
+  window of the target region with the slot's own proportions. A square button cut from a wide button bar keeps
+  its icon and bevels.
+- **Leave out pieces that cover others.** An opaque replacement for a frame or bezel can hide what's drawn
+  beneath it, the crest included.
+- **Restore by slot.** With dozens of slots, two of them will often share a target rect. Use the per-slot `u0`
+  nudge (see Traps), or the way back can't tell them apart.
+
+The art you point at has to be in the atlas. A loose, repainted atlas can carry it: see the UI atlas page (to
+come). The atlas can't hold widgets that aren't there already, so this changes how Red Alert's sidebar looks, not
+what's on it.
+
 ## A quick test loop
 
 Under Proton on Linux, ClientG's memory is readable and writable at `/proc/<pid>/mem` by the same user. A script
@@ -144,7 +170,9 @@ with a joiner.
 > TF's radar crest follows the picked faction: TD's eagle for GDI, the scorpion for Nod, a Tiberian Sun crest for
 > TS GDI. Both TD logos are already in the stock atlas as regions Red Alert never draws, so re-pointing the crest
 > records costs no new art. The same patch re-points the small Allied and Soviet logos the waypoint and rally
-> markers use. To reach LAN joiners too, TF relies on ClientG loading the mod's DLL briefly at its own start-up on
+> markers use. For a while TF also re-skinned Red Alert's whole sidebar for GDI and Nod this way: 54 region pairs,
+> each Red Alert piece pointed at its TD counterpart, checked for all four factions. It retired that the day
+> GDI and Nod switched to TD's own HUD scene in `FACTIONS.XML`, which did the same job as data. To reach LAN joiners too, TF relies on ClientG loading the mod's DLL briefly at its own start-up on
 > every machine. A hook installed during that load lets each player's launcher run the patch for itself. See
 > [Patching the launcher's code from your DLL](patching-the-launchers-code.md).
 >
