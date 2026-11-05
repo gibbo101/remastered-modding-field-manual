@@ -43,6 +43,9 @@ what it does with the technique.
 - [HD-only mods](getting-started/hd-only-mods.md): this manual assumes HD graphics mode, and how to switch off the
   classic option when your new art exists only in HD.
 
+### File formats
+- [MEG and MIX archives](formats/meg-and-mix-archives.md): reading, extracting and repacking the game's archives.
+
 ### Launcher data
 - [Overriding the launcher's data](launcher-data/overriding-launcher-data.md): loose files, a replacement
   `CONFIG.MEG` and `GameConstants_Mod.xml`, and what none of them reach.

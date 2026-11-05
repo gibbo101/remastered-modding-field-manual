@@ -27,6 +27,12 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [HD-only mods](getting-started/hd-only-mods.md): the manual assumes HD graphics mode; switch off the classic
   option with CNCDisableLegacyGraphicsOption in GameConstants_Mod.xml when new art exists only in HD.
 
+## File formats
+
+- [MEG and MIX archives](formats/meg-and-mix-archives.md): MEG = upper-case paths, 20-byte entries sorted by CRC,
+  no checksum (EA's Megafile.cs); classic MIX = name-hash index sorted by signed CRC; RA's outer MIX = flags header
+  (0x2 encrypted, 0x1 SHA-1 trailer; RA ships 0x0, 0x2 and 0x3), RSA-wrapped Blowfish key, encrypted index.
+
 ## Launcher data
 
 - [Overriding the launcher's data](launcher-data/overriding-launcher-data.md): a loose file under Data/ replaces
