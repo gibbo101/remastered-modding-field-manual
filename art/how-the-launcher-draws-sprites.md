@@ -55,8 +55,10 @@ and takes only the size from the DLL. See [Building selection boxes](building-se
 
 ## Shadows are baked in
 
-The game draws a shadow only for things in the air: a bullet with `Height > 0` whose type has `Shadow` set
-(`BULLET.CPP`), and aircraft in flight (`AIRCRAFT.CPP`). No ground unit, infantry or building gets one. Every ground shadow is part of the
+The game draws a separate shadow only for things in the air: a bullet with `Height > 0` whose type has `Shadow`
+set (`BULLET.CPP`), and aircraft in flight. On the ground, a shadow is part of the object's own art. A classic
+shape carries shadow pixels, which `TechnoClass::Techno_Draw_Object` darkens through a shadow table (`TECHNO.CPP`,
+which switches to the air table when `Height > 0`). An HD frame carries its shadow baked in. Every ground shadow is part of the
 sprite, EA's included. EA's Medium Tank frame above carries its shadow as pure black at alpha 191.
 
 So bake the shadow into each frame as an offset copy of the object's silhouette, pure black at around alpha 191,
@@ -75,7 +77,8 @@ line's colour. TD's Obelisk never hits this: its `LineMaxFrames` is 5. Lines can
 ## How it was verified
 
 - **The `.meta` format and the baked shadow:** read from the base game's own `MTNK.ZIP`.
-- **Shadows only in the air, and three lines per object:** EA's released source. The Obelisk's 5 line frames are
+- **Shadows only in the air, and three lines per object:** EA's released source (`BULLET.CPP`, `TECHNO.CPP`,
+  `DLLInterface.h`). The Obelisk's 5 line frames are
   in EA's TD source.
 - **Each rule:** found in a shipped mod's art, where a build drew wrong and the fix was confirmed in game. The
   canvas-centre anchor was also tested against the competing idea that the crop's centre is the anchor. A tall
