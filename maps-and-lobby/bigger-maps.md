@@ -20,6 +20,10 @@ source in January 2025, so this should hold.
 **Status:** built and played on Linux and the Steam Deck, but not yet in a released mod. LAN with a joiner hasn't
 been tested.
 
+**HD mode only.** Classic graphics can't draw a map past 128 cells: the legacy renderer's buffer is 128 cells wide,
+and big maps run with it switched off (see the engine side below). A mod with big maps should lock classic mode
+out. See [HD-only mods](../getting-started/hd-only-mods.md).
+
 ## When you need this
 
 When you want Red Alert maps bigger than 128×128 cells, the size Red Alert has always had. It takes a custom DLL
