@@ -23,7 +23,9 @@ it does in skirmish.
 
 ## One simulation, on the host
 
-The original Red Alert ran a copy of the game on every machine. The Remastered Collection doesn't. In a LAN game
+The original Red Alert ran a copy of the game on every machine, in lockstep: each machine ran the same frames from
+the same orders, and compared a checksum of the game state to catch any machine falling out of sync. The
+Remastered Collection doesn't. In a LAN game
 **only the host runs the simulation**: one instance server, one copy of your DLL, simulating every player's house.
 A joiner simulates nothing: their launcher (`ClientG.exe`) draws what the host's simulation exports, and sends its
 player's input back.
@@ -61,6 +63,9 @@ single player. In multiplayer it's on for everyone or for no one.
 
 ## How it was verified
 
+- **The original's lockstep:** EA's `QUEUE.CPP`, whose frame-sync logic keeps every system within
+  `Session.MaxAhead` frames of the others, and whose `Compute_Game_CRC` records a checksum of the whole game for each
+  of the last 32 frames.
 - **One simulation on the host:** EA's own comment and context switching in `DLLInterface.cpp`; the executables'
   imports (the instance server names `CNC_Advance_Instance`, the launcher only `CNC_Version`); and a working mod
   whose LAN joiners needed launcher-side patches for anything per player.
