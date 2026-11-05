@@ -101,7 +101,11 @@ mod's root instead. Whether the launcher also reads it there hasn't been tested.
 - **A new file name isn't loaded.** The launcher loads only the files its index lists. For tilesets that's
   `DATA\XML\TILESETS.XML`, which names exactly 19 files: TD's, Red Alert's and the `Common_` ones. A
   `MY_UNITS.XML` beside them is never read, so put your entries into a copy of a listed file such as `RA_UNITS.XML`.
-  **Unproven:** whether a loose, extended `TILESETS.XML` would get extra files loaded.
+  `CONFIG.MEG` has an index like this for each kind of data (`GAMEOBJECTFILES.XML` for objects,
+  `SFXEVENTFILES.XML` for sound events, and others). One published mod, DontCryJustDie's "Veterancy and more", ships
+  loose copies of the object and sound-event indexes with one extra file each, and its new files load. So a loose,
+  extended index looks like the way to add a file name. **Unproven** for `TILESETS.XML`, and not tested here for
+  any index.
 - **Only while the mod is enabled.** Every override applies only when the mod is enabled. The player's vanilla game
   is untouched, so editing shared files such as `FACTIONS.XML` is safe.
 

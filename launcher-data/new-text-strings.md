@@ -79,7 +79,8 @@ So a value can grow if another gives the same bytes back, and the file's total s
 ## How it was verified
 
 - **`ModText.csv`:** DontCryJustDie's "Nuke Tank Sample Mod" ships one (UTF-16 LE with a BOM, these columns,
-  `//` comments) with no DLL, so the launcher is what reads it. A working mod ships its own for every new unit and
+  `//` comments). The launcher is what reads it: neither that sample's host DLL (his "Veterancy and more") nor a
+  working mod's own DLL contains any code for the file, and both mods' strings show in game. A working mod ships its own for every new unit and
   building name, with LF line endings, and they show in the sidebar. `ClientG.exe`'s mod loader lists `CSV` among
   the file types it takes from a mod (beside `Loading mod: %s` in `ModManagerClass::Load_Mod`). The name
   `ModText.csv` itself appears in no game binary, so how the launcher picks this file out is unknown.

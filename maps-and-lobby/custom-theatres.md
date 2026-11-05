@@ -51,8 +51,9 @@ Alert's and the `Common_` ones (see [Overriding the launcher's data](../launcher
 TD's theatres work because `TD_Terrain_Desert`, `_Temperate` and `_Winter` are already on the list. A new file such
 as `TS_Terrain_Temperate.xml` isn't. Three routes, none tested yet:
 
-- **Ship a loose `TILESETS.XML`** naming your file as well. **Unproven** whether the launcher reads a mod's copy of
-  the index.
+- **Ship a loose `TILESETS.XML`** naming your file as well. The most promising route: a published mod adds files
+  this way through two of `CONFIG.MEG`'s other indexes (objects and sound events). **Unproven** for the tileset
+  index.
 - **Add your tiles to a listed terrain tileset**, under template names of your own, and point your slot at that
   tileset. **Unproven** whether two slots can name one tileset. Tile names must not clash with the stock theatre's.
 - **Replace a listed tileset you don't use** with your own contents under its name. It works as file overriding,
