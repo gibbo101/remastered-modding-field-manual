@@ -32,6 +32,12 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [Overriding the launcher's data](launcher-data/overriding-launcher-data.md): a loose file under Data/ replaces
   its CONFIG.MEG member whole; a replacement CONFIG.MEG must keep every member's exact size; GameConstants_Mod.xml
   merges over GameConstants.xml (overwrite="true" replaces a list). The instance server reads none of them.
+- [New text strings](launcher-data/new-text-strings.md): add strings with a loose Data/ModText.csv (UTF-16 LE with
+  a BOM; TEXT ID, AUDIO TAG, CHARACTER, then a column per language), merged at load; the MASTERTEXTFILE .LOC table
+  can only be relabelled at its exact size.
+- [Mod hotkey commands](launcher-data/mod-hotkey-commands.md): CNCEnableModHotKeyGameCommands turns on
+  GAME_COMMAND_CNC_MOD_COMMAND_1-4; the DLL gets INPUT_REQUEST_MOD_GAME_COMMAND_n_AT_POSITION with the cell under
+  the mouse; players bind the keys, a mod can't ship bindings.
 
 ## Using what the player already owns
 
@@ -56,6 +62,13 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [Bigger maps](maps-and-lobby/bigger-maps.md): maps up to 255 cells a side (253x253 playable): widen CELL to
   32 bits with 8-bit X/Y, patch InstanceServerG's two export copies (0x59235A, 0x5982A4) to read bigger arrays,
   re-encode offsets on the launcher's 128-wide grid, skip the legacy render. Byte cell fields cap it at 255.
+
+- [Custom campaigns](maps-and-lobby/custom-campaigns.md): INSTANCES.XML decides what Mission Select shows
+  (ShowOnMissionSelect, IsUnlockedAtStart, ExternalGameID), the campaign files what launches; replace a stock
+  mission by shipping its scenario (SC<house><nn><dir><var>.INI) in CCDATA/ without [Digest].
+- [Per-AI lobby difficulty](maps-and-lobby/per-ai-lobby-difficulty.md): the launcher never sends per-AI skirmish
+  difficulty to the DLL; read ClientG's AIPLAYERn records (stride 0xA8: team +0x50, ActLike +0x54, difficulty
+  +0x64, colour +0x68) and pick the live copy. Read-only. Fragile: one ClientG build.
 
 ## Engine
 
@@ -86,6 +99,9 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [Patching the launcher's code from your DLL](clientg-ram/patching-the-launchers-code.md): ClientG loads the
   mod's DLL at start-up for CNC_Version; DllMain there can pin the DLL and hook launcher functions on every machine.
   Compare stock bytes before every write. Fragile: one ClientG build only.
+- [Rewriting launcher strings in memory](clientg-ram/rewriting-launcher-strings.md): when ClientG builds a name
+  in code (the sidebar tab-icon prefixes), rewrite the string in place, never longer, keeping the old tail behind
+  the terminator so a patched slot is findable. Fragile: one ClientG build.
 
 ## Optional
 

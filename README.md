@@ -46,6 +46,10 @@ what it does with the technique.
 ### Launcher data
 - [Overriding the launcher's data](launcher-data/overriding-launcher-data.md): loose files, a replacement
   `CONFIG.MEG` and `GameConstants_Mod.xml`, and what none of them reach.
+- [New text strings](launcher-data/new-text-strings.md): names for new units, buildings and maps with
+  `ModText.csv`, and relabelling the base game's strings.
+- [Mod hotkey commands](launcher-data/mod-hotkey-commands.md): the four keys EA left for modders, and why players
+  have to bind them.
 
 ### Using what the player already owns
 - [TD art from the base game](using-what-the-player-owns/td-art-from-the-base-game.md): drawing Tiberian Dawn's
@@ -61,6 +65,10 @@ what it does with the technique.
 - [New maps in the skirmish Official list](maps-and-lobby/new-maps-in-the-skirmish-list.md): listing maps
   with data, and launching them under an entry the game already knows.
 - [Bigger maps](maps-and-lobby/bigger-maps.md): Red Alert maps up to 255×255, and what caps them there.
+- [Custom campaigns](maps-and-lobby/custom-campaigns.md): replacing or adding to the official campaigns, and
+  what launches.
+- [Per-AI lobby difficulty](maps-and-lobby/per-ai-lobby-difficulty.md): honouring each AI's lobby difficulty by
+  reading the launcher's memory.
 
 ### Engine
 - [What the launcher owns: the modding walls](engine/what-the-launcher-owns.md): what the community calls
@@ -80,6 +88,8 @@ what it does with the technique.
   widget draws, with the radar crest as the example.
 - [Patching the launcher's code from your DLL](clientg-ram/patching-the-launchers-code.md): hooking launcher
   functions from the start-up load, safely, on every player's machine.
+- [Rewriting launcher strings in memory](clientg-ram/rewriting-launcher-strings.md): changing a name the
+  launcher builds in code, with the sidebar tab icons as the example.
 
 ## Using this with an AI assistant
 
