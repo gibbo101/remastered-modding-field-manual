@@ -72,6 +72,14 @@ what it does with the technique.
 - [Per-AI lobby difficulty](maps-and-lobby/per-ai-lobby-difficulty.md): honouring each AI's lobby difficulty by
   reading the launcher's memory.
 
+### Sound and music
+- [Launcher-played EVA lines by faction](sound-and-music/launcher-eva-lines-by-faction.md): giving each faction
+  its own voice on the lines the launcher plays itself.
+- [Credit tick and radar sounds by faction](sound-and-music/credit-tick-and-radar-by-faction.md): faction sounds
+  for the money counter and the radar.
+- [Music by faction, and the jukebox](sound-and-music/music-by-faction-and-the-jukebox.md): skirmish music per
+  faction, and optional jukebox tracks.
+
 ### Engine
 - [What the launcher owns: the modding walls](engine/what-the-launcher-owns.md): what the community calls
   impossible, and which of it isn't.

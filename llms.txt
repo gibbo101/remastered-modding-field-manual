@@ -73,6 +73,17 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
   difficulty to the DLL; read ClientG's AIPLAYERn records (stride 0xA8: team +0x50, ActLike +0x54, difficulty
   +0x64, colour +0x68) and pick the live copy. Read-only. Fragile: one ClientG build.
 
+## Sound and music
+
+- [Launcher-played EVA lines by faction](sound-and-music/launcher-eva-lines-by-faction.md): nine EVA lines are
+  played by ClientG itself; write each faction's recording over the launcher's sample names at match start, and
+  over ClientG's cached copy (same-length payloads, whole-file compare before writing). Fragile: one ClientG build.
+- [Credit tick and radar sounds by faction](sound-and-music/credit-tick-and-radar-by-faction.md): the launcher
+  plays both itself; silence its copy and fire the faction's sound from the DLL under new event names, per house.
+- [Music by faction, and the jukebox](sound-and-music/music-by-faction-and-the-jukebox.md): AUDIO_FACTIONS
+  MusicMap is unused and the DLL can't play music, so redirect ClientG's skirmish music lookup to a per-faction
+  event; jukebox entries are removed only before the jukebox manager's setup. Fragile: one ClientG build.
+
 ## Engine
 
 - [What the launcher owns: the modding walls](engine/what-the-launcher-owns.md): each behaviour ClientG owns,
