@@ -3,6 +3,7 @@ title: Re-pointing launcher UI art in memory
 description: Give a third faction or sub-faction its own radar crest and HUD logos by rewriting ClientG's cached 16-byte atlas-region records, scanned safely off the game thread.
 tags: [clientg, ram-patch, ui-atlas, advanced]
 holds_for: Steam build 21590013
+clientg_version: 1.153 (745903)
 clientg_sha256: d405ed389548be51c67740bb6309de10a5f02bdfc86324a10c9ad3b663c08897
 status: verified
 unproven: [what happens if a new client kept the same 16-byte record but used it for something else]
@@ -34,7 +35,7 @@ its own logo also means re-pointing, by the local player's country.
 > [!WARNING]
 > **Fragile: this patches the running launcher's memory.**
 >
-> - **Verified against:** `ClientG.exe`, 34,797,928 bytes, SHA-256
+> - **Verified against:** `ClientG.exe` version 1.153 (745903), 34,797,928 bytes, SHA-256
 >   `d405ed389548be51c67740bb6309de10a5f02bdfc86324a10c9ad3b663c08897` (Steam build 21590013), with the stock UI
 >   atlas `MT_COMMANDBAR_COMMON.TGA` at 6871x6716.
 > - **What it depends on:** the layout of ClientG's cached region record (four floats, in the order given below),
@@ -144,7 +145,7 @@ with a joiner.
 > TS GDI. Both TD logos are already in the stock atlas as regions Red Alert never draws, so re-pointing the crest
 > records costs no new art. The same patch re-points the small Allied and Soviet logos the waypoint and rally
 > markers use. To reach LAN joiners too, TF relies on ClientG loading the mod's DLL briefly at its own start-up on
-> every machine. A hook installed during that load lets each player's launcher run the patch for itself. That
-> technique will get a page of its own.
+> every machine. A hook installed during that load lets each player's launcher run the patch for itself. See
+> [Patching the launcher's code from your DLL](patching-the-launchers-code.md).
 >
 > <!-- screenshot: the GDI eagle in the radar slot of a Red Alert match -->

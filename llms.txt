@@ -9,10 +9,25 @@ Every page's frontmatter carries `holds_for` (the Steam build it was verified on
 claims not yet tested). Pages that patch the launcher's memory also carry `clientg_sha256`. Before applying any
 offset from such a page, check the SHA-256 of the user's `ClientG.exe` against it, and stop if they differ.
 
+## Getting started
+
+- [HD-only mods](getting-started/hd-only-mods.md): the manual assumes HD graphics mode; switch off the classic
+  option with CNCDisableLegacyGraphicsOption in GameConstants_Mod.xml when new art exists only in HD.
+
 ## Using what the player already owns
 
 - [TD art from the base game](using-what-the-player-owns/td-art-from-the-base-game.md): draw Tiberian Dawn's HD
   art in a Red Alert mod from the base game's TEXTURES_TD_SRGB.MEG, using opener tiles, instead of shipping copies.
+- [TD theatres in Red Alert](using-what-the-player-owns/td-theatres-in-red-alert.md): add TD's desert, temperate
+  and winter as Red Alert theatres: launcher slots in GameConstants_Mod.xml, a matching TheaterType and templates
+  in the DLL.
+- [TD sounds from the base game](using-what-the-player-owns/td-sounds-from-the-base-game.md): play Tiberian
+  Dawn's sound effects and EVA lines in a Red Alert mod from the base game's sound MEGs, by naming each sound in the
+  DLL and adding RAC_/RAR_ alias events; your own samples must be MS-ADPCM.
+- [Content built from the player's own games](using-what-the-player-owns/content-from-the-players-own-games.md):
+  EA's guidelines bar music files from any C&C game, so convert Tiberian Sun's soundtrack from the player's own copy
+  (MIX/AUD to the Remastered MS-ADPCM WAVs) instead of shipping it. Conversion proven; in-game importer is design
+  only.
 
 ## Art
 
@@ -24,6 +39,9 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [Re-pointing launcher UI art in memory](clientg-ram/repointing-atlas-regions.md): give a third faction or
   sub-faction its own radar crest and HUD logos by rewriting ClientG's cached atlas-region records. Fragile:
   verified against one ClientG build only.
+- [Patching the launcher's code from your DLL](clientg-ram/patching-the-launchers-code.md): ClientG loads the
+  mod's DLL at start-up for CNC_Version; DllMain there can pin the DLL and hook launcher functions on every machine.
+  Compare stock bytes before every write. Fragile: one ClientG build only.
 
 ## Optional
 

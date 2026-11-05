@@ -31,9 +31,19 @@ what it does with the technique.
 
 ## Pages
 
+### Getting started
+- [HD-only mods](getting-started/hd-only-mods.md): this manual assumes HD graphics mode, and how to switch off the
+  classic option when your new art exists only in HD.
+
 ### Using what the player already owns
 - [TD art from the base game](using-what-the-player-owns/td-art-from-the-base-game.md): drawing Tiberian Dawn's
   HD art in a Red Alert mod without shipping it.
+- [TD theatres in Red Alert](using-what-the-player-owns/td-theatres-in-red-alert.md): Red Alert maps in TD's
+  desert, temperate and winter terrain, drawn from the base game.
+- [TD sounds from the base game](using-what-the-player-owns/td-sounds-from-the-base-game.md): TD weapon,
+  building and EVA sounds in a Red Alert mod, with no audio shipped, and the format your own samples need.
+- [Content built from the player's own games](using-what-the-player-owns/content-from-the-players-own-games.md):
+  building content the guidelines don't let you ship, such as Tiberian Sun's music, from the player's own copy.
 
 ### Art
 - [Building selection boxes](art/building-selection-boxes.md): the launcher places the box, and your DLL only sizes
@@ -42,6 +52,8 @@ what it does with the technique.
 ### Patching the launcher in memory (advanced)
 - [Re-pointing launcher UI art in memory](clientg-ram/repointing-atlas-regions.md): swapping which atlas region a HUD
   widget draws, with the radar crest as the example.
+- [Patching the launcher's code from your DLL](clientg-ram/patching-the-launchers-code.md): hooking launcher
+  functions from the start-up load, safely, on every player's machine.
 
 ## Using this with an AI assistant
 
@@ -61,6 +73,7 @@ trusted.
 - **Each page opens with when you need it:** the kind of mod or problem that calls for the technique, and when you
   can skip it.
 - **Game-level facts only:** true for any Remastered mod, not just one.
+- **Written for HD graphics mode.** Pages about art and drawing describe the HD renderer, not classic mode.
 - **Each fact has one home.** It lives on one page, and other pages link to it.
 - **Every claim was checked** against a working mod or the game's source, and anything unproven is marked
   **Unproven**.

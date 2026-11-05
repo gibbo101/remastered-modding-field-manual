@@ -15,6 +15,8 @@ unproven: [load time and memory compared with shipping copies]
 **Holds for:** C&C Remastered Collection, Steam build 21590013. EA has stopped patching the game and archived the
 source in January 2025, so this should hold.
 
+**HD mode only.** This page describes the HD renderer. See [HD-only mods](../getting-started/hd-only-mods.md).
+
 ## When you need this
 
 When a Red Alert mod uses Tiberian Dawn units, buildings or effects with their art unchanged. Shipping copies of

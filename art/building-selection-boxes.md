@@ -15,6 +15,8 @@ unproven: [whether the classic shape's stub and canvas geometry affect where the
 **Holds for:** C&C Remastered Collection, Steam build 21590013. EA has stopped patching the game and archived the
 source in January 2025, so this should hold.
 
+**HD mode only.** This page describes the HD renderer. See [HD-only mods](../getting-started/hd-only-mods.md).
+
 ## When you need this
 
 When your mod adds a building with new art, or re-seats an existing building's art, and its selection box sits too
