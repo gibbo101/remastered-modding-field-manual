@@ -98,9 +98,22 @@ what it does with the technique.
 - [LAN games](engine/lan-games.md): one simulation on the host, and what that means for per-player code.
 - [Save versions](engine/save-versions.md): keeping players' saves safe as your classes grow.
 
+### Units and buildings
+- [Adding a unit](units/adding-a-unit.md): a new vehicle type in the DLL, end to end.
+- [Raising the limits](units/raising-the-limits.md): how many types and objects the engine allows, and how to raise
+  each.
+- [Turrets](units/turrets.md): giving a unit a turret, and making turretless guns aim.
+- [Porting Tiberian Dawn units](units/porting-td-units.md): bringing TD units' behaviour into Red Alert's engine.
+
 ### Art
 - [How the launcher draws sprites](art/how-the-launcher-draws-sprites.md): canvas-centre anchoring, shape and
   frame limits, the alpha cutoff, baked shadows and beams.
+- [HD tilesets and ZIPs](art/hd-tilesets-and-zips.md): shipping HD art for a new unit, building or effect, and
+  tying it to its type.
+- [Sprite memory and DDS](art/sprite-memory-and-dds.md): keeping a big mod's art inside video memory.
+- [Sidebar cameos](art/sidebar-cameos.md): new build icons, and icons that change with the player.
+- [Porting art from other C&C games](art/porting-art-from-other-games.md): Tiberian Sun and C&C3 units as HD
+  Remastered sprites.
 - [Building selection boxes](art/building-selection-boxes.md): the launcher places the box, and your DLL only sizes
   it.
 

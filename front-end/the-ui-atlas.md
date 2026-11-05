@@ -48,8 +48,8 @@ don't repaint must still be there.
   is fine. But anything of yours that computes those coordinates, such as a memory patch on the cached region
   records, must use the size you ship. See [Re-pointing launcher UI art in memory](../clientg-ram/repointing-atlas-regions.md).
 
-Tileset frames can swap formats the same way: a tileset XML can name `t17.tem\t17.tem-0000.tga` while the mod ships `T17.TEM/T17.TEM-0000.DDS`, and the launcher
-draws the DDS.
+Sprite and terrain frames can ship as loose DDS too, with their own rules: see
+[Sprite memory and DDS](../art/sprite-memory-and-dds.md).
 
 ## Geometry is the launcher's
 

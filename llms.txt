@@ -113,12 +113,36 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [Save versions](engine/save-versions.md): SAVEGAME_VERSION is the sum of class sizes and DLLLoad runs before
   the version check, so lead the DLL's save data with your own marker and version.
 
+## Units and buildings
+
+- [Adding a unit](units/adding-a-unit.md): a new UnitType before UNIT_COUNT, a UnitTypeClass constructor
+  (geometry offsets only settable there), registration in Init_Heap in exact enum order, a rules.ini section, and a
+  classic shape so ImageData isn't null (null = invisible); its frame size sets the selection box.
+- [Raising the limits](units/raising-the-limits.md): type heaps sized by enum; live objects and weapon/warhead
+  types by rules.ini [Maximums] (ProjectileMax is never used); per-house MaxUnit throttles only the AI; the 75-entry
+  sidebar column has a stock off-by-one.
+- [Turrets](units/turrets.md): turret frame = body frame + 32 (hull 0-31, turret 32-63); the second draw is limited
+  to shapes 0-127 in HD; Fire_Coord offsets; turretless units turn to aim only if tracked, else set is_lock_turret.
+- [Porting Tiberian Dawn units](units/porting-td-units.md): Speed = round(MPH x 100 / 256); Tracked= for SPEED_TRACK;
+  fill RA-only geometry; ANIM_FRAG2 loads "FRAG3"; TD text IDs don't exist in RA; cloak/scanner is one system.
+
 ## Art
 
 - [How the launcher draws sprites](art/how-the-launcher-draws-sprites.md): an HD frame's .meta is a canvas size
   plus a crop box, anchored by canvas centre; second draws use shapes 0-127; no rotation; alpha below ~128
   discarded; ground shadows are baked (black, alpha 191); beam line frames 0-4 only, 3 lines per object.
 
+- [HD tilesets and ZIPs](art/hd-tilesets-and-zips.md): a unit's art is a ZIP of <name>-NNNN.tga + .meta frames,
+  one tile per shape in a patched copy of RA_UNITS/RA_STRUCTURES/RA_VFX.XML, a buildables entry named
+  RA_<IniName>; TypeName = IniName, AssetName = graphic name.
+- [Sprite memory and DDS](art/sprite-memory-and-dds.md): the launcher uploads every enabled mod's textures at
+  start-up; ZIP frames cost 4 bytes a pixel of their crop; loose DDS frames about a quarter but need the whole
+  canvas, and DXT shifts greys toward team-colour green.
+- [Sidebar cameos](art/sidebar-cameos.md): stock cameos are 341x256 BUILDICON_* atlas regions; new ones are loose
+  TGA or DDS; the DLL's sidebar AssetName picks the entry, so per-player suffixes swap cameos at runtime.
+- [Porting art from other C&C games](art/porting-art-from-other-games.md): Tiberian Sun voxels/SHPs and C&C3
+  models into HD sprites: a 32-degree camera, 32 counter-clockwise facings from north, pure-green team colour,
+  a baked shadow.
 - [Building selection boxes](art/building-selection-boxes.md): the launcher centres a building's selection box on
   its plot and takes only the size from the DLL; a misplaced box means the art is seated off the plot's centre.
 

@@ -52,7 +52,8 @@ with no DLL needed. The radar samples the new art too, so the minimap matches.
 - **The capacity is the stock tileset's.** Red Alert's temperate tileset has 331 template names in 2,053 tiles
   (8,213 frames), and TD's are about 200 names each. A set of pieces that tile together fits; tens of thousands of
   unique pieces don't.
-- **Frames named `.tga` in the XML can ship as `.DDS`** at the same path, and the launcher draws the DDS.
+- **Frames can ship as loose DDS** at the same path, which keeps a reskin's video memory down: see
+  [Sprite memory and DDS](../art/sprite-memory-and-dds.md).
 
 **Per-map art without new names:** `Data/XML/TILEPATCHES/` holds per-map cell placements
 (`MAPS/<game>/<MAP>_MAPPATCHES.XML`) and animated multi-cell texture blocks (`PATCHES/<name>_PATCH.XML`, with a
