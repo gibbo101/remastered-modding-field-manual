@@ -6,7 +6,7 @@ holds_for: Steam build 21590013
 instanceserverg_version: 1.153 (745903)
 instanceserverg_sha256: 8d66c63b02ca71e6cf52502bd5d7d2be499ca79822f09717c556161e37791e5d
 status: partly proven
-unproven: [LAN games with a joiner on a big map, how the lobby reads a 256-wide map's start markers, maps past 255 cells a side (would need 32-bit coordinates and launcher patches)]
+unproven: [LAN games with a joiner on a big map, how EA's stock pathfinder (no A*) performs on a big map, how the lobby reads a 256-wide map's start markers, maps past 255 cells a side (would need 32-bit coordinates and launcher patches)]
 ---
 
 > [!NOTE]
@@ -176,7 +176,9 @@ export checks every cell. A 512 × 512 map is four times the per-tick export wor
 
 ## Costs
 
-Measured on the Steam Deck, with a 253×253 map, eight players (seven AI) and the server's 59 ticks a second:
+Measured on the Steam Deck, with a 253×253 map, eight players (seven AI) and the server's 59 ticks a second. The
+mod measured uses an A* pathfinder (below), not Red Alert's own. A mod on the stock pathfinder will have different
+pathfinding costs.
 
 | Per tick | Early game | Late game, 25 minutes in |
 |---|---|---|
@@ -188,9 +190,12 @@ Measured on the Steam Deck, with a 253×253 map, eight players (seven AI) and th
 At its worst the server spends about 8 ms of each 17 ms tick, and the match ran 25 minutes without a fault. A
 200×200 skirmish plays with no slowdown felt.
 
-- **Long orders need coarse routing.** Red Alert's A* gives up at its node budget on a long route, and a unit
-  retrying at each looser move type costs 10–20 ms in one tick: the spikes in the table. Route far orders over a
-  coarse graph of map sectors first, and send A* to a waypoint along it.
+- **The pathfinder decides the spikes.** Stock Red Alert has no A*: EA's `Find_Path` (`FINDPATH.CPP`) follows
+  edges around obstacles. The mod measured here uses an A* pathfinder ported from CFE Patch Redux, with a budget of
+  4,096 node expansions. On a long route A* runs out of budget, and a unit retrying at each looser move type costs
+  10–20 ms in one tick: the spikes in the table. The fix there is coarse routing. Route far orders over a graph of
+  map sectors first, and send A* to a waypoint along it. How EA's stock pathfinder behaves on a 253×253 map hasn't
+  been measured.
 - **Per-cell exports grow with the area.** The shroud and occupier exports write an entry per cell. While units are
   selected, the player-info export checks the action for every cell: about 64,000 on a 253×253 map, against at most
   16,384 before.
