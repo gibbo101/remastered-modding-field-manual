@@ -1,10 +1,10 @@
 ---
 title: Adding a theatre of your own
-description: A brand-new terrain theatre for Red Alert, beyond its own three and TD's three. The slot, DLL and template steps are proven with TD's theatres; a tileset file of your own, its video-memory cost, and converting isometric (Tiberian Sun) terrain onto Red Alert's square grid are still open.
+description: A custom terrain theatre for Red Alert. The slot and DLL steps are proven with TD's theatres, but a new terrain template name with loose art crashes the launcher, so custom terrain is drawn by reskinning existing template names; isometric (Tiberian Sun) conversion is still open.
 tags: [maps, terrain, theatres, tilesets, dll, tiberian-sun]
 holds_for: Steam build 21590013
 status: partly proven
-unproven: [whether the launcher loads a terrain tileset file not named in TILESETS.XML, whether a terrain tileset costs video memory whole or per tile drawn, theatre slots past 5, two slots naming one tileset, a converted Tiberian Sun theatre playing end to end]
+unproven: [any route to new terrain template names (new names with loose art crash the launcher), TILEPATCHES as a whole-theatre route, whether a terrain tileset costs video memory whole or per tile drawn, theatre slots past 5, a converted Tiberian Sun theatre playing end to end]
 ---
 
 > [!NOTE]
@@ -17,8 +17,9 @@ source in January 2025, so this should hold.
 
 **HD mode only.** This page describes the HD renderer. See [HD-only mods](../getting-started/hd-only-mods.md).
 
-**Status:** partly proven. Adding a theatre works, with TD's three as the proof. A theatre with a terrain tileset
-of your own hasn't been played end to end yet. This page says which part is which.
+**Status:** partly proven, with one hard wall. Adding a theatre works, with TD's three as the proof. But the
+launcher can't draw terrain art under a template name it doesn't already have: **a new template name with loose
+art crashes it.** Custom terrain has to be drawn under existing names. This page says which part is which.
 
 ## When you need this
 
@@ -26,40 +27,55 @@ When your mod wants terrain the base game doesn't have: Tiberian Sun's temperate
 If TD's desert, temperate or winter will do, use [TD theatres in Red Alert](../using-what-the-player-owns/td-theatres-in-red-alert.md)
 instead, which is proven and draws its art from the base game.
 
-## What's proven: the theatre itself
+## The wall: no new terrain template names
 
-A new theatre takes the same steps as a TD one. Each step below is proven by TD's three theatres, in slots 3 to 5:
+The launcher draws terrain templates only from the base game's own art. Give a template a new name, ship its art
+loose, and register it in a tileset: the tileset loads, but the launcher crashes the moment a placed tile renders
+(`0xC0000005`, its fatal-assert address `0x56A539`; see [Crash triage](../troubleshooting/crash-triage.md)). The
+DDS format, a replacement `CONFIG.MEG` and the file's load path were each ruled out as the cause. Your DLL can't
+fix this: it only hands the launcher each cell's template name, and the art behind the name is the launcher's.
 
-1. **A launcher slot.** Add an entry to `CNCRATheaterTilesets` in `GameConstants_Mod.xml` naming your terrain
+TD's theatres work because every TD template name is already in the base game. New *object* names (units,
+effects, trees with art of their own) are a different system, and they do render.
+
+## What works: new art under existing names
+
+**A loose file at an existing template's path replaces its art.** For example,
+`Data/ART/TEXTURES/SRGB/RED_ALERT/TERRAIN/TEMPERATE/<NAME>.TEM/<NAME>.TEM-0000.DDS` shadows the base game's frame,
+with no DLL needed. The radar samples the new art too, so the minimap matches.
+
+- **It reskins, it doesn't add.** The names, shapes, sizes and land types stay the stock template's. Only the
+  pixels change.
+- **It changes that theatre everywhere.** The path is per theatre, so every map in that theatre gets the new look.
+  A custom look in its own theatre slot means giving up a stock theatre you don't use, or reskinning one only your
+  mod's maps use.
+- **The capacity is the stock tileset's.** Red Alert's temperate tileset has 331 template names in 2,053 tiles
+  (8,213 frames), and TD's are about 200 names each. A set of pieces that tile together fits; tens of thousands of
+  unique pieces don't.
+- **Frames named `.tga` in the XML can ship as `.DDS`** at the same path, and the launcher draws the DDS.
+
+**Per-map art without new names:** `Data/XML/TILEPATCHES/` holds per-map cell placements
+(`MAPS/<game>/<MAP>_MAPPATCHES.XML`) and animated multi-cell texture blocks (`PATCHES/<name>_PATCH.XML`, with a
+frame rate). Loose copies override them, with no size rule. **Unproven** as a route for a whole custom theatre.
+
+## The theatre itself
+
+The slot and DLL steps are the same as for a TD theatre, and each is proven by TD's three, in slots 3 to 5:
+
+1. **A launcher slot.** Add an entry to `CNCRATheaterTilesets` in `GameConstants_Mod.xml` naming the terrain
    tileset. The slot's position is its theatre number.
 2. **A DLL theatre.** Add a `TheaterType` value after the existing ones, with the same number as the slot, and a
    row in `Theaters[]` naming it for maps' `Theater=` key.
 3. **Templates.** Every terrain piece is a DLL template, flagged for the theatres that draw it, with classic data
    giving its size and the land type of each cell. `TemplateType` is an `unsigned short`, so there's room past 255
-   templates.
-4. **Names on the wire.** On your theatre, export each cell's template under the name your tileset uses, and
-   anything the tileset can't draw as `CLEAR1`. Make sure your tileset has a `CLEAR1`.
+   templates, but every name has to be one the launcher can draw (above).
+4. **Names on the wire.** On your theatre, export each cell's template under its tileset name, and anything the
+   tileset can't draw as `CLEAR1`.
 
-**Terrain frames can be loose DDS.** A tileset XML can name a frame `t17.tem\t17.tem-0000.tga` while the mod ships
-`T17.TEM/T17.TEM-0000.DDS` in its place, and the launcher draws the DDS. That's proven by a shipped terrain object.
-Compressed DDS frames take far less video memory than TGA, which matters for a large tileset.
-
-## What's open: the tileset file
-
-The launcher loads only the tileset files its index, `DATA\XML\TILESETS.XML`, names. That's 19 files: TD's, Red
-Alert's and the `Common_` ones (see [Overriding the launcher's data](../launcher-data/overriding-launcher-data.md)).
-TD's theatres work because `TD_Terrain_Desert`, `_Temperate` and `_Winter` are already on the list. A new file such
-as `TS_Terrain_Temperate.xml` isn't. Three routes, none tested yet:
-
-- **Ship a loose `TILESETS.XML`** naming your file as well. The most promising route: a published mod adds files
-  this way through two of `CONFIG.MEG`'s other indexes (objects and sound events). **Unproven** for the tileset
-  index.
-- **Add your tiles to a listed terrain tileset**, under template names of your own, and point your slot at that
-  tileset. **Unproven** whether two slots can name one tileset. Tile names must not clash with the stock theatre's.
-- **Replace a listed tileset you don't use** with your own contents under its name. It works as file overriding,
-  but you lose that theatre.
-
-Find out which route works before building any art.
+**A new tileset file** only matters once you have names the launcher can draw. The launcher loads only the files
+its index, `DATA\XML\TILESETS.XML`, lists (19 files). A published mod adds files through two of `CONFIG.MEG`'s other
+indexes with loose copies, so a loose `TILESETS.XML` may work. **Unproven**, and under the wall above it wouldn't
+open new art anyway.
 
 ## What's open: video memory
 
@@ -94,7 +110,9 @@ camera, rotated 45° and squashed 2:1. So a TS map can be laid on Red Alert's gr
 
 **Unproven end to end:** a converter written this way lays TS's multiplayer maps on the grid. The shortest routes
 between start points come out at 0.93 to 1.04 times TS's own on 33 of 39 maps, and the art probes draw them with
-TS's tiles. No converted map has been played as a theatre yet. Red Alert 2 uses the same map and tile formats, so
+TS's tiles. No converted map has been played as a theatre yet. The wall above changes the art plan: TS's pieces
+would have to be drawn under existing template names, which suits a small set of pieces that tile together, not
+TS's tens of thousands of unique ones. Red Alert 2 uses the same map and tile formats, so
 the same method would apply to its theatres.
 
 ## How it was verified
@@ -102,17 +120,24 @@ the same method would apply to its theatres.
 - **The theatre steps:** TD's three theatres, proven in a shipped mod; see
   [TD theatres in Red Alert](../using-what-the-player-owns/td-theatres-in-red-alert.md) for their three-way
   checks. `TemplateType`'s width is in the mod's source.
-- **Loose DDS frames:** a shipped mod's tileset XML names `.tga` frames that ship only as `.DDS`, and they draw.
+- **The wall:** a working mod's investigation, which hit the crash with several new template names and ruled out
+  the DDS format, a replacement `CONFIG.MEG` and the load path; the crash address disassembled from `ClientG.exe`
+  on disk (a deliberate write after an assert flag test); and no published mod adding new terrain template names.
+- **Reskinning existing names:** Reilsss's Desert mod (Workshop 2833233740) ships 8,305 loose `.DDS` frames at
+  stock template paths and per-map `TILEPATCHES`, with no DLL. A shipped mod's tileset XML names `.tga` frames that
+  ship only as `.DDS`, and they draw. The tile and name counts were read from the stock tilesets for this page.
 - **The tileset index:** the stock `TILESETS.XML` in `CONFIG.MEG`, read for this page.
 - **The TS method:** a converter and art probes in a working mod's development branch, with the route measurements
   above. Nothing past that is proven.
+
+**Credit:** Reilsss's Desert mod is the public proof that terrain reskins need only data.
 
 > [!TIP]
 > **In Tiberian Factions**
 >
 > TF plans Tiberian Sun's Temperate and Snow as theatres 6 and 7, with TS's own multiplayer maps converted onto them
-> and drawn with TS's art. The converter and art probes exist on a development branch. The work is parked until the
-> video-memory test picks the art route: TS's own tiles, one piece per cell, or a smaller square tile set made from
-> TS's art.
+> and drawn with TS's art. The converter and art probes exist on a development branch, and the work is parked. The
+> template wall means the art has to be drawn under existing template names, which favours a small set of pieces
+> made from TS's art that tile together over TS's own tiles one piece per cell.
 >
 > <!-- screenshot: a converted TS map preview beside TS's own view of the same map -->
