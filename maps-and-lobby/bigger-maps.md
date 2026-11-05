@@ -6,7 +6,7 @@ holds_for: Steam build 21590013
 instanceserverg_version: 1.153 (745903)
 instanceserverg_sha256: 8d66c63b02ca71e6cf52502bd5d7d2be499ca79822f09717c556161e37791e5d
 status: partly proven
-unproven: [LAN games with a joiner on a big map, how EA's stock pathfinder (no A*) performs on a big map, how the lobby reads a 256-wide map's start markers, maps past 255 cells a side (would need 32-bit coordinates and launcher patches)]
+unproven: [LAN games with a joiner on a big map, a map editor for the 256 grid (none exists yet), how EA's stock pathfinder (no A*) performs on a big map, how the lobby reads a 256-wide map's start markers, maps past 255 cells a side (would need 32-bit coordinates and launcher patches)]
 ---
 
 > [!NOTE]
@@ -133,6 +133,21 @@ aircraft sections, `[Base]`, and team move-to-cell missions).
   different x and y on the 256 grid. Convert every cell number as you read it, and never rewrite the files.
   Every existing map then loads unchanged, official maps included.
 - **Saves change layout.** Saves from a 128-grid build won't load. See [Save versions](../engine/save-versions.md).
+
+## The other limit: no editor makes them yet
+
+A bigger grid is only half the job: someone has to make the maps. Today no map editor can.
+
+- **EA's map editor**, in the released source, caps a Red Alert map at 128 × 128
+  (`MaxSize = new Size(128, 128)` in `CnCTDRAMapEditor/RedAlert/Constants.cs`).
+- **The community's Mobius editor**, a fork of EA's, keeps the same cap.
+- **[cnc-map-editor](https://github.com/gibbo101/cnc-map-editor)**, a Linux-native, mod-aware editor for Red
+  Alert and Tiberian Dawn by this manual's author, is a work in progress. It also stops at 128 × 128 for now.
+  Because it learns a mod's types and theatres from data, it's the natural place for 256-grid support to land.
+
+Until then, big maps are written by script: a program that writes the format-4 scenario directly, cell numbers
+and MapPack included. That's fine for test maps, such as open ground, mazes and ore fields at each start, but not
+for maps people want to play.
 
 ## Why 255, and what going further would take
 
