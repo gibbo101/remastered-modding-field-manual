@@ -156,7 +156,7 @@ memory.
 > [!TIP]
 > **In Tiberian Factions**
 >
-> TF adds Tiberian Dawn's and Tiberian Sun's vehicles this way, each appended to the end of the enum and the heap.
+> TF adds Tiberian Dawn's, Tiberian Sun's, Red Alert 2's and C&C3's vehicles this way, each appended to the end of the enum and the heap.
 > Its classic shapes live in one MIX of its own, opened at start-up: TD's own shapes for TD units, and transparent
-> stubs for Tiberian Sun and C&C3 units (the Titan's stub has 128 frames, matching its HD art). A TD unit's HD art
+> stubs for Tiberian Sun, Red Alert 2 and C&C3 units (the Titan's stub has 128 frames, matching its HD art). A TD unit's HD art
 > comes from the base game, and the classic shape only sets its size.

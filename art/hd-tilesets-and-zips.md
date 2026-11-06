@@ -121,7 +121,7 @@ type's `ImageData` as a donor, fixes it. The DLL side is on [Adding a unit](../u
 > [!TIP]
 > **In Tiberian Factions**
 >
-> TF's TD, Tiberian Sun and C&C3 types ship as `TD`, `TS`, `R2` and `C3`-prefixed tiles in patched copies of Red
+> TF's TD, Tiberian Sun, Red Alert 2 and C&C3 types ship as `TD`, `TS`, `R2` and `C3`-prefixed tiles in patched copies of Red
 > Alert's three object tilesets. Its build merges every unit's tiles and buildables entries into those files, and
 > packs its art at 8 canvas pixels per classic pixel for the zoomed-in view. Its HD-only types are sized by a
 > transparent classic shape of the right size, or by a stock type's shape as a donor. A Tiberian Sun power plant's

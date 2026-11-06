@@ -140,8 +140,8 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
   canvas, and DXT shifts greys toward team-colour green.
 - [Sidebar cameos](art/sidebar-cameos.md): stock cameos are 341x256 BUILDICON_* atlas regions; new ones are loose
   TGA or DDS; the DLL's sidebar AssetName picks the entry, so per-player suffixes swap cameos at runtime.
-- [Porting art from other C&C games](art/porting-art-from-other-games.md): Tiberian Sun voxels/SHPs and C&C3
-  models into HD sprites: a 32-degree camera, 32 counter-clockwise facings from north, pure-green team colour,
+- [Porting art from other C&C games](art/porting-art-from-other-games.md): Tiberian Sun voxels/SHPs, Red Alert 2 voxels
+  and C&C3 models into HD sprites: a 32-degree camera, 32 counter-clockwise facings from north, pure-green team colour,
   a baked shadow.
 - [Building selection boxes](art/building-selection-boxes.md): the launcher centres a building's selection box on
   its plot and takes only the size from the DLL; a misplaced box means the art is seated off the plot's centre.

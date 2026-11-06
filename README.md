@@ -112,7 +112,7 @@ what it does with the technique.
   tying it to its type.
 - [Sprite memory and DDS](art/sprite-memory-and-dds.md): keeping a big mod's art inside video memory.
 - [Sidebar cameos](art/sidebar-cameos.md): new build icons, and icons that change with the player.
-- [Porting art from other C&C games](art/porting-art-from-other-games.md): Tiberian Sun and C&C3 units as HD
+- [Porting art from other C&C games](art/porting-art-from-other-games.md): Tiberian Sun, Red Alert 2 and C&C3 units as HD
   Remastered sprites.
 - [Building selection boxes](art/building-selection-boxes.md): the launcher places the box, and your DLL only sizes
   it.
