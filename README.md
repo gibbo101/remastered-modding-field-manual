@@ -109,6 +109,29 @@ what it does with the technique.
   traps of giving a new building its own exit path.
 - [Porting Tiberian Dawn units](units/porting-td-units.md): bringing TD units' behaviour into Red Alert's engine.
 
+### AI and pathfinding
+- [The skirmish AI and its IQ levels](ai/skirmish-ai-and-iq.md): how the computer player builds and scales with
+  difficulty, and the stock gaps every DLL mod inherits.
+- [Pathfinding](ai/pathfinding.md): the stock pathfinder's limits, and A*, give-way and give-up fixes that work.
+- [Harvesters](ai/harvesters.md): why harvesters get stuck or crowd one refinery, and the fixes.
+
+### New unit behaviours
+- [Gates](behaviours/gates.md): wall sections that open for their owner and allies, and why they need a zone
+  rebuild.
+- [Subterranean units](behaviours/subterranean-units.md): units that dig, travel underground and surface, from TS's
+  tunnel locomotion.
+- [Firestorm Defense](behaviours/firestorm-defense.md): a toggled, charge-draining defensive field, and line fill
+  for every wall.
+- [A stealth generator](behaviours/stealth-generator.md): cloaking a base through Red Alert's own cloak system.
+- [EMP and stun](behaviours/emp-and-stun.md): disabling vehicles and buildings for a time, and showing hidden
+  enemies.
+- [The Tiberium ecosystem](behaviours/tiberium-ecosystem.md): Tiberium beside ore, with blossom trees, infantry
+  damage and Visceroids.
+- [Air delivery, fleets and support powers](behaviours/air-delivery-and-fleets.md): TD's cargo-plane delivery,
+  faction navies and air forces.
+- [Jumpjets, deployers, mines and bouncing discs](behaviours/jumpjets-deployers-and-more.md): smaller TS behaviours
+  and the engine checks they hit.
+
 ### Art
 - [How the launcher draws sprites](art/how-the-launcher-draws-sprites.md): canvas-centre anchoring, shape and
   frame limits, the alpha cutoff, baked shadows and beams.

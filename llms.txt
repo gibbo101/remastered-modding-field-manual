@@ -132,6 +132,36 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [Porting Tiberian Dawn units](units/porting-td-units.md): Speed = round(MPH x 100 / 256); Tracked= for SPEED_TRACK;
   fill RA-only geometry; ANIM_FRAG2 loads "FRAG3"; TD text IDs don't exist in RA; cloak/scanner is one system.
 
+## AI and pathfinding
+
+- [The skirmish AI and its IQ levels](ai/skirmish-ai-and-iq.md): skirmish runs as GAME_GLYPHX_MULTIPLAYER so campaign
+  AI paths are skipped; [IQ] gates each behaviour and every skirmish AI gets MaxIQ; IQ below Production (5) stops base
+  building; difficulty is a stat handicap; stock gaps: no skirmish ships, radar only vs air, stubbed urgency checks.
+- [Pathfinding](ai/pathfinding.md): stock RA has no A* (EA's edge-following Find_Path); zones ignore buildings;
+  allied vehicles head-on are MOVE_NO. Fixes: cfehunter's CFE A* (expansion cap, binary heap, per-cell visited
+  table), give-way plus corridor claims, a no-progress give-up.
+- [Harvesters](ai/harvesters.md): stock latches and overwritten orders strand harvesters; fixes: a no-progress
+  detector, field blacklist, home rescan, watchdog, CFE refinery load-balancing.
+
+## New unit behaviours
+
+- [Gates](behaviours/gates.md): RA has no gates; a gate is a building in a wall line, opened by an ally's request
+  before each step (TS Try_Open_Gate), held open while occupied, closed after GateCloseDelay; rebuild zones after.
+- [Subterranean units](behaviours/subterranean-units.md): port of TS's tunnel locomotion (OpenTS tunnel.cpp): a
+  state machine, a live object moving in a straight line, hidden through the cloak check, legal surfacing cells.
+- [Firestorm Defense](behaviours/firestorm-defense.md): a charge-drain superweapon toggled by a patched cameo click;
+  live sections kill, block and eat shots; airborne damage doubled because flying aircraft take half; line fill.
+- [A stealth generator](behaviours/stealth-generator.md): set IsCloakable and let Cloaking_AI cloak; buildings never
+  copy IsCloakable; scanner detection is one-way; hide bibs at draw time.
+- [EMP and stun](behaviours/emp-and-stun.md): RA has no timed stun (its Stun() only clears targets); port of OpenTS's
+  EMPulseClass: Damage = duration, Spread = radius, stun gates per action.
+- [The Tiberium ecosystem](behaviours/tiberium-ecosystem.md): RA ore is LAND_TIBERIUM, so Tiberium needs its own
+  overlay; the launcher's IsResource covers only GOLD1-GEMS4; blossom trees; infantry damage; Visceroids.
+- [Air delivery, fleets and support powers](behaviours/air-delivery-and-fleets.md): RA has no cargo plane; TD's
+  airstrip calls Create_Special_Reinforcement; aircraft need a rules.ini section and non-null ImageData.
+- [Jumpjets, deployers, mines and bouncing discs](behaviours/jumpjets-deployers-and-more.md): MissionClass::AI skips
+  non-aircraft with Height > 0; deploy where the build-up starts; drone mines as buildings; Distance() runs long.
+
 ## Art
 
 - [How the launcher draws sprites](art/how-the-launcher-draws-sprites.md): an HD frame's .meta is a canvas size
