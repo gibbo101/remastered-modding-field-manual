@@ -103,6 +103,8 @@ what it does with the technique.
 - [Raising the limits](units/raising-the-limits.md): how many types and objects the engine allows, and how to raise
   each.
 - [Turrets](units/turrets.md): giving a unit a turret, and making turretless guns aim.
+- [Units leaving buildings: exits and rails](units/exits-and-rails.md): how a unit drives out of a factory, and the
+  traps of giving a new building its own exit path.
 - [Porting Tiberian Dawn units](units/porting-td-units.md): bringing TD units' behaviour into Red Alert's engine.
 
 ### Art

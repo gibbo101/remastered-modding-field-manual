@@ -123,6 +123,9 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
   sidebar column has a stock off-by-one.
 - [Turrets](units/turrets.md): turret frame = body frame + 32 (hull 0-31, turret 32-63); the second draw is limited
   to shapes 0-127 in HD; Fire_Coord offsets; turretless units turn to aim only if tracked, else set is_lock_turret.
+- [Units leaving buildings: exits and rails](units/exits-and-rails.md): Exit_Object places a war factory's unit at
+  Exit_Coord facing south and drives it out by radio tether; vehicles follow fixed DRIVE.CPP tracks (TrackNumber is
+  saved); a new exit path is a per-unit straight-line rail, never a shared static table; sort under the doorway.
 - [Porting Tiberian Dawn units](units/porting-td-units.md): Speed = round(MPH x 100 / 256); Tracked= for SPEED_TRACK;
   fill RA-only geometry; ANIM_FRAG2 loads "FRAG3"; TD text IDs don't exist in RA; cloak/scanner is one system.
 
