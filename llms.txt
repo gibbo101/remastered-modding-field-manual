@@ -39,7 +39,8 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 
 - [Overriding the launcher's data](launcher-data/overriding-launcher-data.md): a loose file under Data/ replaces
   its CONFIG.MEG member whole; a replacement CONFIG.MEG must keep every member's exact size; GameConstants_Mod.xml
-  merges over GameConstants.xml (overwrite="true" replaces a list). The instance server reads none of them.
+  merges over GameConstants.xml (overwrite="true" replaces a list). The instance server reads none of them. Team
+  colours are an example: loose CNCRATEAMCOLORS.XML or CNCTDTEAMCOLORS.XML, one HSV-shift entry per house.
 - [New text strings](launcher-data/new-text-strings.md): add strings with a loose Data/ModText.csv (UTF-16 LE with
   a BOM; TEXT ID, AUDIO TAG, CHARACTER, then a column per language), merged at load; the MASTERTEXTFILE .LOC table
   can only be relabelled at its exact size.
@@ -238,7 +239,7 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [Open questions](open-questions.md): unproven research only, never a recipe. Scripted co-op missions, players
   changing the rules, Tiberian Sun theatres, music built from the player's own copy, tileset video memory, which
   mod's loose file wins, theatre slots past 5, building placement on a 253x253 map, hiding units from radar, how a
-  campaign ends, untouched launcher data (colours, cursors, lobby lists). Each entry links TF's design doc.
+  campaign ends, untouched launcher data (cursors, lobby lists, slash commands). Each entry links TF's design doc.
 
 ## Optional
 

@@ -108,19 +108,19 @@ A unit that can be seen on the map but not on the enemy's minimap.
   it, and watch for the credits. Then cut a stage's campaign-map entry to one mission.
 - **Full context:** TF's [campaigns page doc](https://github.com/gibbo101/cnc-ra-tiberian-factions/blob/main/docs/campaigns-page.md).
 
-## Launcher data nobody has changed yet
+## Launcher data no mod is known to have changed
 
-Team colours, cursors, lobby option lists, the bonus gallery, slash commands and UI hints are all data in
-`CONFIG.MEG`.
+Cursors, lobby option lists, the bonus gallery, slash commands and UI hints are all data in `CONFIG.MEG`.
+Team colours are the same kind of data, and published mods do change them (see
+[Overriding the launcher's data](launcher-data/overriding-launcher-data.md)).
 
-- **Established:** `CNCRATEAMCOLORS.XML` and `CNCTDTEAMCOLORS.XML` key colour transforms by country.
-  `MOUSEPOINTERS.XML` has 90 entries (texture and hotspot). The lobby lists (`CNCStartingUnits`,
+- **Established:** `MOUSEPOINTERS.XML` has 90 entries (texture and hotspot). The lobby lists (`CNCStartingUnits`,
   `CNCStartingCredits` and others) are `<Entry>` lists in `GameConstants.xml`. `CNCRABONUSCONTENT.XML` has 87 gallery
   entries, `SLASHCOMMANDS.XML` 203 commands with permission letters, and `UIHINTS.XML` ships every hint commented out.
   `CNCRULES.XML` has a per-difficulty table marked `network="server"`.
 - **Untested:** whether a loose or `GameConstants_Mod.xml` change to any of these shows in game; whether ClientG
   honours slash-command permissions from data; whether UI hints are live; whether `CNCRULES.XML` is read at all.
-- **The test:** one change each (a recoloured country, a new cursor texture, a tenth starting-units entry, a relaxed
+- **The test:** one change each (a new cursor texture, a tenth starting-units entry, a relaxed
   permission letter, one uncommented hint), launched once.
 - **Full context:** TF's [CONFIG.MEG lever audit](https://github.com/gibbo101/cnc-ra-tiberian-factions/blob/main/docs/config-meg-lever-audit.md).
 

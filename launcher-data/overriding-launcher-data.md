@@ -79,6 +79,18 @@ only the constants you change. A list is appended to unless you mark it `overwri
 Ship it as `Data/XML/GameConstants_Mod.xml`. **Unproven:** Vanilla Conquer's TD sample places the file at the
 mod's root instead. Whether the launcher also reads it there hasn't been tested.
 
+## Example: team colours
+
+House colours are launcher data. `Data/XML/CNCRATEAMCOLORS.XML` and `CNCTDTEAMCOLORS.XML` in `CONFIG.MEG` hold one
+`TeamColorTypeClass` per house name, each a variant of `BASE_TEAM`. Red Alert's has 21: `BASE_TEAM`, the nine
+countries, `GOOD`, `BAD`, `NEUTRAL`, `JP` and `MULTI1` to `MULTI8`. Tiberian Dawn's has 11, with `MULTI1` to
+`MULTI6` and separate `BAD_UNIT` and `BAD_STRUCTURE` entries. Each entry gives an RGB range of the art to recolour
+(`LowerBounds`, `UpperBounds`), an `HSVShift` and input and output levels.
+
+Ship a whole edited copy loose at the same path. Published mods do: Reilsss's C&C in RA recolours a dozen of Red
+Alert's houses, and CFE Patch Redux's Tiberian Dawn copy rearranges TD's multiplayer colours and adds `MULTI7` and
+`MULTI8` for its eight-player games.
+
 ## What none of them reach
 
 - **The instance server.** `InstanceServerG.exe` runs the match and resolves instances and map files from the base
@@ -114,6 +126,9 @@ mod's root instead. Whether the launcher also reads it there hasn't been tested.
 
 ## How it was verified
 
+- **Team colours:** the stock files extracted from `CONFIG.MEG`, compared with the copies three published Workshop
+  mods ship (Reilsss's C&C in RA, CFE Patch Redux, and a veterancy mod that adds the same two TD entries); CFE's
+  credits list its TD colour rearrangement and eight-player TD.
 - **Loose files and the replacement archive:** a byte-identical repack of `CONFIG.MEG` with one string edited
   showed in the lobby when shipped in a mod folder. Loose `INSTANCES.XML`, `CNCMAPPREVIEWDATA.XML`, tileset, sound
   and `.BUI` files all load in a shipped mod. The size-rule crash and its signature were hit, then fixed by padding.
