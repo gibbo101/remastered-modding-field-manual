@@ -86,6 +86,7 @@ ZIPs.**
 > **In Tiberian Factions**
 >
 > TF keeps the preload on whatever the player's launch options say, since its shared art and base-game TD art
-> depend on it: a launcher patch skips the option's test (`ClientG.exe` 1.153 (745903), at `0x7AE14B`). TF ships
+> depend on it: a launcher patch skips the option's test (`ClientG.exe` 1.153 (745903), `cmp byte [0x1F7F455], 0` at `0x7AE14B`,
+the byte the option clears). TF ships
 > its UI atlas as a 62 MB DDS instead of a 176 MB TGA, and 552 cameos as DDS (about 33 MB instead of 176 MB). Its
 > unit and building sprites stay in ZIPs, after the DDS trial speckled its construction yards.

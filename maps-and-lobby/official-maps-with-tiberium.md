@@ -89,7 +89,11 @@ official map's thumbnail is a pre-rendered texture in `TEXTURES_SRGB.MEG`,
   (`_111_`, 126 × 64 cells) fills rows 126 to 385 of the 512, with black above and below.
 - **Repaint only the converted cells.** Map each converted cell to its pixels with that rule, recolour the ore there,
   and leave the rest of the image alone.
-- **Write it back the same shape.** Same size, format and mip count as the stock file. A DDS of the same name loose
+- **Trees and mines aren't drawn.** The thumbnail shows terrain and overlays only, so a resource source you add
+  as a building or tree needs no paint (observed: none of Keep off the Grass's 14 trees shows).
+- **Write it back the same shape.** Same size, format and mip count as the stock file. The 349,680 bytes are the
+  128-byte DDS header (the `DDS ` magic and its 124-byte header) and 349,552 bytes of DXT5 blocks for the ten mips,
+  512 × 512 down to 1 × 1. Reuse the stock file's header and write only new blocks. A DDS of the same name loose
   under your mod's `Data/ART/TEXTURES/SRGB/` replaces the stock one (see
   [Overriding the launcher's data](../launcher-data/overriding-launcher-data.md)).
 
@@ -127,7 +131,8 @@ resource's tiles to the tileset of every theatre your converted maps use: for sn
   holds ten `SCM…EQ.INI` files; the theatre, `[STRUCTURES]` and `[Digest]` of all 230; `MAIN.MIX`'s header flags
   (0); `SCM05EA.INI`'s sections, its three mines and its
   bounds and starts, matching its preview entry; the repeated starts in `SCMD2EA.INI`; the stock thumbnails' size,
-  format and mip count; Docklands' thumbnail rows; and no `TIB01` tile in Red Alert's stock snow and temperate
+  format and mip count, and that size worked out from the DDS layout (a 16-byte block per 4 × 4 pixels, at least
+  one block a mip); the Keep off the Grass thumbnail beside its map's `[TERRAIN]` trees; Docklands' thumbnail rows; and no `TIB01` tile in Red Alert's stock snow and temperate
   tilesets.
 - **A working mod:** 151 official maps rebuilt this way, each with its repainted thumbnail, shipped as data. Keep off
   the Grass was played on the Steam Deck with its East field as Tiberium and its blossom tree standing in it, and the

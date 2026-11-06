@@ -1,6 +1,6 @@
 ---
 title: Porting Tiberian Dawn buildings and defences
-description: The lessons for bringing Tiberian Dawn's buildings and defences into Red Alert's engine as types of their own. Why sharing a Red Alert type fails, reading TD's constructor and its per-type code, the SAM site's rise-and-lower cycle, the Obelisk's charge and laser, muzzle offsets, build-ups, overlays, placement, the prerequisite bitfield, and the traps.
+description: The lessons for bringing Tiberian Dawn's buildings and defences into Red Alert's engine as types of their own. Why sharing a Red Alert type fails, reading TD's constructor and its per-type code, the SAM site's rise-and-lower cycle, the Obelisk's charge (and the Tesla-only tests it needs) and laser, directional muzzle flashes and offsets, crews, build-ups, overlays, placement and the bib in its preview, Points=, the prerequisite bitfield, and the traps.
 tags: [buildings, defences, tiberian-dawn, porting, dll, rules-ini]
 holds_for: Steam build 21590013
 status: verified
@@ -116,6 +116,10 @@ primary weapon has `Charges=yes`, but the details are the Tesla's, hardcoded: 3 
 and the Tesla's power-up sound. An Obelisk on it charges in under two seconds instead of four, and its stage runs
 past its four charge frames into its damaged frames. Make the rate, the last stage and the sound depend on the type.
 
+Two more tests name only the Tesla Coil. `BuildingClass::Shape_Number` draws the charge stage as the frame only for
+`STRUCT_TESLA`, and `Animation_AI` leaves a building's stage alone only if it has a turret or is `STRUCT_TESLA`.
+Add your type to both, or the charge never shows and the idle animation runs over the charge stage.
+
 `Charges=yes` does two more things in `TechnoClass::Fire_At`: it draws the Tesla's lightning to the target, and
 runs the bullet's logic at once. A laser wants the second and not the first, so skip the lightning for it.
 
@@ -132,8 +136,11 @@ TD's line intercept, and the launcher draws the beam in Red Alert.
   layout. Add your silo to the test.
 - **A barracks' exit.** `Exit_Object` finds a free exit cell for infantry only for `STRUCT_BARRACKS`, `STRUCT_TENT`
   and `STRUCT_KENNEL`. See [Units leaving buildings](exits-and-rails.md).
-- **The crew.** `BuildingClass::Crew_Type` has cases for the silo, kennel and barracks. Anything else gets
-  `TechnoClass::Crew_Type`: a rifleman, or for a building with no weapon a 15% chance of a civilian.
+- **The crew.** `BuildingClass::Crew_Type` has cases by type: the silo gives a civilian, the construction yard a
+  25% chance of an engineer (for a human owner, unless it was captured), the kennel a 50% chance of a dog, and the
+  barracks and tent a rifleman. Anything else gets `TechnoClass::Crew_Type`: no one unless the type is crewed, a
+  random civilian for a neutral house, and otherwise a rifleman, or for a building with no weapon a 15% chance of a
+  civilian. A TD building whose survivors should be TD's infantry needs a case of its own.
 - **Power.** TD hardcodes its Advanced Guard Tower to hold fire on low power (`Can_Fire`). Red Alert does the same
   from data: `Powered=yes` in the building's section.
 
@@ -147,6 +154,12 @@ see [Porting Tiberian Dawn units](porting-td-units.md). Two things differ for bu
 `BULLET_BULLET`, none for spread fire or a laser, and a muzzle flash for everything else. Red Alert's `Fire_At`
 plays only the weapon's `Anim=`. A TD missile tower ported as it is fires with no flash: give its weapon
 `Anim=GUNFIRE`.
+
+Two `Anim=` names turn with the firer. Each names eight animations, one per direction, and `Anim=` finds the first,
+north. `Fire_At` then adds the direction: `MINIGUN` by the direction of fire, `SAMFIRE` by the firer's
+`PrimaryFacing` (a building's turret, a unit's hull). Any other name plays one animation whichever way the weapon
+points. So `Anim=MINIGUN` is TD's 8-direction gun flash, and `Anim=SAMFIRE` a SAM site's launch flash, with no
+code. Stock `rules.ini` uses them on the Vulcan, ChainGun and M60mg, and on the Nike and RedEye.
 
 **Where shots leave.** TD places a building's muzzle in a per-type switch in its `Fire_Coord`. Red Alert takes it
 from three constructor fields: the vertical offset, the primary weapon's offset and its lateral offset, all in
@@ -186,10 +199,15 @@ offsets. The Obelisk's sideways shift doesn't: a building's constructor passes n
 - **The footprint drives placement.** The DLL exports a building type's occupy list to the launcher, which draws
   the placement grid from it, and `Passes_Proximity_Check` scans the same list (`DLLInterface.cpp`). Copy the
   footprint and size from TD's constructor, so that placement, the art and the footprint agree.
+- **The placement grid includes the bib.** The list exported for placement is `Occupy_List(true)`, which adds the
+  bib's cells to the building's own (`BDATA.CPP`, the same in TD). A 2x2 building with a bib previews
+  three rows tall. Size the building from its `BSIZE_*` and footprint, not from the preview.
 - **Set `Points=`, or the AI ignores the building.** `rules.ini`'s `Points=` sets the type's risk and reward
   (`TechnoTypeClass::Read_INI`). A target's value is its risk plus its reward (`TechnoClass::Value`), and
   `Evaluate_Object` only scores a target whose value isn't zero. A building with no `Points=` is never picked as a
-  target, by enemy units or the AI. Take TD's risk and reward from its constructor.
+  target, by enemy units or the AI. `Points=` sets both risk and reward. TD's constructor has a pair, but TD works
+  out the risk from the weapon and keeps only the reward: use the second number (see
+  [Porting Tiberian Dawn units](porting-td-units.md)).
 
 ## The same pass for TD's rocket launchers and aircraft
 
@@ -208,22 +226,27 @@ offsets. The Obelisk's sideways shift doesn't: a building's constructor passes n
   charge in `BuildingClass::AI`, `OBELISK_ANIMATION_RATE`, the `Fire_At` flash by projectile and the `Fire_Coord`
   switch (TD's `BUILDING.CPP` and `DEFINES.H`); TD's weapon rows (`CONST.CPP`), constructors and footprint lists
   (`BDATA.CPP`), `Lines[3][5]` (`TECHNO.H`) and `DLL_Draw_Line_Intercept` (`DLLInterface.cpp`); the art names in
-  `UDATA.CPP` and the rotor flags in `AADATA.CPP`. Red Alert's `SAMState`, `Shape_Number`, the firing arc, `Powered`
-  in `Can_Fire`, `Charging_AI`, `Crew_Type` in both `BUILDING.CPP` and `TECHNO.CPP`, the `Exit_Object` cases, the
-  `WEAP2` overlay, `Turret_Facing`, `One_Time` with its `MAKE` shapes and the building constructor's offsets
-  (`BDATA.CPP`), `TechnoClass::Fire_Coord`, `Fire_At`'s electric branches and `Anim`
-  (`TECHNO.CPP`, `WEAPON.CPP`), `Get_Buildings` and the `STRUCTF_` bits (`CCINI.CPP`, `DEFINES.H`), `From_Name`, the
-  `Nuke` warhead (`RULES.CPP`), the INI section lookup (`INI.CPP`, and Vanilla Conquer's `common/ini.cpp`),
-  `Points=` and `Value`, the start-up order (`INIT.CPP`), the occupy-list export and `NumLines` (`DLLInterface.cpp`),
-  and the aircraft type checks (`AIRCRAFT.CPP`). The type-check counts were taken with `grep -aw` over Red Alert's
-  `.CPP` files.
-- **The base game's files:** the frame counts of TD's `SAM.ZIP` (129), `SAMMAKE.ZIP` (frames 1 to 29), `ATWR.ZIP`
-  (3), `SILO.ZIP` (11) and `MSAM.ZIP` (96) in `TEXTURES_TD_SRGB.MEG`.
+  `UDATA.CPP` and the rotor flags in `AADATA.CPP`; TD's risk worked out from the weapon (`TECHNO.CPP`) and its
+  bib in `Occupy_List(true)` (`BDATA.CPP`). Red Alert's `SAMState`, `Shape_Number`, the firing arc, `Powered` in
+  `Can_Fire`, `Charging_AI`, the `STRUCT_TESLA` tests in `Shape_Number` and `Animation_AI`, `Crew_Type` in both
+  `BUILDING.CPP` and `TECHNO.CPP`, the `Exit_Object` cases, the `WEAP2` overlay, `Turret_Facing`, `One_Time` with
+  its `MAKE` shapes, the building constructor's offsets and `Occupy_List(true)` with the bib (`BDATA.CPP`),
+  `TechnoClass::Fire_Coord`, `Fire_At`'s electric branches, `Anim` and the turn it gives `MINIGUN` and `SAMFIRE`
+  (`TECHNO.CPP`, `WEAPON.CPP`, the eight entries of each in `ADATA.CPP`), `Get_Buildings` and the `STRUCTF_` bits
+  (`CCINI.CPP`, `DEFINES.H`), `From_Name`, the `Nuke` warhead (`RULES.CPP`), the INI section lookup (`INI.CPP`, and
+  Vanilla Conquer's `common/ini.cpp`), `Points=` and `Value`, the start-up order (`INIT.CPP`), the occupy-list
+  export and `NumLines` (`DLLInterface.cpp`), and the aircraft type checks (`AIRCRAFT.CPP`). The type-check counts
+  were taken with `grep -aw` over Red Alert's `.CPP` files.
+- **The game's files:** stock `rules.ini`'s `Anim=MINIGUN` and `Anim=SAMFIRE` weapons; the frame counts of TD's
+  `SAM.ZIP` (129), `SAMMAKE.ZIP` (frames 1 to 29), `ATWR.ZIP` (3), `SILO.ZIP` (11) and `MSAM.ZIP` (96) in
+  `TEXTURES_TD_SRGB.MEG`.
 - **A working mod:** TD's power plants, barracks, silo, guard towers, gun turret, SAM site, Obelisk and the rest,
   each a type of its own, shipped and played under Proton on Linux and on the Steam Deck. Each trap above was hit
   there: the tower frozen on one frame with the turret flag set, the SAM drawing half-risen, the Obelisk charging far
   faster than TD's, the silo always empty, a `NUKE`-named building that never built, prerequisites on new buildings
-  that didn't work until the bitfield was replaced, and buildings the AI walked past until they had `Points=`.
+  that didn't work until the bitfield was replaced, and buildings the AI walked past until they had `Points=`. Also
+  an Obelisk added to the two Tesla tests, TD's SAM with `Anim=SAMFIRE`, crews of TD infantry from a case of their
+  own, and a bib's extra row seen in the placement preview.
 
 > [!TIP]
 > **In Tiberian Factions**

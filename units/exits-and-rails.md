@@ -1,6 +1,6 @@
 ---
 title: "Units leaving buildings: exits and rails"
-description: How Red Alert moves a finished unit out of a factory (exit point, radio tether, unload mission, fixed movement tracks), and the traps of giving a new building an exit path of its own with a straight-line rail; one shared track table, saved track numbers, draw order in the doorway, seat depth, and infantry spots.
+description: How Red Alert moves a finished unit out of a factory (exit point, radio tether, unload mission, fixed movement tracks, a factory track that drives due south), and the traps of giving a new building an exit path of its own with a straight-line rail; one shared track table, saved track numbers, draw order in the doorway, seat depth, and infantry spots.
 tags: [units, buildings, movement, tracks, dll]
 holds_for: Steam build 21590013
 status: verified
@@ -30,10 +30,22 @@ this page.
   the new one to another idle war factory of the same owner, or waits.
 - **Barracks and kennel:** the building finds a free exit cell (`Find_Exit_Cell`), places the unit at its exit point
   facing that cell, and gives it a move order.
+- **Repair pad:** its footprint is a plus, not a square (`ListFix` in `BDATA.CPP`: the centre cell and its four
+  neighbours), so an exit straight out from its centre lands two cells away. A mod that picks where a repaired unit
+  leaves to, as CFE Patch Redux's smarter repair bay does (`DoSmarterRunAway`), has to look past the arms, and ask
+  units standing there to move: the movement code treats the leaving unit as close enough and won't shift them.
 
 Vehicles then move along **fixed track tables** in `DRIVE.CPP`: `TrackControl[67]` picks a track for each turn,
 and `RawTracks[13]` holds the tracks, `Track1` to `Track13`, as lists of coordinate offsets. A moving unit stores the
 `TrackNumber` and `TrackIndex` it's on.
+
+**The war factory's track drives straight south.** `Track13`, "Drive out of weapon's factory", is the active
+`#if(1)` branch in Red Alert's `DRIVE.CPP`: 35 steps due south. The `#else` branch, left in the file, is the curve to
+the south-west that TD's `Track13` still is, and its `TrackControl` entry still names south-west as the final
+facing. A factory whose door faces south-west, as TD's does, needs a path of its own. A fixed curve every unit
+shares can be a constant track appended after the stock ones, forced from the factory's unload mission, with a move
+order after it so the unit carries on when the track ends. A path that differs per building or per unit is a rail
+(below).
 
 ## A new exit path: a rail
 
@@ -67,13 +79,17 @@ pathfinding takes over.
 
 ## How it was verified
 
+- **The repair pad:** EA's `ListFix` (`BDATA.CPP`), CFE Patch Redux's `UnitClass::DoSmarterRunAway`, and a
+  working mod's notes on porting it.
 - **The stock exit and tracks:** EA's `BUILDING.CPP` (`Exit_Object`, the war factory and barracks cases), `DRIVE.H`
   (`TrackControl[67]`, `RawTracks[13]`, `Track1`–`Track13`, `TrackNumber`, `TrackIndex`) and `CELL.CPP`
-  (`Closest_Free_Spot`). That track numbers are saved: `TFixedIHeapClass::Save` (`HEAP.CPP`) writes each object
-  whole.
+  (`Closest_Free_Spot`). The south `Track13` under `#if(1)`, the south-west one under `#else` and its `DIR_SW`
+  control entry are in Red Alert's `DRIVE.CPP`; TD's `DRIVE.CPP` has only the south-west curve. That track numbers
+  are saved: `TFixedIHeapClass::Save` (`HEAP.CPP`) writes each object whole.
 - **The rail and its traps:** a working mod's code (a per-unit `Rail_To` in its `DriveClass`), and its history: the
   harvester that drove out of the back of the factory and its fix, the removed tracks left as empty slots because
-  saves store their numbers, the doorway sort, and the deeper walker seats.
+  saves store their numbers, the doorway sort, and the deeper walker seats. Its TD weapons factory leaves on an
+  appended south-west track, forced from `Mission_Unload`, while Red Alert's factory keeps the stock one.
 - **Observed, not traced:** a deployed mobile war factory that sometimes loses units it has built.
 
 > [!TIP]

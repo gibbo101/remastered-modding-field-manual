@@ -1,6 +1,6 @@
 ---
 title: Harvesters
-description: "Why Red Alert's harvesters get stuck, queue at one refinery or drive into enemy bases (a latch that never resets, an overwritten idle order, zones that ignore buildings, a sticky refinery choice, ore picks with no sense of danger), each confirmed in EA's source, and the fixes one mod ships."
+description: "Why Red Alert's harvesters get stuck, queue at one refinery or drive into enemy bases (a latch that never resets, an overwritten idle order, zones that ignore buildings, a sticky refinery choice, ore picks with no sense of danger), each confirmed in EA's source, the few rules.ini knobs, and the fixes one mod ships."
 tags: [ai, harvesters, economy, pathfinding, dll]
 holds_for: Steam build 21590013
 status: verified
@@ -34,6 +34,21 @@ Each confirmed in EA's released source:
 | **The refinery choice is sticky.** `Find_Best_Refinery` returns the last refinery used whenever it's still valid ("Remember our last refinery and prefer that one"). | `UNIT.CPP` | Harvesters queue at one refinery while another stands idle. |
 | **Ore picks ignore danger.** `Tiberium_Check` scores a cell by land type, ore, fog and zone only, and the harvester returns first to the last cell it mined (`ArchiveTarget`). | `UNIT.CPP` | A harvester that once mined in an enemy's base keeps going back. |
 | **Zones ignore buildings.** A field walled off by a turret still counts as reachable. See [Pathfinding](pathfinding.md). | `CELL.CPP`, `MAP.CPP` | A harvester heads for ore it can never reach. Because the edge-following pathfinder nearly always returns *some* path, nothing reports a failure. It just never arrives. |
+
+## The rules.ini knobs
+
+These are all `rules.ini` offers, with their stock values. None of them touches the problems above, which are DLL
+changes:
+
+| Key | Section | Stock | What it sets |
+|---|---|---|---|
+| `OreNearScan` | `[AI]` | 6 | Search radius in cells for the next ore once a patch runs out (`TiberiumShortScan`). |
+| `OreFarScan` | `[AI]` | 48 | Search radius in cells when looking for a new field (`TiberiumLongScan`). |
+| `RefineryRatio`, `RefineryLimit` | `[AI]` | .16, 4 | The computer builds a refinery while refineries are under this share of its buildings, and never more than the limit. |
+| `Harvester` | `[IQ]` | 2 | The IQ at which a computer player replaces lost harvesters. |
+| `BailCount` | `[General]` | 28 | Bails a full harvester carries. |
+| `GoldValue`, `GemValue` | `[General]` | 25, 50 | Credits per bail of ore and of gems. The ore search also weighs gem cells at four times `GemValue`. |
+| `OreTruckRate` | `[General]` | 1 | How slowly the harvester loads and dumps; larger is slower. |
 
 ## What one mod ships
 
@@ -79,6 +94,10 @@ Each is a DLL change, behind one "harvesters" switch on a settings page that res
   `GOINGTOIDLE` case, `Find_Best_Refinery`'s cache, `Tiberium_Check` and `ArchiveTarget`) and `HOUSE.CPP` (the
   latch's only initialisation, its use in refinery building and harvester replacement, and the `DIFF_HARD` check),
   each read with `grep -a`.
+- **The rules.ini knobs:** each key read in EA's `RULES.CPP` (`OreNearScan` and `OreFarScan` into `TiberiumShortScan`
+  and `TiberiumLongScan`), used in `UNIT.CPP` (`Goto_Tiberium`, `Tiberium_Check`'s `GemValue*4`, the bail count) and
+  `HOUSE.CPP` (`RefineryRatio`, `RefineryLimit`), and the stock values in the base game's `rules.ini`. A working
+  mod's harvester notes list the same keys.
 - **The fixes:** a working mod's design notes and code: the no-progress detector, field blacklist, retreat, zone
   gate, watchdog and field pick, shipped and tested in play. The refinery spreading is a CFE Patch Redux port.
 - **The zone trap:** EA's `Zone_Span` and `Is_Clear_To_Move` (the cleared building bit), and a working mod's failed

@@ -1,6 +1,6 @@
 ---
 title: A stealth generator
-description: A building that cloaks friendly buildings and units around it, driven through Red Alert's existing cloak system; the one missing line that lets buildings cloak, detectors that reveal stationary objects, armed buildings that uncloak to fire, bibs, and the traps that left a base cloaked forever.
+description: A building that cloaks friendly buildings and units around it, driven through Red Alert's existing cloak system; the one missing line that lets buildings cloak, which types detect (Sensors=, all infantry and ships), the re-cloak delay hiding under SubmergeDelay, the reveals already built in, detectors that reveal stationary objects, armed buildings that uncloak to fire, bibs, and the traps that left a base cloaked forever.
 tags: [behaviours, stealth, cloak, buildings, tiberian-sun, dll]
 holds_for: Steam build 21590013
 status: verified
@@ -40,6 +40,23 @@ A generator only has to decide **who may cloak**. The machine does the rest.
    It re-cloaks after the threat has gone.
 
 Hidden objects stay hidden from the AI too, since `Is_Cloaked` hides them from every non-ally, players and AI alike.
+And when an object starts to cloak, `Do_Cloak` calls `Detach_All`, so enemies already targeting it lose it.
+
+## What the engine gives you
+
+- **The detector flag is `IsScanner`,** set by `Sensors=` in a type's `rules.ini` section. Every infantry type
+  and every vessel type has it on from its constructor, so infantry and ships detect with no work. A vehicle
+  detector needs `Sensors=yes`.
+- **The re-cloak delay is read from `SubmergeDelay`.** `Rule.CloakDelay` comes from `[General]` `SubmergeDelay`
+  (in minutes; the stock `rules.ini` says .02, and calls it the submarine's surface time), and it applies to every
+  cloaker: after uncloaking, `Cloaking_AI` won't cloak an object again until it runs out. Tune that key to change
+  how long revealed buildings stay visible.
+- **Some reveals are built in.** A cloaked object shimmers when it takes damage (`TechnoClass::Take_Damage`), when
+  a vehicle's move is blocked by it (`MOVE_CLOAK` in `DRIVE.CPP` shimmers the cell, so units walking into a hidden
+  base seem to detect it), and while it carries a captured flag.
+- **Both transitions need the flag.** `Do_Cloak` acts only on an object that's `IsCloakable` and uncloaked or
+  uncloaking; `Do_Uncloak` only on one that's `IsCloakable` and cloaked or cloaking. Clear `IsCloakable` before the
+  uncloak has finished and the object stays as it is.
 
 ## The engine gaps you have to fill
 
@@ -60,7 +77,8 @@ Hidden objects stay hidden from the AI too, since `Is_Cloaked` hides them from e
   `IsCloakable`, and let the machine cloak.
 - **A whole base stayed cloaked after the generator died.** The restore pass ran for one frame, but `Do_Uncloak` only
   *starts* a transition over several frames. The objects never reached "uncloaked", their flag was never reset, and
-  `Cloaking_AI` cloaked them again. Keep restoring until a full pass finds nothing left.
+  `Cloaking_AI` cloaked them again. Keep restoring until a full pass finds nothing left, and clear `IsCloakable` only
+  once an object is uncloaked, since `Do_Uncloak` does nothing without it.
 - **A helipad never cloaked.** It's always in radio contact with its parked helicopter, and a "don't cloak while in
   radio contact" rule held it visible. Block cloaking only while the partner is actually moving. Aircraft need their
   own cover pass too.
@@ -69,9 +87,14 @@ Hidden objects stay hidden from the AI too, since `Is_Cloaked` hides them from e
 
 ## How it was verified
 
-- **The cloak machine and its gaps:** EA's `TECHNO.CPP` (the cloak states, `Do_Cloak`, `Do_Uncloak`,
-  `Cloaking_AI`), the `IsCloakable` copy in `UNIT.CPP`, `INFANTRY.CPP` and `VESSEL.CPP` but not `BUILDING.CPP`, and
-  the one-way scanner shimmer in `FOOT.CPP`.
+- **The cloak machine and its gaps:** EA's `TECHNO.CPP` (the cloak states, `Do_Cloak` and `Do_Uncloak` with their
+  guards and `Detach_All`, `Cloaking_AI`, the `CloakDelay` wait, the shimmer in `Take_Damage`), the `IsCloakable`
+  copy in `UNIT.CPP`, `INFANTRY.CPP` and `VESSEL.CPP` but not `BUILDING.CPP`, and the one-way scanner shimmer in
+  `FOOT.CPP`; Vanilla Conquer's copies match.
+- **Detectors and the delay:** EA's `TECHNO.CPP` (`Sensors=` read into `IsScanner`), `IDATA.CPP` and `VDATA.CPP`
+  (`IsScanner = true` for every infantry and vessel type), `RULES.CPP` (`CloakDelay` read from `SubmergeDelay`) and
+  `DRIVE.CPP` (`MOVE_CLOAK` shimmering the cell); the stock `rules.ini`'s `SubmergeDelay=.02`. The working mod gives
+  its Radar Jammer `Sensors=yes`, and saw units walking into a hidden base shimmer it.
 - **A working mod:** the generator in its release, played under Proton on Linux and on the Steam Deck. The traps
   above were each hit and fixed there.
 - **Unproven:** in play, a cloaked armed building (an Obelisk) charged and failed to fire, which is why the ambush

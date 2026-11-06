@@ -1,6 +1,6 @@
 ---
 title: Pathfinding
-description: "Red Alert's stock pathfinder (EA's edge-following Find_Path, with no A*), movement zones and what they ignore, the head-on rule that jams vehicle columns in one-cell gaps, and the fixes one mod ships: an A* search from CFE Patch Redux tried first, give-way and corridor claims at chokepoints, and a give-up rule that ends path-failure livelocks."
+description: "Red Alert's stock pathfinder (EA's edge-following Find_Path, with no A*), movement zones and what they ignore, the move thresholds and the head-on rule that jams vehicle columns in one-cell gaps, group moves that send every unit to one cell, and the fixes one mod ships: an A* search from CFE Patch Redux tried first, give-way and corridor claims at chokepoints, and a give-up rule that ends path-failure livelocks."
 tags: [ai, pathfinding, a-star, movement, zones, dll]
 holds_for: Steam build 21590013
 status: verified
@@ -52,10 +52,24 @@ That gap is behind several of the stuck-unit bugs on this page and on [Harvester
 
 ## Vehicles jam head-on
 
+Each cell a unit might enter is rated a `MoveType`, from easiest to hardest: `MOVE_OK`, `MOVE_CLOAK` (a cloaked
+enemy), `MOVE_MOVING_BLOCK` (an ally that's moving), `MOVE_DESTROYABLE` (an enemy), `MOVE_TEMP` (an ally standing
+still), `MOVE_NO` (impassable). `Basic_Path` (`FOOT.CPP`) searches at the strictest threshold first and raises it one
+step at a time, up to `MOVE_TEMP`, until a path turns up. Allied buildings, and a standing ally in another zone,
+rate `MOVE_NO`.
+
 `UnitClass::Can_Enter_Cell` (`UNIT.CPP`) treats an allied vehicle facing exactly the opposite way, within about
 1.25 cells (`0x1FF` leptons), as `MOVE_NO`: the one blocked state a unit never escalates past. So two columns of
 vehicles meeting in a one-cell-wide gap jam nose to nose for good. Infantry have no such rule, and several share a
 cell, so they slip past.
+
+## Group moves aim every unit at one cell
+
+When the player orders a group to move, `DisplayClass::Mouse_Left_Release` (`DISPLAY.CPP`) gives every selected unit
+the clicked cell, unless it's a formation move (all in one control group with formation offsets set). The
+edge-follower hides this: the first unit takes the cell and the rest settle beside it. A search that gives up on
+an occupied destination close by can't: CFE's A\* returns no path when the destination is impassable within 3 cells,
+so every unit behind the first re-paths each tick and the group jams round one cell.
 
 ## Units that never give up
 
@@ -75,7 +89,13 @@ Each of these is a DLL change, and each can be switched off for EA's stock behav
 **cfehunter's CFE Patch**, as carried in CFE Patch Redux. It retries with weaker threat-avoidance in stages before it
 gives up. As DontCryJustDie pointed out, that A\* wasn't written with performance in mind, and most mods that use it
 take it as it is. CFE also uses the search to keep infantry out of Tiberium: see
-[Porting CFE Patch Redux](../engine/cfe-patch-ports.md). Three changes made it affordable:
+[Porting CFE Patch Redux](../engine/cfe-patch-ports.md).
+
+Take CFE 1.8's version or later. `Basic_Path` hands the search a 200-step buffer (`workpath1[200]`), and before 1.8
+a path longer than that was trimmed to 200 steps with its end marker written one past the buffer, which crashed the
+game on long routes.
+
+Three changes made it affordable:
 
 - **A budget.** A search stops after `ASTAR_MAX_EXPANSIONS` (4096) nodes. Without it, a search for an unreachable
   destination floods the whole connected area, up to about 16,000 cells, and a capped miss falls to the
@@ -108,6 +128,14 @@ LAN games, since only the host simulates (see [LAN games](../engine/lan-games.md
 When A\* fails and a fresh claim lies on the line to the destination, the search returns no path, so the unit waits
 its turn instead of taking the edge-follower's long detour.
 
+### Spreading group moves
+
+When a group move isn't a formation move, give each unit its own free cell near the click, in the same zone as
+the clicked cell, instead of the click itself. Do it where `Mouse_Left_Release` sets each unit's destination: that
+destination travels in the unit's order event, so nothing in the simulation changes and LAN play needs no extra
+care. In one mod's play log, 252 of 325 A\* fallbacks in a match were units ordered onto the same cell; spreading
+roughly halved the fallback rate.
+
 ### Giving up on a hopeless path
 
 A unit that keeps failing to path **from the same cell** gives up: infantry after 8 seconds, vehicles after a minute.
@@ -119,8 +147,9 @@ Any movement or successful path starts the count again, so a queue that advances
   `DRIVE.H`), and the overrides run radio protocols and reassign missions. Called from inside `Basic_Path`, it can tear
   down a harvester's dock contact while the movement code is still running. In a working mod, that crashed the game
   on two machines within minutes.
-- **Guard recursion in give-way.** A retreat that assigns a new destination can start a nested move, which retreats
-  again. Unguarded, that recursed about 1,500 frames deep and overflowed the stack.
+- **Guard recursion in give-way.** `DriveClass::Assign_Destination` calls `Start_Of_Move` straight away when the unit
+  isn't already driving (`DRIVE.CPP`), so a retreat decided inside `Start_Of_Move` starts a nested move, which can
+  decide to retreat again. Unguarded, that recursed about 1,500 frames deep and overflowed the stack.
 
 ## How it was verified
 
@@ -130,6 +159,17 @@ Any movement or successful path starts the count again, so a queue that advances
   `Zone_Reset` caller.
 - **The head-on rule and the give-up gate:** EA's `UNIT.CPP` (`face == techface && Distance <= 0x1FF`, `MOVE_NO`)
   and `INFANTRY.CPP` (the zone-mismatch abort). No such rule in `INFANTRY.CPP`'s own `Can_Enter_Cell`.
+- **Move thresholds:** EA's `MoveType` (`DEFINES.H`), the ally ratings in `UnitClass::Can_Enter_Cell` and the
+  escalation loop in `Basic_Path` (`FOOT.CPP`). A working mod's diagnostic log recorded thousands of head-on
+  `MOVE_NO` ratings at the jammed pinch.
+- **Group moves:** EA's `Mouse_Left_Release` (`DISPLAY.CPP`: `newmove = cell` unless `FormMove`); CFE's A\*
+  (`impassableCloseEnough = 3`, return 0); a working mod's play log of its A\* fallbacks before and after spreading,
+  and its spread code at the same hook.
+- **The 200-step buffer:** EA's `workpath1[200]` in `Basic_Path`, CFE's 1.8 changelog ("a crash bug with A-Star
+  pathfinding when the shortest path was more than 200 cells long") and its fix commit, which stops the trim one
+  step short to leave room for the end marker.
+- **The recursion:** EA's `DriveClass::Assign_Destination` (`if (!IsDriving ...) Start_Of_Move()`), a working mod's
+  crash dump of the overflow, and its guard.
 - **The fixes:** a working mod's design notes and code (`Find_Path_AStar` marked as a CFE Patch Redux port, the
   budget, `Give_Way_Decision`, the corridor claims, `Try_Deadlock_Scatter`, the no-progress detector), each checked
   in play: a 1-wide pinch on a snow map for the claims, and a live match for the livelock. None of them exists in

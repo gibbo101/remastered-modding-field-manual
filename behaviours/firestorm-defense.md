@@ -28,11 +28,15 @@ From TS's `RULES.INI` and OpenTS (`super.cpp`, `house.cpp`, `building.cpp`, `bul
 
 - **A charge-drain superweapon** (`UseChargeDrain=true`). While on, the field drains the charge. Turned on, the
   drain time is the charge × `ChargeToDrainRatio` (.333, so a full charge buys about a minute). Turned off early,
-  the leftover drain goes back as charge. Low power, or losing the last generator, drops the field and resets the
-  charge.
+  each frame of drain left comes back as three frames of charge (1 ÷ .333), and the weapon stays usable while it
+  charges on, so a part charge buys a shorter field. It can be raised in any state except charging from zero. A
+  drain that runs out, low power, or losing the last generator drops the field and starts the charge from zero.
+- **A section costs $250.** TS's own `RULES.INI` says `Cost=50` for `[GAFSDF]`, but TS's executable, as OpenTS
+  reconstructs it, charges 250 whatever the rules say.
 - **Every wall section the house owns goes live**, anywhere on the map. A live section blocks everyone, its owner
   included, and kills anything standing on it or moving in.
 - **Aircraft over a live section die,** at any height.
+- **`IgnoresFirestorm=yes` passes the field** untouched: TS sets it on its two Hunter Seekers.
 - **Shots are eaten:** a projectile entering a live cell is deleted unless the wall's owner fired it, and instant
   weapons stop at the first live cell of another house's wall.
 - **A live section takes no damage.** Each hit drains the field instead (damage × 0.1).
@@ -73,8 +77,12 @@ owns the placement ghost, so the line appears only when the second end is placed
 ## How it was verified
 
 - **What stock Red Alert lacks:** `grep -a` over EA's Red Alert source finds no firestorm or charge drain.
-- **TS's model:** TS's `RULES.INI` (`UseChargeDrain=true`, `ChargeToDrainRatio=.333`, the section and generator
-  entries) and OpenTS's `super.cpp`, `house.cpp`, `building.cpp`, `bullet.cpp` and `map.cpp`.
+- **TS's model:** TS's `RULES.INI` (`UseChargeDrain=true`, `ChargeToDrainRatio=.333`, `[GAFSDF]` `Cost=50`,
+  `IgnoresFirestorm=yes` on `[GHUNTER]` and `[NHUNTER]`, the section and generator entries) and OpenTS's `super.cpp`
+  (`Discharged`: the leftover drain divided by the ratio; `Can_Place`: anything but `CHARGING`), `techtype.cpp`
+  (`GAFSDF`'s cost forced to 250), `house.cpp`, `building.cpp`, `bullet.cpp` and `map.cpp`.
+- **The same rules in Red Alert:** the working mod's charge-drain `SuperClass` refunds three frames of charge per
+  frame of drain left and keeps a part-charged weapon usable, charges $250 a section, and spares its Hunter Seeker.
 - **A working mod:** the generator, sections, field, toggle and line fill in its release, played under Proton on
   Linux and on the Steam Deck.
 - **Unproven:** the enemy-side checks in a LAN game.
@@ -83,7 +91,7 @@ owns the placement ghost, so the line appears only when the second end is placed
 > **In Tiberian Factions**
 >
 > TS GDI's Firestorm Generator raises the field with one click on its cameo, and drops it with another, banking
-> what's left. Sections cost $250, what TS players paid. Line fill works for every wall in the mod, from sandbags to
+> what's left. Sections cost $250, as in TS. Line fill works for every wall in the mod, from sandbags to
 > Firestorm sections.
 >
 > ![A live Firestorm wall](img/firestorm-wall-live.jpg)

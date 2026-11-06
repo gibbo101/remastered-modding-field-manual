@@ -1,6 +1,6 @@
 ---
 title: Air delivery, fleets and support powers
-description: Delivering vehicles by cargo plane as Tiberian Dawn's airstrip does, which Red Alert has no cargo plane for; giving a new faction its own ships, aircraft and support powers without opening Red Alert's types to it; the traps of bringing a TD aircraft into Red Alert's engine.
+description: Delivering vehicles by cargo plane as Tiberian Dawn's airstrip does, which Red Alert has no cargo plane for; giving a new faction its own ships, aircraft and support powers without opening Red Alert's types to it; a new superweapon's launcher type and cameo name; the traps of bringing a TD aircraft into Red Alert's engine, and short-range aircraft weapons that never fire.
 tags: [behaviours, aircraft, naval, superweapons, reinforcements, tiberian-dawn, dll]
 holds_for: Steam build 21590013
 status: verified
@@ -53,17 +53,44 @@ Grant each support power from a host building, the way Red Alert grants its own 
 it while the house has the building active, and remove it when the building goes. The power that fires decides what
 it delivers, so a captured building of another era gives its own era's version.
 
+**The launcher's side of a new power.** `DLLExportClass::Convert_Special_Weapon_Type` (`DLLInterface.cpp`) tells the
+launcher two things about each superweapon: its type (`DllSuperweaponTypeEnum`), which sets how the cameo click and
+targeting behave, and its asset name (`SW_Nuke`, `SW_GPS`; at most 15 characters, copied with `strncpy(..., 16)`).
+A new `SpecialWeaponType` falls to `SW_UNKNOWN` there, so add a case:
+
+- **The type:** for a power aimed at a cell, `SW_ION_CANNON` (one of TD's values in the shared enum) gives the plain
+  targeting cursor in Red Alert too. A power that works like a stock one can borrow that one's type instead
+  (`SW_NUKE`, `SW_PARA_INFANTRY`, `SW_SPY_MISSION`).
+- **The asset name** picks the sidebar entry: `RA_` plus the name in capitals, as `SW_Nuke` is `RA_SW_NUKE` in
+  `RABUILDABLES.XML`. Give each power its own name and entry, with its own cameo (see
+  [Sidebar cameos](../art/sidebar-cameos.md)). The launcher still shows a cost line on it (see
+  [What the launcher owns](../engine/what-the-launcher-owns.md)).
+
 ## Traps
 
 - **An aircraft with no `rules.ini` section** gets a speed of zero and never moves.
 - **A null `ImageData`** makes an aircraft invisible, as for any unit.
 - **Opening a stock building to a new owner** leaks its roster and superweapons.
+- **A short-range aircraft weapon never attacks.** An attacking aircraft that isn't fixed-wing (fixed-wing ones hunt
+  instead) picks where to fire from with `AircraftClass::Good_Fire_Location`, whose ring search starts a cell inside
+  the weapon's range and stops a cell from the target (`for (r = range-0x0100; r > 0x0100; ...)`). For a weapon of
+  two cells' range or less it finds nothing, and the aircraft returns to base. Give such a weapon (a bomb dropped
+  from overhead) a firing spot of its own, such as the target's cell.
 
 ## How it was verified
 
 - **TD's delivery and what Red Alert lacks:** EA's TD `BUILDING.CPP` (the airstrip calling
   `Create_Special_Reinforcement` with `AIRCRAFT_CARGO`) and `REINF.CPP` (`SOURCE_AIR`), and Red Alert's `DEFINES.H`, with
   no cargo plane in its aircraft list.
+- **Superweapon types and names:** EA's `DLLInterface.cpp` (`Convert_Special_Weapon_Type`: the `SW_*` names, the
+  16-byte `strncpy`, `SW_UNKNOWN` for anything else) and `DLLInterface.h` (`DllSuperweaponTypeEnum`, with
+  `SW_ION_CANNON` among TD's values), the stock `RA_SW_*` entries in `RABUILDABLES.XML`, and the working mod's four
+  new targeted powers routed as `SW_ION_CANNON`, and others as `SW_NUKE`, `SW_PARA_INFANTRY` and `SW_SPY_MISSION`,
+  each with its own `RA_SW_*` entry.
+- **The short-range trap:** EA's `AIRCRAFT.CPP` (`Mission_Attack` handing fixed-wing aircraft to `Mission_Hunt`,
+  `Good_Fire_Location`'s loop, and `PICK_ATTACK_LOCATION` falling to `RETURN_TO_BASE` when it returns nothing), the
+  same in Vanilla Conquer, and the working mod's Orca Bomber, whose 1.5-cell bombs needed the target cell as the
+  firing spot.
 - **A working mod:** cargo-plane delivery at its Nod airstrip, its GDI and Nod navies and airfield, and its Nod
   paratroops and recon flight, shipped and played under Proton on Linux and on the Steam Deck. The roster leak was hit
   in its first navy and A-10 builds and reverted.

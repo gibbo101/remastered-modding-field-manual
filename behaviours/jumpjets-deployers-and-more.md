@@ -1,6 +1,6 @@
 ---
 title: Jumpjets, deployers, mines and bouncing discs
-description: Smaller Tiberian Sun behaviours in Red Alert's engine; jumpjet infantry and the engine checks that assume only aircraft fly, units that deploy into buildings and pack up, a mine dropped by a drone, and a disc that bounces, each with the code that has to change and its traps.
+description: Smaller Tiberian Sun behaviours in Red Alert's engine; jumpjet infantry and the engine checks that assume only aircraft fly, units that deploy into buildings and pack up, a mine dropped by a drone, and a disc that bounces, with the 255-frame fuse cap on slow projectiles; each with the code that has to change and its traps.
 tags: [behaviours, jumpjets, deploy, mines, projectiles, tiberian-sun, dll]
 holds_for: Steam build 21590013
 status: verified
@@ -75,6 +75,9 @@ TS's Disc Thrower throws a disc that bounces (`Bouncy=yes`; OpenTS's `bounce.cpp
 - **Use the true distance for ballistics.** EA's `Distance()` (`COORD.CPP`) is an approximation (the larger
   difference plus half the smaller), up to about 6% long on a diagonal. A ballistic arc flown on it lands long:
   about 290 leptons long for one long-range shot.
+- **A slow projectile bursts mid-flight.** `FuseClass::Arm_Fuse` (`FUSE.CPP`) stores the flight time in a byte,
+  capped at 255 frames, and `Fuse_Checkup` detonates when it runs out. Anything that needs longer to arrive (a lobbed
+  disc, a falling drop pod) must end its flight by its own logic instead of the fuse.
 
 ## How it was verified
 
@@ -82,6 +85,8 @@ TS's Disc Thrower throws a disc that bounces (`Bouncy=yes`; OpenTS's `bounce.cpp
   (`JumpJet=yes`) and OpenTS's `jumpjet.cpp`.
 - **Mines:** EA's mine buildings (`STRUCT_AVMINE`, `STRUCT_APMINE`), and a working mod's drone that settles into one.
 - **The disc:** TS's `RULES.INI` (`Bouncy=yes`), OpenTS's `bounce.cpp`, and EA's `Distance()` in `COORD.CPP`.
+- **The fuse cap:** EA's `FUSE.CPP` (`Timer = min(timeto, 0xFF)`) and `FUSE.H` (`unsigned char Timer`), the same in
+  Vanilla Conquer, and the working mod's TS shells and drop pods, which end their flights without the fuse.
 - **A working mod:** jumpjet infantry, the mobile war factory and sensor, a deploy-to-fire walker, the limpet
   drone and the disc thrower in its release, played under Proton on Linux and on the Steam Deck.
 

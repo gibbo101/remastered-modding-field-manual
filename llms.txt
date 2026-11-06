@@ -32,6 +32,8 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [MEG and MIX archives](formats/meg-and-mix-archives.md): MEG = upper-case paths, 20-byte entries sorted by CRC,
   no checksum (EA's Megafile.cs); classic MIX = name-hash index sorted by signed CRC; RA's outer MIX = flags header
   (0x2 encrypted, 0x1 SHA-1 trailer; RA ships 0x0, 0x2 and 0x3), RSA-wrapped Blowfish key, encrypted index.
+- [Save files (.sav)](formats/save-files.md): a CH ChunkFile: zlib stream (size at 0x10) ending in a sync flush,
+  a zlib chunk index, then a 20-byte instance header (size at +8) and raw deflate holding the DLL's save data.
 
 ## Launcher data
 
@@ -168,6 +170,9 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
   airstrip calls Create_Special_Reinforcement; aircraft need a rules.ini section and non-null ImageData.
 - [Jumpjets, deployers, mines and bouncing discs](behaviours/jumpjets-deployers-and-more.md): MissionClass::AI skips
   non-aircraft with Height > 0; deploy where the build-up starts; drone mines as buildings; Distance() runs long.
+- [Hover and amphibious units](behaviours/hover-and-amphibious-units.md): RA dropped TD's SPEED_HOVER; restore it
+  with a speed type, a Hover= land-cost column, an MZONE_HOVER zone flooded by hover passability (one zone spans the
+  shore) and MZONEF_HOVER in every Zone_Reset; TS's Hover= and Amphibious= tables; saves change.
 
 ## Art
 
@@ -220,12 +225,17 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [Rewriting launcher strings in memory](clientg-ram/rewriting-launcher-strings.md): when ClientG builds a name
   in code (the sidebar tab-icon prefixes), rewrite the string in place, never longer, keeping the old tail behind
   the terminator so a patched slot is findable. Fragile: one ClientG build.
+- [Launcher key commands and superweapon clicks](clientg-ram/launcher-key-commands-and-clicks.md): ClientG's
+  command dispatcher (0x168A1B0) jumps through 0x168AD74; point deploy/select-all/camera slots at stubs that send mod
+  commands 0x1032-0x1035; the cameo click's superweapon test (0x73EA39) patched to send START_CONSTRUCTION; input
+  mode 0x20F1C90. Fragile: one ClientG build.
 
 ## Open questions
 
 - [Open questions](open-questions.md): unproven research only, never a recipe. Scripted co-op missions, players
   changing the rules, Tiberian Sun theatres, music built from the player's own copy, tileset video memory, which
-  mod's loose file wins, theatre slots past 5, building placement on a 253x253 map. Each entry links TF's design doc.
+  mod's loose file wins, theatre slots past 5, building placement on a 253x253 map, hiding units from radar, how a
+  campaign ends, untouched launcher data (colours, cursors, lobby lists). Each entry links TF's design doc.
 
 ## Optional
 

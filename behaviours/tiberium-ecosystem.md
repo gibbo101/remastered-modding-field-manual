@@ -1,6 +1,6 @@
 ---
 title: The Tiberium ecosystem
-description: Tiberium in Red Alert as its own overlay rather than ore, with blossom trees that spread it, damage to infantry standing in it, and Visceroids; what Red Alert's shared resource land type and the launcher's resource range force on a new resource.
+description: Tiberium in Red Alert as its own overlay rather than ore, with blossom trees that spread it, damage to infantry standing in it, and Visceroids; what Red Alert's shared resource land type, the launcher's resource range and the no-building-on-overlays rule force on a new resource.
 tags: [behaviours, tiberium, overlays, resources, tiberian-dawn, dll]
 holds_for: Steam build 21590013
 status: verified
@@ -36,6 +36,10 @@ keys its resource pips off that range. A new overlay outside it gets no pips. Tw
 - export it to the launcher as a stock resource overlay for the overlay model and the radar, but with its own asset
   name, so the map still draws Tiberium.
 
+**It blocks building, as ore does.** Outside the map editor, `CellClass::Is_Clear_To_Build` refuses any cell with an
+overlay ("In normal game mode, all overlays are not buildable"), so ore, gems and a new resource all block
+placement. A field left to spread can close off every legal cell near a construction yard.
+
 **Keep the fields apart.** Make sure Tiberium and ore never convert each other where their fields meet, in the
 spread code. Stock spreading always plants ore, whatever the source cell holds (see
 [A new resource on the official skirmish maps](../maps-and-lobby/official-maps-with-tiberium.md)).
@@ -69,6 +73,9 @@ TD turns some infantry killed by Tiberium into Visceroids, hostile to everyone.
 
 - **The shared land type and the resource range:** EA's `ODATA.CPP` (ore and gems are `LAND_TIBERIUM`) and
   `DLLInterface.cpp` (`IsResource` only for `OVERLAY_GOLD1` to `OVERLAY_GEMS4`).
+- **Placement:** EA's `CELL.CPP` (`Is_Clear_To_Build` returning false for any overlay unless `Debug_Map`), the same
+  in Vanilla Conquer, and a working mod's long test matches, where spreading Tiberium left no legal cell near the
+  yard.
 - **TD's behaviour:** EA's TD `INFANTRY.CPP` (2 damage on reaching a cell's centre, not for `INFANTRY_E5`), and
   `HOUSE_JP` in Red Alert's `DEFINES.H`.
 - **A working mod:** Tiberium as its own overlay, blossom trees, infantry damage and Visceroids, shipped and played

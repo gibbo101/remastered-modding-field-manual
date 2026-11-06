@@ -59,6 +59,11 @@ How loose files under `Data/` replace the game's own is on
 Since the version is two integers, `1.10` and `1.1` are different versions but `1.1.6` can't be written. Pick a
 mapping (for example `version_low = minor * 10 + patch`) and keep to it.
 
+**Every version change switches the mod off once.** The launcher identifies a mod by a CRC of its `name` plus
+`high.low`, so a new version is a new ID, and the launcher drops enabled IDs that match no installed mod. After an
+update the player has to tick the mod again in Options > Mods (observed). Going back to an older version does the
+same. See [New screens and buttons](../front-end/new-screens-and-buttons.md) for the ID.
+
 ## Where the launcher looks
 
 **Local mods** go in the player's documents folder, under the game's own subfolder:

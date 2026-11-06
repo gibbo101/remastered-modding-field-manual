@@ -5,7 +5,7 @@ tags: [launcher, text, strings, localisation, data]
 holds_for: Steam build 21590013
 clientg_version: 1.153 (745903)
 status: verified
-unproven: [how the launcher finds ModText.csv (the name is in no game binary), whether a CSV under another name is read too, whether a loose MASTERTEXTFILE .LOC with added records loads]
+unproven: [how the launcher finds ModText.csv (the name is in no game binary), whether a CSV under another name is read too, whether a loose MASTERTEXTFILE .LOC with added records loads, what a double quote inside ModText.csv text does (avoided, never tested)]
 ---
 
 > [!NOTE]
@@ -40,6 +40,9 @@ base game's text, so any text ID it defines can be used anywhere a text ID goes.
   languages you have and leave the rest empty.
 - **Comments:** a row whose `TEXT ID` starts with `//`.
 - **Line endings:** CRLF in the sample below, and LF loads too.
+- **Write `&` as `&&`.** The launcher's font reads a single `&` as a shortcut marker. EA's own strings do the same
+  (`C&&C`, `SKIRMISH && ONLINE`). This holds for every launcher string, `.LOC` included.
+- **Keep double quotes out of the text.** A working mod's build rule bans them; what one does hasn't been tested.
 
 Then point at your IDs. A buildable object's sidebar name and description come from its `ObjectNameTextID` and
 `ObjectDescriptionTextID` in its `ObjectTypeClass` entry. A skirmish entry's name comes from its
@@ -84,6 +87,8 @@ So a value can grow if another gives the same bytes back, and the file's total s
   building name, with LF line endings, and they show in the sidebar. `ClientG.exe`'s mod loader lists `CSV` among
   the file types it takes from a mod (beside `Loading mod: %s` in `ModManagerClass::Load_Mod`). The name
   `ModText.csv` itself appears in no game binary, so how the launcher picks this file out is unknown.
+- **`&&`:** 79 `&&` pairs in the stock English `.LOC` (`C&&C`, `Locate && free the hostages`); a working mod's
+  build rule writes `&&` in its `ModText.csv` and screen text, and one `&` shows in game.
 - **The `.LOC` format:** the stock English table parsed exactly as above: 6,852 records, sorted by hash, every
   hash the CRC-32 of its key, and the file ending where the keys end. Same-size relabels and a byte-neutral regrow
   were checked in game. The crash on adding records came from a repacked `CONFIG.MEG`.

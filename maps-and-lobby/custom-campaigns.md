@@ -1,6 +1,6 @@
 ---
 title: "Custom campaigns: replacing the official ones"
-description: Replace or add to Red Alert's official campaigns. INSTANCES.XML decides what Mission Select shows, the campaign files decide what launches, and a stock mission slot plays your own scenario INI shipped in CCDATA with its [Digest] removed; brand-new instances still need a launch route.
+description: Replace or add to Red Alert's official campaigns. INSTANCES.XML decides what Mission Select shows, the campaign files (manifests, campaigns, mission definitions) decide what launches, and a stock mission slot plays your own scenario INI shipped in CCDATA with its [Digest] removed; brand-new instances still need a launch route.
 tags: [maps, campaigns, missions, mission-select, instances, ccdata]
 holds_for: Steam build 21590013
 clientg_version: 1.153 (745903)
@@ -43,6 +43,33 @@ missions still shows all fourteen. Adding missions to a campaign's `<Stages>` do
 Both kinds of file ship loose in the mod, as patched copies of the stock ones. See
 [Overriding the launcher's data](../launcher-data/overriding-launcher-data.md).
 
+### How the campaign files fit together
+
+All in `CONFIG.MEG`, under `DATA\XML\`:
+
+- **Two manifests list what loads.** `PROGRESSIVECAMPAIGNFILES.XML` names the campaign files and
+  `PROGRESSIVECAMPAIGNMISSIONFILES.XML` the mission files. `CAMPAIGNS.XML` is an empty wrapper. There's no separate
+  Counterstrike file (its line is commented out): Counterstrike's missions belong to the Aftermath campaigns.
+- **A campaign** is a `ProgressiveCampaignTypeClass` in a campaign file. Its `<CampaignMissions>` lists mission
+  definitions by name, in order.
+- **A mission definition** is a `ProgressiveCampaignMissionTypeClass` in a `*_MISSIONS.XML` file. It names the
+  `<Instance>` to play and, with `MapStageUnlock`, the stage it unlocks. Its name needn't match the instance's:
+  `Mobius_Aftermath_Allied_Campaign_9_Map` plays `Mobius_Allied_Aftermath_Campaign_48_Map`.
+
+Each Red Alert tab's missions belong to one campaign:
+
+| Tab | Campaign | Campaign file | Mission file |
+|---|---|---|---|
+| Allies | `RA_ALLIES_CAMPAIGN` | `RA_ALLIES.XML` | `RA_ALLIES_MISSIONS.XML` |
+| Soviets | `RA_USSR_CAMPAIGN` | `RA_USSR.XML` | `RA_USSR_MISSIONS.XML` |
+| Allied expansions | `RA_Aftermath_Allied_CAMPAIGN` | `RA_AFTERMATH.XML` | `RA_AFTERMATH_MISSIONS.XML` |
+| Soviet expansions | `RA_Aftermath_USSR_CAMPAIGN` | `RA_AFTERMATH.XML` | `RA_AFTERMATH_MISSIONS.XML` |
+| Ant | `RA_Ant_CAMPAIGN` | `ANT.XML` | `ANT_MISSIONS.XML` |
+
+The last Allied and Soviet missions (`RA_ALLIES_14`, `RA_USSR_14`) carry `MapStageUnlock` -1; the last expansion
+and Ant missions carry no `MapStageUnlock` at all. Tiberian Dawn's campaigns live beside them in `GDI.XML`,
+`NOD.XML`, `CONSOLE.XML` and `FUNPARK.XML`.
+
 ## Replacing an official mission: shadow its scenario
 
 A stock mission slot plays whatever scenario INI of the right name it finds first, and a file in your mod's
@@ -55,7 +82,8 @@ A stock mission slot plays whatever scenario INI of the right name it finds firs
 3. **Remove the `[Digest]` section.** Red Alert checks a scenario's digest at load. A wrong digest aborts the
    load (only multiplayer scenarios numbered below 25 are exempt), but a *missing* digest skips the check. Any edit makes the old
    digest wrong, so delete it.
-4. **Ship it** as `CCDATA/SCG43EA.INI` in the mod. No `CONFIG.MEG` change is needed.
+4. **Ship it** as `CCDATA/SCG43EA.INI` in the mod. No `CONFIG.MEG` change is needed. The file is read when the mission loads, so a
+   changed copy takes effect at the next Start, with no restart of the game (observed on a Steam Deck).
 
 The mission keeps its slot: its tab, its name and briefing (from `INSTANCES.XML` and the game's text), its movies
 and its place in the campaign chain. The INI's own `[Briefing]` feeds only the in-game briefing screen. To restyle
@@ -102,7 +130,9 @@ missions in Red Alert's Mission Select therefore takes a launcher code patch on 
 | Soviet-side test (faction 7 to 8: USSR, Ukraine) | `0x118E840` | `8B 81 88 04 00 00 83 C0 F9 83 F8 01 0F 96 C0 C3` |
 | Expansion tabs' calls to them | `0x63382F`, `0x633878` | `E8` to the two tests |
 
-The mission's faction is read from the instance at `+0x488`. GDI is 0 and Nod 1, which is why neither passes.
+The mission's faction is read from the instance at `+0x488`. GDI is 0 and Nod 1, which is why neither passes. The
+calls sit in the tab sort, `0x633520`, which files each mission under a numbered tab: Allies 6, Soviets 7, Allied
+expansions 8, Soviet expansions 9, Ant 10 (the `mov [ebp-0Ch], n` after each test).
 
 ## The campaign map and branching missions (open)
 
@@ -144,7 +174,8 @@ tab:
 ## Traps
 
 - **Progress decides what shows.** A mission not yet unlocked doesn't list, even with `ShowOnMissionSelect`
-  true. Only `IsUnlockedAtStart` overrides that. Where the player's progress is kept is unknown: it isn't in the
+  true. Only `IsUnlockedAtStart` overrides that. On one player's Ant tab, two of the four missions showed, though all
+  four are `ShowOnMissionSelect` true. Where the player's progress is kept is unknown: it isn't in the
   local settings file. **Unproven.**
 - **TD's campaigns can't be borrowed.** Their instances are `TiberianDawn` instances on TD's tabs, and TD's scenario
   format doesn't run in Red Alert's engine. A GDI or Nod campaign in Red Alert needs new Red Alert scenarios.
@@ -165,8 +196,15 @@ tab:
 - **The campaign map:** the stock `RA_CAMPAIGNMAPS.XML` and `RA_ALLIES_MISSIONS.XML` read for this page (stages,
   movies, entries, `MapStageUnlock`, `RestoreAllUnits`), the movies listed in `MOVIES_RA.MEG`, and a working
   mod that couldn't make a map of its own or a lasting branch.
-- **Tab sort:** the two side tests and their calls were read from `ClientG.exe` on disk. A shipped mod's patch on
-  them lists its GDI and Nod missions.
+- **Tab sort:** the two side tests and their calls, and the tab numbers stored after each test in the tab sort,
+  were read from `ClientG.exe` on disk. A shipped mod's patch on them lists its GDI and Nod missions, and its notes
+  give the same tab numbers.
+- **The campaign files:** the stock manifests, campaign and mission files extracted from `CONFIG.MEG` for this page
+  (every `ProgressiveCampaignTypeClass`, every `MapStageUnlock`), checked against a working mod's campaign notes
+  and the loose copies its CAMPAIGNS page ships. The stock `INSTANCES.XML` has 456 instances: 22 on the Allied base,
+  20 Soviet, 8 and 9 on the Allied Counterstrike and Aftermath bases, 4 Ant.
+- **No restart:** a working mod copied a changed scenario INI into the mod's `CCDATA/` on a Steam Deck with the game
+  running, and the next Start played it.
 
 > [!TIP]
 > **In Tiberian Factions**

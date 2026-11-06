@@ -1,6 +1,6 @@
 ---
 title: Patching the launcher's code from your DLL
-description: ClientG loads a mod's DLL at its own start-up for a version check; DllMain runs inside the launcher there, so a pinned DLL can hook launcher functions on every machine, LAN joiners included, if every write checks the stock bytes first.
+description: ClientG loads a mod's DLL at its own start-up for a version check; DllMain runs inside the launcher there, so a pinned DLL can hook launcher functions on every machine, LAN joiners included, if every write checks the stock bytes first. A hidden message hooked in the launcher's event dispatcher tells each launcher its own player's details.
 tags: [clientg, code-patch, hooks, dll, advanced]
 holds_for: Steam build 21590013
 clientg_version: 1.153 (745903)
@@ -89,6 +89,29 @@ next section at `0x1BEA000`. Windows maps that tail as zero-filled, executable m
 code, shared by every patch you write. Plan who gets which bytes, and check every byte is still zero before writing,
 so that two patches never share a cave and a changed client never runs one.
 
+## Telling each player's launcher something
+
+Each launcher patches itself, but only the host's simulation knows each player's faction. The simulation can reach
+every launcher through EA's message callback, and a hook can read the message before the launcher shows it:
+
+1. **Send it from the DLL** with `CALLBACK_EVENT_MESSAGE`, as `On_Message` does with `MESSAGE_TYPE_DIRECT`: one
+   message per human house, with a marker of your own at the start of the text and the player's GlyphX ID in it.
+2. **Hook the launcher's event dispatcher**, `IncomingExternalGamePluginEventClass::Execute` (`0x783B60`), at its
+   type switch, `0x783B82`. The stock bytes there are `8B 43 10 8D 48 FF 83 F9 0D 0F 87 76 27 00 00`: the event's
+   type is at `+0x10`, and the switch takes 14 types. A snapshot hook (above) hands your handler the event in
+   `ebx`.
+3. **Pick out your messages.** In the launcher a message event is type 6. Its text is an MSVC `std::string` at
+   `+0x180` (length at `+0x190`, capacity at `+0x194`; with a capacity under 16 the characters sit at `+0x180`
+   itself, otherwise `+0x180` points at them).
+4. **Hide it.** The kind is at `+0x19C`. EA defines four kinds (`MESSAGE_TYPE_DIRECT` to
+   `MESSAGE_TYPE_PLAYER_DISCONNECTED`, 0 to 3). Set it past them, to `0x7F`, and the launcher shows nothing.
+5. **Act only on your own player's.** The launcher keeps its own player's GlyphX ID at `0x1FB6D48`, valid once the
+   byte at `0x1FB6D40` is non-zero. Compare it with the ID in the text, and hand the work to a thread of your own,
+   off the launcher's thread.
+
+Send it more than once (a mod sends at match start and again about 2 and 6 seconds later), since a joiner's
+launcher may still be loading at the first.
+
 ## How it was verified
 
 - **The two processes:** the exports each executable names (above), EA's `CNC_Version` in `DLLInterface.cpp`, and
@@ -97,6 +120,10 @@ so that two patches never share a cave and a changed client never runs one.
   Linux under Proton and on the Steam Deck. Both machines' `ClientG.exe` hash the same.
 - **Every LAN player patched:** checked in a LAN game, with a Deck hosting and a desktop joining. Each launcher's
   patches followed its own player.
+- **The message route:** the dispatcher's bytes at `0x783B82` read from `ClientG.exe` on disk; the four message
+  kinds and `CALLBACK_EVENT_MESSAGE` in EA's `DLLInterface.h`; the class name is a `ClientG.exe` string, and
+  `0x1FB6D48` is referenced from its code. In the same LAN game, every joiner's launcher acted on its own message,
+  and no message text showed.
 - **Unproven:** that an unpinned DLL is gone before a hook into it would run. That's why the pin is there, but
   nobody has tested what happens without it.
 

@@ -32,6 +32,9 @@ Every screen is a `.BUI` file under `DATA\ART\GUI\` in `CONFIG.MEG` (207 of them
 **Which screen opens is data.** Each faction in `FACTIONS.XML` lists screens by key in `GUIFileNames`, as
 `RA/<name>` (for example `DialogBox` → `RA/RA_DialogBox_Allied`), and names its HUD scenes. Pointing a key at
 TD's screen name swaps in TD's whole screen. For the HUD, see [Adding a faction](../engine/adding-a-faction.md).
+Red Alert's front-end screens (the lobbies, the multiplayer and quick-match screens and the rest) are listed only in
+`Faction5`'s entry, the USSR's. The other Red Alert countries list just their dialog boxes, so `Faction5` is the
+entry to edit for the front end.
 
 **Ship a `.BUI` loose**, at its path under your mod's `Data/` (`Data/ART/GUI/RA_MAIN_MENU.BUI`). A loose screen may
 be any size. Inside a replacement `CONFIG.MEG` it must keep the stock file's exact size: see
@@ -66,7 +69,8 @@ so far:
   widget. Editing the tint after a name changes the wrong widget.
 - Texture-set names are strings inside a widget's header leaf, and can be swapped for any set the launcher knows.
 
-Text styles live in `FONTLIBRARY.BFD`, a flat list of named styles, and new ones can be appended. Some text widgets
+Text styles live in `FONTLIBRARY.BFD`, a flat list of named styles, and new ones can be appended. A style's colour
+is its `0b 10` tag, four floats RGBA. Some text widgets
 are recoloured by the launcher itself, so for those a tint won't stick: use a coloured style instead.
 
 ## What you can do
@@ -100,7 +104,10 @@ why per-faction crests come from [re-pointing records in memory](../clientg-ram/
 
 - **A combo box's list only takes clicks inside the group that holds the combo.** Stretch a drop-down list past
   its group and its lower rows draw, but close the list when clicked. Grow the group too, and scale its other
-  widgets so nothing moves on screen (observed).
+  widgets so nothing moves on screen (observed). The list's row height is the micro-chunk `05 04 <float>` in the
+  list's property leaf, a fraction of the combo's height: 0.0975 in Red Alert's faction combo, 0.1711 in TD's.
+- **A cloned group keeps its source group's tint**, and places its children differently from the original
+  (observed). To add a group of widgets, insert them straight into the screen's top group instead.
 - **A widget moved off screen widens the screen's fit**, stretching the whole menu, and its clicks, on ultrawide
   displays. Shrink a widget you want gone, in place, instead (observed).
 - **Shared sets and styles restyle more than one screen.** The stock main menu's buttons use the texture set
@@ -122,6 +129,10 @@ why per-faction crests come from [re-pointing records in memory](../clientg-ram/
   LAN screens and HUD to TD's.
 - **Cloned widgets:** a shipped mod's main menu carries cloned buttons, and a HUD test with inserted widgets drew
   normally.
+- **`Faction5`, the colour tag and the row height:** the stock `FACTIONS.XML` (only `Faction5`'s `GUIFileNames`
+  holds the lobbies), the stock `FONTLIBRARY.BFD` (`0b 10` and four floats in each style), and the stock combo-box
+  screens (`05 04` and 0.0975 or 0.1711), all read for this page; a shipped mod edits all three and they hold in
+  game. The cloned-group tint is that mod's record only.
 
 > [!TIP]
 > **In Tiberian Factions**

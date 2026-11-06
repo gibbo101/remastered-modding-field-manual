@@ -1,6 +1,6 @@
 ---
 title: MEG and MIX archives
-description: The Remastered Collection's MEG bundles (named entries, no checksum, EA's own reader and builder in the map editor source) and the classic MIX archives inside them (entries keyed by a filename hash, Red Alert's outer MIXes encrypted), with what a modder needs to read, extract and repack each.
+description: The Remastered Collection's MEG bundles (named entries, no checksum, EA's own reader and builder in the map editor source) and the classic MIX archives inside them (entries keyed by a filename hash, Red Alert's outer MIXes encrypted), with what a modder needs to read, extract and repack each, and which archive holds Red Alert's rules.ini and expansion INIs.
 tags: [formats, meg, mix, config-meg, tools]
 holds_for: Steam build 21590013
 status: verified
@@ -118,6 +118,19 @@ Red Alert's top-level archives add a 4-byte header and encrypt their index:
 Archives nest. `MAIN.MIX` and `REDALERT.MIX` hold other MIXes as ordinary entries, usually classic and
 unencrypted, so a search for a file has to recurse into them.
 
+### Where Red Alert's files are
+
+In `Data/CNCDATA/RED_ALERT/CD1/`:
+
+| Archive | Holds |
+|---|---|
+| `REDALERT.MIX` | 6 nested MIXes. `LOCAL.MIX` among them holds `rules.ini` (59,867 bytes) and 48 `.lut` colour tables. |
+| `EXPAND2.MIX` | Aftermath's new units' art (the Chrono, Tesla and MAD tanks and others), `aftrmath.ini`, `mplayer.ini`, `mission.ini` and `tutorial.ini`. 32 entries, no nested MIX. |
+| `MAIN.MIX` | 12 nested MIXes, about 454 MB: `MOVIES1.MIX` (369 MB), `SCORES.MIX`, `GENERAL.MIX` (the scenarios), the theatre MIXes (`TEMPERAT`, `SNOW`, `INTERIOR`), `CONQUER.MIX`, `SOUNDS.MIX`, `ALLIES.MIX`, `RUSSIAN.MIX` and the editor's two. |
+
+These are the files EA's code loads by name: `RULES.INI` and `AFTRMATH.INI` in `INIT.CPP`, after `EXPAND2.MIX` is
+registered there.
+
 ## Traps
 
 - **Matching a name needs the right hash.** A MIX listing that resolves almost nothing is usually being matched
@@ -142,6 +155,9 @@ unencrypted, so a search for a file has to recurse into them.
   page (the table above). The key chain mirrors
   EA's `PK.CPP`, `BLOWFISH.CPP` and `MIXFILE.H`, and a working mod's reader extracts Red Alert's `PALETTE.CPS`
   with it.
+- **Where Red Alert's files are:** `REDALERT.MIX`, `LOCAL.MIX`, `EXPAND2.MIX` and `MAIN.MIX` listed for this page
+  with a working mod's reader (every name resolved), and `rules.ini` extracted and read; the same layout in that
+  mod's MIX notes; EA's `INIT.CPP` for the names it loads.
 
 > [!TIP]
 > **In Tiberian Factions**

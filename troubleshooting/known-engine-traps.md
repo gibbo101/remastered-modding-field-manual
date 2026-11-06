@@ -1,7 +1,7 @@
 ---
 title: Known engine traps
-description: Crashes and misbehaviour in EA's released Red Alert source that any DLL mod built from it inherits. The mod search-path buffer overruns with about four mods enabled; another folder's RULES.INI is read before yours; a sidebar column of exactly 75 entries writes past its array; a crate that destroys the unit driving onto it leaves a call on a dead unit. Each with its fix.
-tags: [troubleshooting, crashes, engine, dll, ini, sidebar, crates]
+description: Crashes and misbehaviour in EA's released Red Alert source that any DLL mod built from it inherits. The mod search-path buffer overruns with about four mods enabled; another folder's RULES.INI is read before yours; a sidebar column of exactly 75 entries writes past its array; the name table fills; a crate that destroys the unit driving onto it leaves a call on a dead unit; a misspelt INI key makes Inaccurate=yes do nothing. Each with its fix.
+tags: [troubleshooting, crashes, engine, dll, ini, sidebar, crates, projectiles]
 holds_for: Steam build 21590013
 status: verified
 unproven: [whether the stock RedAlert.dll shipped with the game behaves exactly as EA's released source on each trap, the order in which the launcher registers enabled mods' folders]
@@ -20,7 +20,8 @@ source in January 2025, so this should hold.
 When your mod ships a DLL built from EA's released source, directly or through Vanilla Conquer. Each trap below is
 in EA's own code, so your DLL has it too unless you've fixed it. Most of them stay hidden in the stock game and
 only show once a mod grows it: more mods enabled, more buildable types, crates in a busy game. A data-only mod
-runs on the stock DLL and can't change them, though the INI trap still applies to it.
+runs on the stock DLL and can't change them, though the two INI traps (another folder's `RULES.INI`, the misspelt
+key) still apply to it.
 
 ## More than about four mods enabled: the search path overruns
 
@@ -98,6 +99,18 @@ Start_Driver".
 return at once if the unit is gone. A working mod linked it to crashes in LAN games with crates on, which stopped
 after the fix.
 
+## `Inaccurate=yes` does nothing: the key is spelt `Inaccuate`
+
+`BulletTypeClass::Read_INI` reads a projectile's inaccuracy from the key `Inaccuate`, one letter short
+(`BBDATA.CPP`). Stock `rules.ini` documents and sets `Inaccurate=yes`, on `FROG`, `HeatSeeker`, `Lobbed`, `Catapult`
+and `Ballistic`, and the game never reads it. Those projectiles still scatter when fired on the move, or when an
+armour-piercing or fuelled shot is aimed at infantry or the ground (`BulletClass::Unlimbo`), but not by type. Your
+own `Inaccurate=yes` is ignored the same way.
+
+**Fix:** in a DLL, read both spellings, the correct one second so it wins. A data-only mod can write
+`Inaccuate=yes`, which the stock DLL reads. Mind the balance: turning it on for the stock projectiles changes every
+stock weapon that uses them. Vanilla Conquer keeps EA's spelling.
+
 ## How it was verified
 
 Each trap three ways:
@@ -107,10 +120,14 @@ Each trap three ways:
   mod path; the search order in `CDFileClass::Set_Name` and the bare-name loads in `INIT.CPP`, `SCENARIO.CPP` and
   `SAVELOAD.CPP`; the `<=` guard and `MAX_BUILDABLES=75` in `SIDEBAR.H`, `SIDEBAR.CPP` and `SIDEBARGlyphx.CPP`;
   the crate chain through `FOOT.CPP`, `CELL.CPP` and `DRIVE.CPP`, with `Set_Speed` declared `virtual` in
-  `FOOT.H`; `NameOverride[25]` in `GLOBALS.CPP`, its fill loop in `TECHNO.CPP` and the `<` test in `INLINE.H`. Vanilla Conquer inherits the search-path code unchanged.
+  `FOOT.H`; `NameOverride[25]` in `GLOBALS.CPP`, its fill loop in `TECHNO.CPP` and the `<` test in `INLINE.H`; the
+  `"Inaccuate"` key in `BBDATA.CPP`, in the Remastered source, in EA's original Red Alert source and in Vanilla
+  Conquer's `bbdata.cpp`, and its use in `BULLET.CPP`. Vanilla Conquer inherits the search-path code unchanged.
+- **The game's files:** stock `rules.ini` (from `REDALERT.MIX`) sets `Inaccurate=yes` on five projectiles and
+  never the key the code reads.
 - **A working mod hit each one:** the search-path crash, reported by another modder running several mods; another
   rules mod's `RULES.INI` replacing its own; the sidebar overrun and the name table, both found as its roster grew; and the crate crash,
-  found from minidumps.
+  found from minidumps. Its projectile code reads both spellings of the inaccuracy key.
 - **The fixes** are in that mod's code and released, and the crashes stopped.
 - **Unproven:** that the stock `RedAlert.dll` behaves exactly as the released source on each trap (it's built from
   it, but the binary wasn't checked), and the order in which the launcher registers enabled mods' folders, which
@@ -119,6 +136,8 @@ Each trap three ways:
 > [!TIP]
 > **In Tiberian Factions**
 >
-> TF fixed all four. It hit the sidebar limit first, once its TD and Tiberian Sun trees joined Red Alert's; its
+> TF fixed all of them. It hit the sidebar limit first, once its TD and Tiberian Sun trees joined Red Alert's; its
 > columns now hold 120. DontCryJustDie reported the search-path crash and the rules trap from his own mod's
-> experience. TF loads its rules from its own folder, unless a found `RULES.INI` carries TF's sections.
+> experience. TF loads its rules from its own folder, unless a found `RULES.INI` carries TF's sections, and reads
+> both spellings of the inaccuracy key. Its `rules.ini` sets the five stock projectiles to `Inaccurate=no`, so they
+> stay as accurate as Red Alert has always played them.

@@ -41,6 +41,9 @@ don't repaint must still be there.
 
 - **Either TGA flavour loads.** The stock atlas is bottom-origin with no footer (descriptor `0x00`). A copy written
   by a typical image library, top-origin with a footer (descriptor `0x08`), loads too.
+- **Or edit the stock file's bytes in place.** After its 18-byte header, the pixel at `(x, y)` (from the top-left,
+  as the `.MTD` measures) is at `18 + (6716 - 1 - y) × 6871 × 4 + x × 4`, stored `B, G, R, A`. The file stays
+  format-identical, and only the regions you paint change.
 - **Ship it as DXT5 DDS to save video memory.** The atlas is drawn on every screen, and as a TGA it costs 176 MB.
   As a DXT5 DDS with a full mip chain it's 62 MB, and the menus and sidebar look the same. DXT needs sides that are
   multiples of 4, so pad the width from 6871 to 6872 pixels. Name it `MT_COMMANDBAR_COMMON.DDS`, in the same folder.
@@ -68,8 +71,9 @@ Most lost time here is spent repainting the wrong region. Several look alike:
 | The radar crest, in a match | `UI_SIDEBAR_FACTIONLOGO_ALLIES` / `_SOVIET` (794 × 713) in Red Alert's HUD; `_GDI` / `_NOD` in TD's | side, and the HUD scene |
 | The big side logo in the skirmish lobby | `RA_UI_MULTIPLAYER_ALLIED_LOGO_LARGE_NORMAL` and its `_HOVER` / `_SELECTED` versions | side |
 | A country's flag in lobby lists | `RA_UI_FLAG_ICON_<COUNTRY>` (73 × 40) | country |
-| The small logo on waypoint and rally markers | `RA_UI_ALLIED_LOGO_SMALL` / `RA_UI_SOVIET_LOGO_SMALL` | side |
-| A faction's emblem in the lobby picker | `UI_MULTIPLAYER_PLAYERSLOT_FACTION_<nn>` with `_ON` / `_OVER` | the picker row, via `FACTIONS.XML` |
+| The small logo on waypoint and rally markers | `RA_UI_ALLIED_LOGO_SMALL` (25 × 19) / `RA_UI_SOVIET_LOGO_SMALL` (21 × 18) | side |
+| A faction's emblem in the lobby picker | `UI_MULTIPLAYER_PLAYERSLOT_FACTION_<nn>` with `_ON` / `_OVER`: `_00` and `_01` (66 × 56) are TD's GDI and Nod, `_03` to `_10` (150 × 80) Red Alert's eight countries, and there is no `_02` | the picker row, via `FACTIONS.XML` |
+| A player's badge on the lobby map's start positions and on the loading screen | `UI_MAPSELECT_FACTION_<nn>` (40 × 40), numbered `_01` to `_10`, one above the picker's numbers | the faction |
 
 **Per side or per country decides what you can do with data.** A repainted crest shows for every faction on that
 side and HUD scene. A repainted flag shows only for its country, so it's the clean data lever for a faction that
@@ -92,6 +96,11 @@ grown TGA is about 268 MB, against 184 MB.
 - **The atlas and table:** `TEXTURES_SRGB.MEG`'s listing (1,355 DDS plus the atlas TGA, `.MTD` and `.MTM`), the
   atlas's TGA header, and regions read from the `.MTD` with the padding rule above. Each matches the boxes a
   working mod's crest patch uses.
+- **The picker, marker and small-logo regions:** their boxes read from the `.MTD` for this page, and the stock
+  `FACTIONS.XML`, whose `SmallIconName`s run `_00`, `_01`, `_03` to `_10`. A shipped mod repaints all of them and
+  each shows where the table says; that the map badges also draw on the loading screen is its record (observed).
+- **Editing in place:** the formula matches the stock file's size (18 + 6871 × 6716 × 4 = 184,582,562 bytes) and
+  the scripts a shipped mod paints its crests and emblems with.
 - **Loose TGA:** a shipped mod's repainted copy draws in menus and matches, and another mod's
   ([Reilsss's Command & Conquer in Red Alert](https://steamcommunity.com/sharedfiles/filedetails/?id=2853520457))
   ships one with descriptor `0x08` and a footer that also loads. It's the only loose atlas among the Workshop mods

@@ -28,10 +28,13 @@ digging units doesn't need this page.
 OpenTS's `tunnel.cpp` reconstructs TS's `TunnelLocomotionClass`, and its `unit.cpp` the drive-or-dig decision:
 
 - **Dig unless a short surface route exists.** TS digs on a move order unless the destination is in the same zone,
-  within 12 cells, and reachable by a short trial walk.
-- **Underground travel is a straight line** through any terrain, water included, at a fixed speed.
+  within 12 cells, and reachable by a short trial walk. It never digs to an adjacent cell.
+- **Underground travel is a straight line** through any terrain, water included, at a fixed 19 leptons a tick,
+  whatever the unit's own speed.
 - **Surfacing:** on arrival, a blocked cell is swapped for a nearby legal one. With no legal cell anywhere, the unit
-  is destroyed. A stop order underground heads for the nearest place it can surface.
+  is destroyed. A stop order underground heads for the nearest place it can surface, unless the unit is already
+  within a cell's diagonal of its destination, where it carries on. The search tries the unit's own zone first,
+  then any zone.
 
 ## The method in Red Alert's DLL
 
@@ -45,7 +48,9 @@ OpenTS's `tunnel.cpp` reconstructs TS's `TunnelLocomotionClass`, and its `unit.c
 4. **Protect it while under:** no damage unless forced, no firing, no scattering, no unloading.
 5. **Let orders aim at anything:** a click on water or a cliff is a legal order, resolved to the nearest cell it can
    surface on.
-6. **Surface only on legal ground:** not water, rock, an occupied cell or a building.
+6. **Surface only on legal ground:** not water, rock, an occupied cell or a building. Red Alert's
+   `MapClass::Nearby_Location` does TS's two-step search: pass the unit's zone first, then `-1`, which
+   `CellClass::Is_Clear_To_Move` reads as any zone.
 
 The owner sees an earth marker. A useful trick: make the marker the unit's own underground frame, because the
 launcher draws an owner's cloaked unit solid. The owner sees the marker, and enemies see nothing.
@@ -79,8 +84,13 @@ tilt; hide the hull the moment the last step completes, while the mound is still
 ## How it was verified
 
 - **What stock Red Alert lacks:** `grep -a` over EA's Red Alert source finds no tunnel locomotion.
-- **TS's model:** OpenTS's `tunnel.cpp` and `unit.cpp`, and TS's `RULES.INI` (`[SAPC]`, `[SUBTANK]`, `[General]`'s
-  `TunnelSpeed`, `DigSound`, `Dig=DIG`) and art registry.
+- **TS's model:** OpenTS's `tunnel.cpp` (`Process_Tunneling`'s fixed 19-lepton step, `Stop_Moving`'s
+  cell-diagonal test and its same-zone-then-any `Nearby_Location` calls) and `unit.cpp` (`Is_Route_Broken`: no dig
+  to an adjacent cell), and TS's `RULES.INI` (`[SAPC]`, `[SUBTANK]`, `[General]`'s `TunnelSpeed`, `DigSound`,
+  `Dig=DIG`) and art registry.
+- **The surfacing search in Red Alert:** EA's `MapClass::Nearby_Location` (`MAP.CPP`) and `Is_Clear_To_Move`
+  (`CELL.CPP`, where a zone of `-1` matches any), and the working mod's code, which calls it with the unit's zone
+  and then `-1`, and steps 19 leptons a tick underground.
 - **A working mod:** both TS digging units in its release, with the behaviour above, played under Proton on Linux
   and on the Steam Deck.
 - **Unproven:** saving and loading with a unit underground.

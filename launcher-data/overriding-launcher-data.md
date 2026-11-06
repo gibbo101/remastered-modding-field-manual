@@ -88,7 +88,10 @@ mod's root instead. Whether the launcher also reads it there hasn't been tested.
   those, see the pages on [re-pointing records in memory](../clientg-ram/repointing-atlas-regions.md) and
   [patching the launcher's code](../clientg-ram/patching-the-launchers-code.md).
 - **Player-side settings.** For example, no file shipped in a mod sets a default key binding. There is no
-  `InputTranslatorConfigurations_Mod.xml`, and the launcher ignores a mod's copy of the bindings file.
+  `InputTranslatorConfigurations_Mod.xml`, and the launcher ignores a mod's copy of the bindings file. The
+  player's own settings, bindings included, are in `userdata/<account>/1213210/remote/Player_RA_settings_1.bin`
+  (and `Player_TD_settings_1.bin`): a ChunkFile (`CH`, zlib from `0x24`) with a second ChunkFile nested inside,
+  synced by Steam Cloud and kept after the mod is gone. It's the player's file, so a mod shouldn't write it.
 
 ## Traps
 
@@ -117,6 +120,8 @@ mod's root instead. Whether the launcher also reads it there hasn't been tested.
 - **`GameConstants_Mod.xml`:** the path appears in `ClientG.exe`, and it's the only `_Mod` name there. A shipped mod
   uses it to lock out classic graphics, enable the mod hotkeys and add theatre slots, all working in play.
   Vanilla Conquer's TD sample uses the same file and `overwrite="true"`.
+- **The settings file:** read for this page (the nested `CH` header inside the first stream) and listed in Steam's
+  `remotecache.vdf` for the game; a working mod's notes on it match.
 - **The server:** `InstanceServerG.exe` carries its own `\XML\Instances.xml` path and the
   `Creating instance %s` assert from `serveripcmessagehandler.cpp`, which a new instance hits at match start.
 

@@ -62,7 +62,8 @@ Check here before porting anything:
    lower-cased the files and refactored many of them, so a CFE commit won't cherry-pick. Expect drift in exactly
    the files Vanilla Conquer changed.
 3. **Take the LAN-safe version.** CFE 1.7 reworked its features for LAN play ("All mod features should now work
-   perfectly in LAN multiplayer", except the wall-building preview). Port code from 1.7 or later, not earlier.
+   perfectly in LAN multiplayer", except the wall-building preview). Port code from 1.7 or later, not earlier, and
+   the A\* from 1.8 or later (see [Pathfinding](../ai/pathfinding.md)).
 4. **Decide on the switches.** Every CFE feature reads an on/off key from CFE's own INI. You can keep that, or
    switch features on in code and drop the INI.
 5. **Expect your save version to change.** EA's saved classes end in a `SaveLoadPadding` byte array (32 bytes in
@@ -80,7 +81,7 @@ Check here before porting anything:
 | **Rally points** | `RALLY_POINTS` | A saved `RallyPoint` on `BuildingClass`, the click handling, and the line drawn in the building's draw code (below). |
 | **A\* pathfinding** | `ASTAR_PATHING` | The search and its hooks: see [Pathfinding](../ai/pathfinding.md). |
 | **Infantry Tiberium aversion** | `INFANTRY_TIBERIUM_AVERSION` (TD only) | A cost per Tiberium cell in the A\* search, for infantry. Needs the A\* port. |
-| **Harvester queue-jumping and optimisation** | `HARVY_QUEUE_JUMP`, `HARVY_OPTIMIZE` | Refinery choice by distance plus a weight per inbound harvester: see [Harvesters](../ai/harvesters.md). |
+| **Harvester queue-jumping and optimisation** | `HARVY_QUEUE_JUMP`, `HARVY_OPTIMIZE` | Refinery choice by distance plus a weight per inbound harvester: see [Harvesters](../ai/harvesters.md). CFE's older `HARVY_LOAD_BALANCING` is switched off whenever optimisation is on, so it needn't be ported. |
 | **Smarter repair bay** | `SMARTER_REPAIRBAY` | Queueing for a busy bay, a working rally point on the bay, and a better exit for repaired units (`DoSmarterRunAway`). |
 | **Smarter SAMs** | `SMARTER_SAMS` (TD only) | A SAM that loses its target with ammo left looks for another before lowering. Tiberium Dawn's SAM state machine only. |
 | **Harvester self-repair** | `HARVY_SELF_REPAIR` (TD only) | Nothing in Red Alert: the stock `SelfHealing=yes` key does it (below). |
@@ -133,7 +134,12 @@ offered on smaller maps (not tested here).
   and drives past power plants and factories. Changing that is a design choice of your own.
 - **Special cases.** CFE's README lists them: aircraft return to base when out of ammo or at the destination;
   boats (except the plain submarine) attack briefly and move on, and surface boats don't chase; minelayers lay all
-  their mines near the destination and return to the repair bay. Each is code in that unit kind's class.
+  their mines near the destination and return to the repair bay. Each is code in that unit kind's class. A boat's
+  "briefly" is a 180-frame clock set when it engages, and for the last 90 frames it's forced back to moving.
+- **The minelayer sees hidden mines.** `MinelayerFindSpot` skips any cell holding a building, and mines are
+  buildings, so it steers round enemy mines its owner can't see. CFE's own comment calls it a small cheat.
+- **Aircraft flags are private.** EA's `AircraftClass` keeps `IsLanding` and `IsTakingOff` private, and attack-move
+  reads them from `TechnoClass`. CFE comments out the `private:`; on a Vanilla Conquer base, make the two public.
 
 ### Rally points
 
@@ -184,17 +190,23 @@ superweapons, instant capture) are design choices, not fixes.
   the rally artwork), its default INIs (the feature keys), its git history (the commits citing Vanilla Conquer, the
   two disputed fixes, the padding correction, the 1.9 rally-line fix, the zoom commit), and its source: the
   `MISSION_ATTACKMOVE` comment, the `Missions[]` names, `DLL_Export_Get_Input_Key_State` in `AIRCRAFT.CPP`, the
-  owner-only rally drawing, the Smarter SAMs code in TD's `BUILDING.CPP`. Its Workshop item (2268301299) ships
+  owner-only rally drawing, the Smarter SAMs code in TD's `BUILDING.CPP`, `AttackMoveBoatClock` (`TECHNO.CPP`),
+  `MinelayerFindSpot` and its comment (`UNIT.CPP`), the commented-out `private:` in `AIRCRAFT.H`, and
+  `Find_Best_Refinery` taking the optimised choice whenever `HARVY_OPTIMIZE` is on (its README says the same). Its
+  Workshop item (2268301299) ships
   `Data/RedAlert.dll` and a whole `GAMECONSTANTS.XML`.
 - **Vanilla Conquer:** ChthonVII's four commits on its `vanilla` branch, and its commit removing `SaveLoadPadding`
   from every class.
-- **EA's source and the base game:** `SaveLoadPadding` in the saved classes' headers; `Missions[]` and
+- **EA's source and the base game:** `IsLanding` and `IsTakingOff` under `private:` in `AIRCRAFT.H` (and in Vanilla
+  Conquer's); mines as buildings (`STRUCT_AVMINE`, `STRUCT_APMINE`); `SaveLoadPadding` in the saved classes'
+  headers; `Missions[]` and
   `Mission_From_Name`; `CNC_Handle_Input` and the per-player `SpecialKeyFlags`; the weaponless-building filter in
   `Evaluate_Object`; no attack-move or rally point anywhere in EA's Red Alert; ore's `LAND_TIBERIUM`; `IsSelfHealing`
   in `TechnoClass::AI`. Each was read with `grep -a`. The stock zoom list is in `CONFIG.MEG`'s `GameConstants.xml`,
   and `[HARV]` with `SelfHealing=yes` is in the base game's `rules.ini`.
 - **A working mod** ported each feature in the table into a Vanilla Conquer DLL and played it in skirmish under
-  Proton on Linux. LAN play of the ported features rests on CFE's own statement, not a test here.
+  Proton on Linux. Its port notes record the boat clock, the minelayer leak and the build fix for the aircraft
+  flags. LAN play of the ported features rests on CFE's own statement, not a test here.
 
 **Credits:** cfehunter (the original CFE Patch, and its A\*), Root-Core (the first Red Alert port), ChthonVII (CFE
 Patch Redux: attack-move, harvester optimisation, Tiberium aversion, smarter repair bays, LAN play and most of the

@@ -80,6 +80,18 @@ twins.
 `TDACCOM1`), and add `RAC_SFX_TDACCOM1` and `RAR_SFX_TDACCOM1` as `<LocalizedSFXEvent>` entries pointing at TD's
 `TDC_SFX_EVA_ACCOM1_EN-US.MP3` and `TDR_SFX_EVA_ACCOM1_EN-US.MP3`.
 
+**Unit voices** are localized too. TD's commando one-liners are 14 lines in `SFX2D_EN-US.MEG`, as
+`TDC_SFX_CMD_<NAME>_EN-US.WAV` and `TDR_SFX_CMD_<NAME>_EN-US.WAV` (`BOMBIT1`, `ROKROLL1`, `NOPRBLM1`, `RAMYELL1` and
+others). **Give them names of your own.** Red Alert's Tanya uses the same bare names (`ROKROLL1`, `BOMBIT1` in
+`SoundEffectName[]`), and the base game already has `RAC_SFX_ROKROLL1` and its siblings, pointing at Red Alert's
+recordings. A `ROKROLL1` routed as above plays Tanya. Name the TD line `TDROKROLL1` in the DLL instead, and point
+`RAC_SFX_TDROKROLL1` and `RAR_SFX_TDROKROLL1` at TD's samples.
+
+**The voice enum is a byte.** EA's `VoxType` is `enum VoxType : char` (`DEFINES.H`), and Red Alert already has 111
+EVA lines in it, so there is room for 16 more before the enum overflows past 127. Adding TD's EVA set needs the
+enum widened (`: short`). Trigger actions and superweapons store a `VoxType`, so widening it can change those classes'
+sizes, and with them the save version: see [Save versions](../engine/save-versions.md).
+
 ## Samples of your own
 
 New sounds ship loose in the mod, under names of their own: `Data/AUDIO/` for sound effects, and a locale folder
@@ -124,6 +136,11 @@ MEGs: event counts, prefix pairs, presets, EA's own Red Alert events that play T
 sample measured. In a shipped mod, the TD credit tick and around a hundred TD EVA lines play in game from the base
 game's samples, none of them shipped, and the mod routes its TD weapon reports the same way. The PCM crash was
 taken from two identical crash records. Tested under Proton on Linux and on the Steam Deck.
+
+The commando lines were listed from `SFX2D_EN-US.MEG` and the stock `SFXEVENTSLOCALIZED.XML` (the `TDC_`, `TDR_`,
+`RAC_` and `RAR_` events of the same bare names), against EA's `AUDIO.CPP`, where Tanya's lines take those names. A
+shipped mod plays TD's commando under `TD`-prefixed names. The `VoxType` width is EA's `DEFINES.H`, where the 111
+lines were counted, and that mod widens it to carry TD's EVA lines.
 
 **Unproven:** in one early test a routed TD sound stayed silent until its sample was copied into the mod, and the
 cause was never found. Every later route to a base sample played. If a routed TD sound is silent, shipping a copy

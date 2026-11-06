@@ -45,6 +45,8 @@ what it does with the technique.
 
 ### File formats
 - [MEG and MIX archives](formats/meg-and-mix-archives.md): reading, extracting and repacking the game's archives.
+- [Save files (.sav)](formats/save-files.md): the save game's chunk layout, and how to reach the DLL's own save
+  data.
 
 ### Launcher data
 - [Overriding the launcher's data](launcher-data/overriding-launcher-data.md): loose files, a replacement
@@ -134,6 +136,8 @@ what it does with the technique.
   faction navies and air forces.
 - [Jumpjets, deployers, mines and bouncing discs](behaviours/jumpjets-deployers-and-more.md): smaller TS behaviours
   and the engine checks they hit.
+- [Hover and amphibious units](behaviours/hover-and-amphibious-units.md): units that cross land and water; restoring
+  the SPEED_HOVER that Red Alert dropped, with a movement zone that spans the shore.
 
 ### Art
 - [How the launcher draws sprites](art/how-the-launcher-draws-sprites.md): canvas-centre anchoring, shape and
@@ -168,6 +172,8 @@ what it does with the technique.
   functions from the start-up load, safely, on every player's machine.
 - [Rewriting launcher strings in memory](clientg-ram/rewriting-launcher-strings.md): changing a name the
   launcher builds in code, with the sidebar tab icons as the example.
+- [Launcher key commands and superweapon clicks](clientg-ram/launcher-key-commands-and-clicks.md): making the
+  deploy, select-all and camera keys act on a mod's own types, and a superweapon fire on one click.
 
 ### Open questions
 - [Open questions](open-questions.md): research not yet proven in game, what's established, and the test that

@@ -83,6 +83,47 @@ EA's guidelines bar music from C&C games in a mod, so the tracks would be conver
 - **The test:** a reread of the guidelines first, then one track converted by the DLL inside the launcher.
 - **Full context:** TF's [Tiberian Sun music import design](https://github.com/gibbo101/cnc-ra-tiberian-factions/blob/main/docs/ts-music-import.md).
 
+## Hiding a unit from the enemy's radar
+
+A unit that can be seen on the map but not on the enemy's minimap.
+
+- **Established (read from EA's source):** both games' type constructors take an "invisible to radar" flag
+  (`is_stealthy`, stored as `ObjectTypeClass::IsStealthy`), and nothing in either game's source reads it. Red Alert's
+  `Invisible=yes` (`IsInvisible`) hides a unit from enemies altogether: the DLL leaves it out of enemy players'
+  exports. A cloaked unit is exported with its cloak state.
+- **Untested:** whether the launcher's minimap shows a cloaked or `Invisible=` unit to an enemy.
+- **The test:** a skirmish with one `Invisible=yes` unit and one cloaked unit near an enemy base, watched from the
+  enemy's side, on the map and the minimap.
+- **Full context:** TF's [TD vehicle port recipe](https://github.com/gibbo101/cnc-ra-tiberian-factions/blob/main/docs/td-vehicle-port-recipe.md).
+
+## How a campaign ends, and stages with one mission
+
+- **Established:** in the stock mission files, only Red Alert's last Allied and Soviet missions (`RA_ALLIES_14`,
+  `RA_USSR_14`) and TD's last Nod missions carry `MapStageUnlock` -1; the expansion and Ant finales carry none (see
+  [Custom campaigns](maps-and-lobby/custom-campaigns.md)). In one mod's development build, a campaign rolled the
+  credits after its last mission and skipped the map screen for a one-mission stage.
+- **Untested:** whether -1 is what ends a campaign and rolls the credits; whether a one-mission stage skips the map
+  screen outside that build.
+- **The test:** give a reused stock slot's mission definition `MapStageUnlock` -1 in a loose mission file, finish
+  it, and watch for the credits. Then cut a stage's campaign-map entry to one mission.
+- **Full context:** TF's [campaigns page doc](https://github.com/gibbo101/cnc-ra-tiberian-factions/blob/main/docs/campaigns-page.md).
+
+## Launcher data nobody has changed yet
+
+Team colours, cursors, lobby option lists, the bonus gallery, slash commands and UI hints are all data in
+`CONFIG.MEG`.
+
+- **Established:** `CNCRATEAMCOLORS.XML` and `CNCTDTEAMCOLORS.XML` key colour transforms by country.
+  `MOUSEPOINTERS.XML` has 90 entries (texture and hotspot). The lobby lists (`CNCStartingUnits`,
+  `CNCStartingCredits` and others) are `<Entry>` lists in `GameConstants.xml`. `CNCRABONUSCONTENT.XML` has 87 gallery
+  entries, `SLASHCOMMANDS.XML` 203 commands with permission letters, and `UIHINTS.XML` ships every hint commented out.
+  `CNCRULES.XML` has a per-difficulty table marked `network="server"`.
+- **Untested:** whether a loose or `GameConstants_Mod.xml` change to any of these shows in game; whether ClientG
+  honours slash-command permissions from data; whether UI hints are live; whether `CNCRULES.XML` is read at all.
+- **The test:** one change each (a recoloured country, a new cursor texture, a tenth starting-units entry, a relaxed
+  permission letter, one uncommented hint), launched once.
+- **Full context:** TF's [CONFIG.MEG lever audit](https://github.com/gibbo101/cnc-ra-tiberian-factions/blob/main/docs/config-meg-lever-audit.md).
+
 ## Whether a terrain tileset costs video memory whole
 
 - **Established and untested:** see "What's open: video memory" on

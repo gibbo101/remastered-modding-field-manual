@@ -1,6 +1,6 @@
 ---
 title: EMP and stun
-description: An EMP that disables vehicles and buildings for a time, ported from Tiberian Sun's EMPulseClass (OpenTS empulse.cpp) into Red Alert, which has no timed stun; what a pulse affects, the gates a stunned object needs, diggers, and a sensor that shows hidden enemies without decloaking them.
+description: An EMP that disables vehicles and buildings for a time, ported from Tiberian Sun's EMPulseClass (OpenTS empulse.cpp) into Red Alert, which has no timed stun; what a pulse affects and spares, the order events a stunned object must ignore, diggers, and a sensor that shows hidden enemies without decloaking them.
 tags: [behaviours, emp, stun, superweapons, detection, tiberian-sun, dll]
 holds_for: Steam build 21590013
 status: verified
@@ -31,8 +31,13 @@ From OpenTS's `empulse.cpp` (`EMPulseClass::Create`) and TS's `RULES.INI`:
 - **Inside the circle:** grounded aircraft crash; underground units lose power and stop; buildings lose power for
   the duration; vehicles and aircraft with a locomotor are stunned. Plain infantry are untouched (only cyborgs are
   stunned), and Visceroids are immune.
-- **The stun counts down** on each object (`StunDuration`). While it runs the object can't move, fire, produce or
-  deploy. At zero, a building's power comes back.
+- **Who's spared:** the object that fired the pulse; a building whose centre cell is outside the circle, even if
+  part of it is inside; and anything in a cell that holds a building, since such a cell affects only the building, so
+  aircraft parked on a pad come through. Limpet mines in the circle are destroyed rather than stunned.
+- **The stun counts down** on each object (`StunDuration`), with TS's `EMPulseSparkles` animation (`EMP_FX01`)
+  attached. While it runs the object can't move, fire, produce or deploy. At zero, a building's power comes back.
+- **No lingering field.** The pulse marks its cells, but nothing reads the mark: a unit driving in afterwards is
+  unaffected. Only each object's own timer matters.
 
 ## The method in Red Alert's DLL
 
@@ -40,7 +45,8 @@ From OpenTS's `empulse.cpp` (`EMPulseClass::Create`) and TS's `RULES.INI`:
 2. **The pulse:** a function that, given a centre cell, radius and duration, walks the cells in a circle
    (`dx*dx + dy*dy <= r*r`) and applies TS's rules above. Call it from the warhead's impact instead of doing damage.
 3. **Gates while stunned**, each one a place that must check the timer:
-   - movement orders and events ignored, and movement finishes the current cell, then holds;
+   - the order events that move or re-task it ignored (`EventClass`'s `MEGAMISSION`, `IDLE`, `SCATTER` and
+     `PRIMARY`), and movement finishes the current cell, then holds;
    - `Can_Fire` refuses;
    - the player can't move it;
    - deploying and taking off refused;
@@ -71,8 +77,12 @@ cloaked ones attackable through the copy (the cell carries the attack action), a
 - **What stock Red Alert lacks:** `grep -a` over EA's Red Alert source finds no EMP and no timed stun. Its
   `TechnoClass::Stun()` (`TECHNO.CPP`) only clears targets, radio and selection.
 - **TS's model:** OpenTS's `empulse.cpp` (the circle test, the aircraft crash, the underground layer, buildings'
-  `Power_Off`, the cyborg-only infantry rule, `StunDuration`), and TS's `RULES.INI` (`[EMPulseWeapon]` `Damage=1200`,
-  `[EMPuls]` `Spread=11`, `[EMPulseSpecial]`).
+  `Power_Off` keyed on their centre cell, limpet mines destroyed, the firer exempt, the cell-with-a-building branch
+  that skips everything else in it, the cyborg-only infantry rule, `StunDuration`, and `IsAffectedByEMP`, which is
+  only ever cleared), and TS's `RULES.INI` (`[EMPulseWeapon]` `Damage=1200`, `[EMPuls]` `Spread=11`,
+  `[EMPulseSpecial]`, `[AudioVisual]` `EMPulseSparkles=EMP_FX01`).
+- **The stun gates:** EA's `EVENT.CPP` (the `MEGAMISSION`, `IDLE`, `SCATTER` and `PRIMARY` orders), and the working
+  mod's code, which gates exactly those four.
 - **A working mod:** the E.M. Pulse Cannon, a Mobile EMP and the Mobile Sensor Array in its release, played under
   Proton on Linux and on the Steam Deck.
 

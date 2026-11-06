@@ -1,6 +1,6 @@
 ---
 title: Save versions
-description: Red Alert's save version is the sum of its saved classes' sizes, so growing a class breaks old saves, and EA's Load_Game reads the DLL's save data before the version check; lead the DLL's save data with your own marker and version.
+description: Red Alert's save version is the sum of its saved classes' sizes, so growing a class breaks old saves, and EA's Load_Game reads the DLL's save data before the version check; lead the DLL's save data with your own marker and version. Loading re-constructs each object in place, so a field with a default in its declaration is reset on every load.
 tags: [engine, saves, dll]
 holds_for: Steam build 21590013
 status: verified
@@ -41,13 +41,29 @@ working mod, old saves crashed rather than being refused (observed).
 **The fix:** write your own marker and version first in the DLL's save data (`DLLExportClass::Save`), check them
 first in `DLLExportClass::Load`, and make `Load_Game` stop when `DLLLoad` returns false. A save from another build
 is then refused before anything else is read. The same leading bytes also let a launcher-side check grey out the
-Load button before the player tries.
+Load button before the player tries: [Save files](../formats/save-files.md) shows how to reach them in a `.sav`.
+
+## Loading re-runs a constructor: no default values in declarations
+
+Red Alert doesn't load objects field by field. For each saved object, the heap's `Load` (`HEAP.CPP`) reads its bytes
+straight into the slot, then constructs it again in place with the class's `NoInitClass` constructor
+(`new(ptr) T(NoInitClass())`), which is written to leave every field alone.
+
+C++ applies a default given in a field's declaration (`int Kills = 0;`) in every constructor that doesn't set that
+field itself, `NoInitClass` included. So a field declared that way is reset on every load, and its saved value is
+lost without an error. Give new fields no default in the class body: set them in the normal constructor, and leave
+them out of the `NoInitClass` one. Vanilla Conquer loads the same way.
 
 ## How it was verified
 
 - **Saves:** `SAVEGAME_VERSION` and the order of `DLLLoad` and the version check in EA's `SAVELOAD.CPP`, with
   `DLLExportClass::Load` reading without checking. A working mod writes its own marker and version first, and
   refuses any other save. The crash on an old save is observed, not traced.
+- **The constructor on load:** EA's `TFixedIHeapClass::Load` (`HEAP.CPP`: `file.Get(ptr, sizeof(T))` then
+  `new(ptr) T(NoInitClass())`), the same two lines in Vanilla Conquer's `heap.cpp`, and CFE Patch Redux, which hit
+  it: its 1.8 changelog fixes "veterancy and other mod variables being reset to 0 when loading a saved game in RA",
+  and the fix commit moves each field's default out of its declaration and into the constructor. The C++ rule for
+  default member initialisers is the language's own.
 
 > [!TIP]
 > **In Tiberian Factions**

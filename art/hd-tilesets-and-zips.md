@@ -60,8 +60,9 @@ units, buildings and projectiles, and shared art costs its video memory once.
 ## Registering new art
 
 1. **Patch a copy of a listed tileset.** Take `RA_UNITS.XML`, `RA_STRUCTURES.XML` or `RA_VFX.XML` out of
-   `CONFIG.MEG`, add your tiles, and ship the whole file in your mod's `Data/XML/TILESETS/`. A file with only your
-   tiles, or one under a new name, isn't loaded. See
+   `CONFIG.MEG`, add your tiles, and ship the whole file in your mod's `Data/XML/TILESETS/`. Infantry go in
+   `RA_UNITS.XML` too: there is no infantry tileset (the Rifle Infantry, `E1`, has 532 tiles there).
+   A file with only your tiles, or one under a new name, isn't loaded. See
    [Overriding the launcher's data](../launcher-data/overriding-launcher-data.md).
 2. **One tile per shape the code draws.** Count the shape numbers your type uses: body facings, turret frames,
    damage states, building animation stages. A shape with no tile draws as a white box. EA's Medium Tank uses 64.
@@ -105,6 +106,8 @@ type's `ImageData` as a donor, fixes it. The DLL side is on [Adding a unit](../u
 
 ## How it was verified
 
+- **Infantry in the units tileset:** the 19 files in `CONFIG.MEG`'s `DATA\XML\TILESETS\` (none for infantry), the
+  532 `E1` tiles counted in `RA_UNITS.XML`, and a working mod's infantry ports, registered there by its build tool.
 - **The pieces and the names:** the base game's `2TNK.ZIP`, `POWR.ZIP` and `WEAP.ZIP` (`TEXTURES_RA_SRGB.MEG`),
   `RA_UNITS.XML` and `RABUILDABLES.XML` (`CONFIG.MEG`), all read for this page. `TypeName` from `IniName` and
   `AssetName` from `Graphic_Name()` in EA's `DLLInterface.cpp`, and `Image=` read in EA's `TECHNO.CPP`

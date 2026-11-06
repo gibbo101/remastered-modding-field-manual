@@ -1,6 +1,6 @@
 ---
 title: "Porting art from other C&C games"
-description: "Turning Tiberian Sun voxels and SHPs, and Command & Conquer 3 models, into HD Remastered sprites; the target every port must hit (canvas, centring, team-colour green, baked shadow), the 32-degree camera and facing order that match EA's HD art, and where each game keeps its art."
+description: "Turning Tiberian Sun voxels and SHPs, and Command & Conquer 3 models, into HD Remastered sprites; the target every port must hit (canvas, centring, team-colour green, baked shadow), the 32-degree camera and facing order that match EA's HD art, where each game keeps its art (Firestorm's expand01.mix, one-theatre buildings), and TS's SHP layout (shadow half, damaged frame, Rate= in frames per minute)."
 tags: [art, pipelines, tiberian-sun, cnc3, voxels, hd]
 holds_for: Steam build 21590013
 status: verified
@@ -55,7 +55,12 @@ then scale down with a good filter.
   `0, 0x3`: encrypted, with a checksum), but its filename hash is a padded CRC-32, not Red Alert's. See
   [MEG and MIX archives](../formats/meg-and-mix-archives.md). Voxel models and the rules INIs are in `LOCAL.MIX`,
   unit SHPs and most cameos in `CONQUER.MIX` (the rest in the per-side sidebar archives, `SIDEC01.MIX` for GDI and
-  `SIDEC02.MIX` for Nod), building SHPs in the theatre MIXes, palettes in `CACHE.MIX`.
+  `SIDEC02.MIX` for Nod), building SHPs in the theatre MIXes, palettes in `CACHE.MIX`. The Firestorm expansion's
+  own files are in `expand01.mix`: its voxels and build-up SHPs at the top level, its other SHPs in the inner
+  `ECACHE01.MIX`, its cameos in `E01SC01.MIX`, and its rules in `FIRESTRM.INI`.
+- **One-theatre buildings.** Some building art exists in one theatre only: the E.M. Pulse Cannon (`NAPULS.SHP`,
+  with `NAPULSMK.SHP`) is only in the snow archives, `SNOW.MIX` and `ISOSNOW.MIX`. Decode such art with that
+  theatre's unit palette (`UNITSNO.PAL` for snow, `UNITTEM.PAL` for temperate; both in `CACHE.MIX`).
 - **Voxels (vehicles).** A VXL is a voxel model, so render it from Remastered's camera. TS lights voxels with one
   fixed light and a table of 32 brightness steps, indexed by each voxel's own normal, which the VXL stores. Use
   those normals rather than ones worked out from the shape: on flat decks, worked-out normals come out blotchy.
@@ -64,6 +69,13 @@ then scale down with a good filter.
 - **SHPs (infantry, buildings).** Decode with the right palette: `UNITTEM.PAL` for units and buildings,
   `CAMEO.PAL` for cameos. The terrain palettes give noise. Remap indices 16 to 31 are the team colour; paint them
   green. Upscale with a pixel-art scaler (hq4x) before any smooth resize.
+- **The second half of an SHP is shadows.** An SHP that TS draws with a shadow (infantry, buildings, build-ups)
+  holds its image frames first, then a shadow for each: frame n's shadow is frame n + count/2, which TS draws darkened under it. Decoded as art, those
+  frames come out as flat purple silhouettes. Drop them, since a Remastered frame bakes its own shadow.
+- **Frame 1 is the damaged look.** A building below the yellow health threshold draws its next frame, so an idle
+  building's base SHP has its healthy art at frame 0 and its damaged art at frame 1.
+- **Animation speed:** an anim's `Rate=` in TS's `ART.INI` is frames per minute (the delay is ticks per minute ÷
+  `Rate`), so a higher `Rate` is faster.
 - **Buildings are isometric.** TS's building sprites are drawn for TS's isometric camera, and no re-render can
   change that, so they look tilted beside Red Alert's near-top-down buildings. Rebuilding them from 3D models in
   Remastered's camera fixes it.
@@ -95,6 +107,17 @@ The step-by-step recipe, written for an AI coding assistant to follow, is Tiberi
 - **Tiberian Sun:** `TIBSUN.MIX`'s header read for this page, and a working mod's extractor and renderer, which ship
   Tiberian Sun units built this way. The lighting tables come from TS's own `VOXELS.VPL`, cross-checked with
   OpenTS's source.
+- **Where TS keeps it:** `expand01.mix` and `TIBSUN.MIX` probed for this page with a working mod's extractor
+  (`M_EMP.VXL`, `MWARMK.SHP` at the top of `expand01.mix`, `MWAR.SHP` and `MEMPFX.SHP` in `ECACHE01.MIX`,
+  `MWARICON.SHP` in `E01SC01.MIX`; `NAPULS.SHP` in `SNOW.MIX` and not `TEMPERAT.MIX`, `NAPULSMK.SHP` in `ISOSNOW.MIX`
+  and not `ISOTEMP.MIX`; both palettes in `CACHE.MIX`), OpenTS's theatre table (`_theater.cpp`: snow's archives and
+  its `SNO` suffix), and the working mod's extraction script and EMP Cannon port.
+- **SHP layout and timing:** OpenTS's `techno.cpp`, `building.cpp` and `anim.cpp` (shadows drawn at
+  `shapenum + Get_Count() / 2` with `SHAPE_DARKEN`), `building.cpp` `Shape_Number` (one frame on below
+  `ConditionYellow`), and `animtype.cpp` (`Delay = TICKS_PER_MINUTE / Rate`); TS's `ART.INI` (`[GAFIRE_B]`
+  `Rate=500` against `[GAFIRE_C]` `Rate=220`); and a working mod, whose extracted build-ups showed the purple second
+  half (frames 20 to 39 of `GTPOWRMK.SHP`'s 40), whose buildings use frame 1 when damaged, and whose Firestorm
+  Generator plays `GAFIRE_B` about twice as fast as `GAFIRE_C`.
 - **Command & Conquer 3:** `StaticStream.big`'s header read for this page (`BIG4`), and a working mod that ships over
   fifteen C&C3 units built this way.
 

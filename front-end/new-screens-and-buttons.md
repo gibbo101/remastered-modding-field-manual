@@ -1,12 +1,12 @@
 ---
 title: New screens and buttons
-description: A mod can add front-end buttons and whole screens of its own. Clone a stock widget into a loose .BUI, build a new screen on ClientG's registered but unused SplashScreen class, and bind every click from a launcher patch, with each launcher function checked by its opening bytes first.
+description: A mod can add front-end buttons and whole screens of its own. Clone a stock widget into a loose .BUI, build a new screen on ClientG's registered but unused SplashScreen class, and bind every click from a launcher patch, with each launcher function checked by its opening bytes first. An add-ons screen can also read the launcher's mod list and switch mods on and off by their ID.
 tags: [front-end, ui, bui, screens, clientg, code-patch, advanced]
 holds_for: Steam build 21590013
 clientg_version: 1.153 (745903)
 clientg_sha256: d405ed389548be51c67740bb6309de10a5f02bdfc86324a10c9ad3b663c08897
 status: verified
-unproven: [new widgets on the in-match HUD by the same route, other unused screen classes besides SplashScreen]
+unproven: [new widgets on the in-match HUD by the same route, other unused screen classes besides SplashScreen, the launcher dropping a mod's old ID after an update (observed), Steam holding a plain subscription's download while the game runs (observed)]
 ---
 
 > [!NOTE]
@@ -89,6 +89,43 @@ own refresh, such as a timer on the UI thread.
 | Bind an event | `0x6A9F50` | `55 8B EC 51 53 8B` |
 | Main menu's binding site (hook) | `0x6B185B` | `6A 15 68 F0 7E C1 01` |
 
+## Switching mods on and off from your screen
+
+An add-ons screen has to know which mods are loaded, which are switched on for the next start, and which are only
+downloaded, and it has to switch them. The launcher keeps all of it:
+
+- **Loaded this session:** a vector of the mod root folders at `0x1FE4C28` (MSVC `std::string`s, first and last
+  pointers). Look in each for a file only your add-on carries.
+- **The Mods screen's list:** the mod manager, returned by `0x5E8CB0`. Its records run from the pointer at `+0x18`
+  to the one at `+0x1C`, `0xBC` bytes each: the folder (a `std::string`) at `+0x78`, the mod's ID at `+0xA8`, and
+  its "on for the next start" byte at `+0xB9`. A fresh download isn't in it yet (see Traps).
+- **Switching a listed mod:** the Mods screen's own toggle, `0x7BB7A0`, called on the mod manager with the ID and
+  1 or 0. It finds the record by ID and sets its byte.
+- **Switching on a mod the list hasn't seen** (just downloaded): add its ID to the profile's enabled list, a vector
+  of IDs at `0x20E0D88`, growing it with the launcher's own allocator. Then save the profile: `0x14D8420` on the
+  profile at `0x20E0CB0`, with 1, 0, 1.
+- **Restarting** as the Mods screen's RESTART NOW does: post the launcher's restart message (`0x1177810` builds
+  it) to the launcher link at `0x1FAD3CC` with `0x11790F0`.
+
+**A mod's ID** is zlib's CRC-32 of its `ccmod.json` `name` followed by `high.low`: `"My Pack"` at version 1.0 hashes
+`My Pack1.0`. So **every version bump changes the ID**. The launcher drops enabled IDs that match no installed mod
+when it starts, so a player's mod switches off once after each update (observed), and your screen should say so.
+
+**Downloads are Steam's.** Subscribe with `SteamAPI_ISteamUGC_SubscribeItem`, then call `DownloadItem` with high
+priority: Steam holds a plain subscription's download while the game runs (observed). A downloaded item sits in
+`steamapps/workshop/content/1213210/<item>/`, which every Steam account on the machine shares, but the launcher
+lists only the signed-in account's subscriptions. Check `GetItemState` before treating a download as this
+player's.
+
+| What | Address | Opening bytes on disk |
+|---|---|---|
+| Mod manager (returns it) | `0x5E8CB0` | `A1 10 45 FA 01 85 C0` |
+| Switch a listed mod | `0x7BB7A0` | `55 8B EC 51 8B C1` |
+| Save the profile | `0x14D8420` | `55 8B EC 8B 45 10` |
+| Build the restart message | `0x1177810` | `6A 08 E8 89 91 7D` |
+| Post it to the launcher | `0x11790F0` | `55 8B EC FF 75 08` |
+| The launcher's allocator | `0x9509A0` | `55 8B EC 5D E9 D7` |
+
 ## Traps
 
 - **Check everything before installing anything.** One mismatched function means a different client. Install
@@ -104,6 +141,12 @@ own refresh, such as a timer on the UI thread.
   `.BUI` files uses it, and a shipped screen that does draws and works.
 - **The calls:** every address above was read from `ClientG.exe` on disk, and matched the opening bytes a working
   patch checks before installing.
+- **Switching mods:** the toggle at `0x7BB7A0` disassembled for this page (it walks `0xBC`-byte records, compares
+  the ID at `+0xA8` and writes the byte at `+0xB9`), the opening bytes above read from disk, and `0x1FE4C28` and
+  `0x20E0D88` referenced from the launcher's code. A released mod's add-ons screen switched a downloaded pack on
+  by the ID worked out as above, restarted, and found the pack loaded. Per-account subscriptions: each account's
+  `userdata/<id>/ugc/1213210_subscriptions.vdf` against the one shared `workshop/content/1213210/` folder.
+  Observed only: the ID dropped after an update, and Steam holding a download while the game runs.
 - **In play:** a released mod adds three main-menu buttons and three screens of its own this way (an add-ons
   manager, a faction encyclopedia and a settings page), on Linux under Proton and on the Steam Deck.
 

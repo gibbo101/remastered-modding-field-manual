@@ -34,6 +34,10 @@ The base game's cameos are all regions of the UI atlas, `MT_COMMANDBAR_COMMON`: 
 341 × 256 pixels each, and no texture archive holds a separate cameo file. See
 [The UI atlas](../front-end/the-ui-atlas.md).
 
+**TD's cameos are in the same atlas.** 54 of those regions are `BUILDICON_TD_*`, and TD's own buildables file
+(`CNCBUILDABLES.XML`) names 51 of them, from `BuildIcon_TD_Minigunner` to `BuildIcon_TD_TempleOfNod`. A Red Alert
+mod that ports a TD unit or building can point its entry's `<BuildIcon>` at TD's and ship no cameo.
+
 ## A new cameo
 
 Ship a loose file named after its `<BuildIcon>` in your mod's `Data/ART/TEXTURES/SRGB/`:
@@ -67,8 +71,10 @@ So the DLL can show different cameos for the same type:
    within 15 characters.
 
 The variant can be chosen per player: by their faction, or by which of their factions can build the entry. The
-cameo widget has no overlay that could add a per-entry badge: its overlay quads draw fixed art, such as the "fake"
-label on decoy buildings. So a badge has to be baked into each variant's picture.
+cameo widget (`UI_SIDEBAR_CONSTRUCTIONENTRY.BUI`) has no overlay that could add a per-entry badge. Its quads
+(`IconFraming_Quad`, `Unavailable_Quad`, `FakeLoc_Quad`) draw fixed art: `FakeLoc_Quad` shows
+`BuildIcon_RA_FakeText_<language>` on decoy buildings, one picture for every entry. So a badge has to be baked into
+each variant's picture.
 
 ## How it was verified
 
@@ -76,6 +82,10 @@ label on decoy buildings. So a badge has to be baked into each variant's picture
   stock `RABUILDABLES.XML`; and a working mod's badge variants, which each draw their own cameo.
 - **Stock cameos:** the base game's `MT_COMMANDBAR_COMMON.MTD`, read for this page (`BUILDICON_*` regions,
   341 × 256), and the texture MEGs, which hold no separate cameo files.
+- **TD's cameos:** the `BUILDICON_TD_*` regions in the `.MTD` and the `<BuildIcon>` names in `CNCBUILDABLES.XML`,
+  both read for this page; a working mod's TD ports name them and ship none but the one it repaints.
+- **The cameo widget:** its quads read from the stock `UI_SIDEBAR_CONSTRUCTIONENTRY.BUI`, the eight
+  `BuildIcon_RA_FakeText_*` names in `ClientG.exe`, and EA's `Fake` field in the sidebar entry struct.
 - **New cameos:** a working mod ships 552 loose DDS cameos (344 × 256, DXT1, 9 mip levels, read for this page),
   drawn in its sidebar and encyclopedia.
 - **Observed only:** that a loose DDS doesn't override a stock region, when a TGA does.

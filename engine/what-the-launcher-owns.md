@@ -39,8 +39,8 @@ cached records in memory, or through a patch to its code. This page lists each o
 | Side-keyed HUD art: radar crest, waypoint and rally markers | **RAM lever** (cached records) | [Re-pointing launcher UI art in memory](../clientg-ram/repointing-atlas-regions.md) |
 | Sidebar tab icons per faction (the launcher builds their names in code) | **RAM lever** (a string in ClientG's image) | Rewrite the four RA prefix strings with TD's, which are shorter and fit. [Rewriting launcher strings in memory](../clientg-ram/rewriting-launcher-strings.md) |
 | EVA voice lines the launcher plays itself: "Mission accomplished", "Mission failed", "Low power", "Select target" and others | **RAM lever** (cached samples) | Overwrite ClientG's cached copy of each sample at match start. The same route carries end-of-game lines, since the launcher drops speech the DLL sends after game over. [EVA voice lines the launcher plays](../sound-and-music/launcher-eva-lines-by-faction.md) |
-| Superweapon that fires on one click, with no targeting cursor | **Code-patch lever** | The cameo click handler's superweapon test. [Patching the launcher's code](../clientg-ram/patching-the-launchers-code.md) |
-| The deploy key on units other than the stock MCV, the camera-to-construction-yard key for new yards, and select-all filters | **Code-patch lever** | Patch the launcher's key commands into mod commands, and handle them in the DLL. [Patching the launcher's code](../clientg-ram/patching-the-launchers-code.md) |
+| Superweapon that fires on one click, with no targeting cursor | **Code-patch lever** | The cameo click handler's superweapon test. [Launcher key commands and superweapon clicks](../clientg-ram/launcher-key-commands-and-clicks.md) |
+| The deploy key on units other than the stock MCV, the camera-to-construction-yard key for new yards, and select-all filters | **Code-patch lever** | Patch the launcher's key commands into mod commands, and handle them in the DLL. [Launcher key commands and superweapon clicks](../clientg-ram/launcher-key-commands-and-clicks.md) |
 | The credit counter's tick sound, per faction | **Data lever** + DLL | Silence the launcher's own tick sample, and have the DLL play the faction's. The routing is on [TD sounds from the base game](../using-what-the-player-owns/td-sounds-from-the-base-game.md). The silencing: [Credit tick and radar sounds by faction](../sound-and-music/credit-tick-and-radar-by-faction.md) |
 | Music by faction | **Code-patch lever** | `AUDIO_FACTIONS.XML`'s music map is dead (EA's own comment says it isn't used for TD or RA). A launcher hook redirects the music lookup instead. [Music by faction, and the jukebox](../sound-and-music/music-by-faction-and-the-jukebox.md) |
 | New maps in the skirmish Official list | **Data** + **code-patch lever** | [New maps in the skirmish Official list](../maps-and-lobby/new-maps-in-the-skirmish-list.md) |
@@ -75,6 +75,19 @@ rules follow:
 3. **Anything the launcher does by itself needs one of the levers above.** "Owned by the launcher" means the
    simulation alone can't change it. It doesn't mean nobody can.
 
+**The wire between them is closed.** The launcher connects to the instance server over a local socket (port base
+16000, `ClientPortBase` in `CONFIG.MEG`'s `SERVERCONFIG.XML`), encrypted with CryptoPP. What crosses is EA's DLL
+interface, serialized: the callback's 13 event types one way, the game-state structs the other. The launcher's
+receiver (`IncomingExternalGamePluginEventClass`) is a compiled switch over those types, so a new kind of event
+from the DLL has nowhere to land. The front end embeds a Lua 5.1 and a ClickScript interpreter, but no `.lua` file
+ships in any of the game's 21 MEGs, and no callback event carries a script, so neither is a way in.
+
+**The tools.** `ClientG.exe`, `ClientLauncherG.exe` and `InstanceServerG.exe` are native 32-bit Windows programs
+(PE32, no .NET runtime), so .NET decompilers don't apply: use a disassembler. The only .NET program in the install
+is the map editor, `CnCTDRAMapEditor.exe`, whose source EA released. When searching `ClientG.exe`'s strings for
+`GDI`, most hits are Windows' Graphics Device Interface ("render target is not compatible with GDI"), not the
+faction.
+
 ## Search in this order
 
 1. **The launcher's data.** Search `CONFIG.MEG` for the behaviour's name or setting first: whole walls have
@@ -101,6 +114,10 @@ Each row was checked three ways where possible:
   (EA's comment that its maps aren't used for TD or RA). `ClientG.exe`'s strings: both tab-icon prefixes, the
   launcher's sound and command names, only `ALLIED` and `SOVIET` as faction tokens, and no input `_Mod` overlay.
   The superweapon click test's bytes, read from the exe on disk.
+- **The wire and the tools:** `SERVERCONFIG.XML`'s port base and `InstanceServerG.exe`'s `CLIENT_PORT` setting;
+  the CryptoPP, Lua 5.1, receiver-class and `SERVER_TO_CLIENT_EXTERNAL_GAME_PLUGIN_EVENT` strings in `ClientG.exe`;
+  its event dispatcher's 14-way type switch, read from disk; every MEG in `Data/` listed for `.lua` files; and each
+  executable's PE header.
 - **EA's source:** the DLL interface (exports, the one callback, `CNCPlayerInfoStruct`'s house, the input handler
   that answers only Ctrl, Shift and Alt) and the 128×128 export buffer.
 - **A working mod**, which ships every data, RAM and code-patch route above, tested under Proton on Linux and on
