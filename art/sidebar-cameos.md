@@ -88,6 +88,6 @@ label on decoy buildings. So a badge has to be baked into each variant's picture
 > carries its owners' emblems baked in. A shared Tiberian Sun type shows Nod's own cameo to a Nod player. TF's one
 > stock-name cameo, `BuildIcon_TD_A10`, stays a TGA for the override rule above.
 >
-> ![A GDI sidebar column](img/sidebar-cameos.jpg)
+> ![A TS GDI sidebar column](img/sidebar-cameos.jpg)
 >
-> A GDI sidebar column mixing TD and Tiberian Sun cameos.
+> A TS GDI sidebar column mixing TD and Tiberian Sun cameos.

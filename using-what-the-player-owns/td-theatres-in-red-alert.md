@@ -120,4 +120,4 @@ Each claim was checked three ways:
 >
 > ![A Red Alert skirmish in TD's winter theatre](img/td-winter-theatre-in-ra.jpg)
 >
-> A Red Alert skirmish on TD's Winter Wonderland: TD's own winter terrain, trees and Tiberium, with a GDI MCV, all drawn from the base game.
+> A Red Alert skirmish on TD's Winter Wonderland: TD's own winter terrain, trees and Tiberium, with an MCV, all drawn from the base game.

@@ -110,6 +110,6 @@ grown TGA is about 268 MB, against 184 MB.
 > Sun GDI's crest is painted over an observer-mode region that Red Alert matches don't draw, because every free region
 > was taken.
 >
-> ![GDI's radar crest in a Red Alert match](../clientg-ram/img/gdi-sidebar-crest.jpg)
+> ![TS GDI's radar crest in a Red Alert match](../clientg-ram/img/gdi-sidebar-crest.jpg)
 >
-> GDI's radar crest in a Red Alert match, drawn from the repainted atlas. The lobby picker's emblems are on the faction page.
+> TS GDI's radar crest in a Red Alert match, painted into the atlas over a region Red Alert matches don't draw. The lobby picker's emblems are on the faction page.
