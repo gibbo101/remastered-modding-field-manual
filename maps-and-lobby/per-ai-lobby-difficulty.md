@@ -45,7 +45,8 @@ already offers it, in the same lobby, every match, with no file to find and edit
 ## Why memory is the only source
 
 - **`CNC_Set_Difficulty`** takes one int for the whole game, and in skirmish the launcher sends the same value
-  whatever the picks are.
+  whatever the picks are. EA's DLL ignores it outside a campaign anyway, and gives every skirmish house the Normal
+  handicap (see [The skirmish AI and its IQ levels](../ai/skirmish-ai-and-iq.md)).
 - **The per-player struct** the DLL receives (`CNCPlayerInfoStruct`) carries a name, house, colour, team and an
   AI flag, but no difficulty.
 - **No file holds it.** The launcher's saved settings keep the map, faction and mode, but not difficulty, and after

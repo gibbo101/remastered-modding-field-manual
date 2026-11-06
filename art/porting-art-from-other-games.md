@@ -54,7 +54,8 @@ then scale down with a good filter.
 - **The archives.** Tiberian Sun's files are in MIX archives encrypted like Red Alert's (`TIBSUN.MIX` reads
   `0, 0x3`: encrypted, with a checksum), but its filename hash is a padded CRC-32, not Red Alert's. See
   [MEG and MIX archives](../formats/meg-and-mix-archives.md). Voxel models and the rules INIs are in `LOCAL.MIX`,
-  unit SHPs and cameos in `CONQUER.MIX`, building SHPs in the theatre MIXes, palettes in `CACHE.MIX`.
+  unit SHPs and most cameos in `CONQUER.MIX` (the rest in the per-side sidebar archives, `SIDEC01.MIX` for GDI and
+  `SIDEC02.MIX` for Nod), building SHPs in the theatre MIXes, palettes in `CACHE.MIX`.
 - **Voxels (vehicles).** A VXL is a voxel model, so render it from Remastered's camera. TS lights voxels with one
   fixed light and a table of 32 brightness steps, indexed by each voxel's own normal, which the VXL stores. Use
   those normals rather than ones worked out from the shape: on flat decks, worked-out normals come out blotchy.

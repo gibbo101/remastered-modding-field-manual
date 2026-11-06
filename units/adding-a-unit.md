@@ -105,7 +105,8 @@ So ship a classic shape for every new type. The launcher draws the HD art by nam
 are never seen in an HD-only mod, but its **frame size** is used. `UnitTypeClass::Dimensions` sets the unit's
 selection box to three-quarters of the image's largest frame side, at most 48 classic pixels, and the launcher
 sizes the box from that (see [Building selection boxes](../art/building-selection-boxes.md)). A new bullet with no
-classic shape drew at a fallback size, as a large block.
+classic shape isn't drawn at all (`BulletClass::Draw_It` returns early), and one given another type's shape as a
+donor draws at the donor's size (see [HD tilesets](../art/hd-tilesets-and-zips.md)).
 
 Three ways to supply one, each in use in a shipped mod:
 

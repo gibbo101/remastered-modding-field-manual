@@ -1,6 +1,6 @@
 ---
 title: The skirmish AI and its IQ levels
-description: "How Red Alert's computer player works in a Remastered skirmish (IQ levels from rules.ini's [IQ] section, difficulty as a stat handicap, the urgency checks that choose what to build) and the stock bugs and gaps every DLL mod inherits, confirmed in EA's source, with what one mod did about them."
+description: "How Red Alert's computer player works in a Remastered skirmish (IQ levels from rules.ini's [IQ] section, difficulty as a stat handicap that stock skirmish never varies, the urgency checks that choose what to build) and the stock bugs and gaps every DLL mod inherits, confirmed in EA's source, with what one mod did about them."
 tags: [ai, skirmish, iq, difficulty, rules-ini, dll]
 holds_for: Steam build 21590013
 status: verified
@@ -45,11 +45,13 @@ Each house has an `IQ`, and `rules.ini`'s `[IQ]` section sets the level at which
 | `Scatter` | 3 | Scatters from incoming fire. |
 | `AutoCrush` | 2 | Drives over infantry it can crush. |
 | `Harvester` | 2 | Replaces lost harvesters. |
-| `SellBack` | 2 | Sells buildings. |
 | `RepairSell` | 1 | Repairs or sells damaged buildings. |
 
-**In a stock skirmish every AI gets `IQ = MaxIQ`** (`SCENARIO.CPP`), so all of the above is on whatever the
-difficulty. IQ is a lever the stock skirmish never uses.
+**In a stock skirmish every AI gets `IQ = MaxIQ`** (`GlyphX_Assign_Houses`, `DLLInterface.cpp`), so all of the
+above is on whatever the difficulty. IQ is a lever the stock skirmish never uses.
+
+`[IQ]` also has `SellBack`, but despite its section it isn't an IQ check: a damaged building sells itself when the
+house's **tech level** is at least `SellBack` (`BuildingClass::AI`, `BUILDING.CPP`), not its IQ.
 
 > [!WARNING]
 > **Lowering IQ can stop an AI building at all.** A computer house only starts base building if
@@ -58,11 +60,16 @@ difficulty. IQ is a lever the stock skirmish never uses.
 
 ## Difficulty
 
-Stock difficulty is a **stat handicap**. `Assign_Handicap` (`HOUSE.CPP`) multiplies each house's firepower, ground
-and air speed, armour, rate of fire and cost from `rules.ini`'s `[Easy]`, `[Normal]` and `[Difficult]` sections, and
-sets its repair and build delays. With more than one human and `CompEasyBonus` on, the computer's difficulty drops a
-step. The launcher hands the DLL only one difficulty for all AIs; for each AI's own lobby setting, see
-[Per-AI lobby difficulty](../maps-and-lobby/per-ai-lobby-difficulty.md).
+Difficulty in Red Alert is a **stat handicap**. `Assign_Handicap` (`HOUSE.CPP`) multiplies a house's firepower,
+ground and air speed, armour, rate of fire and cost from `rules.ini`'s `[Easy]`, `[Normal]` and `[Difficult]`
+sections, and sets its repair and build delays.
+
+**In a stock Remastered skirmish the lobby's difficulty changes nothing.** The DLL sets up skirmish and LAN houses
+in `GlyphX_Assign_Houses`, which gives every house, human and computer, `Assign_Handicap(Scen.Difficulty)`.
+`Scen.Difficulty` starts at Normal, and the only thing that changes it, `CNC_Set_Difficulty`, acts only in a
+campaign (`GAME_NORMAL`). So every skirmish house plays at Normal. `CompEasyBonus` is read only by the old
+`Assign_Houses`, which the Remastered DLL no longer calls. To make the lobby's choice count, the DLL has to read
+each AI's pick itself: see [Per-AI lobby difficulty](../maps-and-lobby/per-ai-lobby-difficulty.md).
 
 ## How it chooses what to build
 
@@ -81,7 +88,7 @@ Each confirmed in EA's released source:
 |---|---|---|
 | **The skirmish AI never builds ships.** All of `AI_Vessel`'s logic sits inside `if (Session.Type == GAME_NORMAL)`. | `HOUSE.CPP` | No navy at all, on any map. |
 | **The radar dome is only built against an air threat.** In skirmish, `AI_Building` queues `STRUCT_RADAR` only inside its air-defence block, which runs when an enemy owns aircraft. | `HOUSE.CPP` | No radar, so no tech centre and nothing that needs one, unless the player builds aircraft first. |
-| **Two of the urgency checks are stubs.** `Check_Build_Defense` and `Check_Build_Offense` always return `URGENCY_NONE`. | `HOUSE.CPP` | Those strategies never drive a decision. |
+| **Four urgency checks and five build actions are stubs.** `Check_Build_Defense`, `Check_Build_Engineer`, `Check_Build_Income` and `Check_Build_Offense` always return `URGENCY_NONE`; `AI_Build_Defense`, `AI_Build_Engineer`, `AI_Build_Income`, `AI_Build_Offense` and `AI_Build_Power` always return `false`. | `HOUSE.CPP` | Those strategies never drive a decision. Power is the one rated but not acted on. |
 | **The power check's `|`.** "Under attack, so power is urgent" tests `BScan \| STRUCTF_CHRONOSPHERE`, which is always true. | `HOUSE.CPP`, `Check_Build_Power` | Any threatened house rates power as high urgency. |
 | **Target choice keeps the last candidate, not the best.** In `Greatest_Threat`'s area scan, a better target sets `bestobject` but never updates `bestval`. | `TECHNO.CPP` (extended ASCII: use `grep -a`) | Units attack whatever scored above the first candidate last, not the most valuable target. |
 | **Harvester bugs:** the "ore is short" latch that never resets, an idle harvester's overwritten order, and no replacement harvesters on Hard. See [Harvesters](harvesters.md). | `UNIT.CPP`, `HOUSE.CPP` | The AI's economy can stop for good. |
@@ -104,8 +111,11 @@ These are methods one mod uses, each a DLL change:
 ## How it was verified
 
 - **IQ and difficulty:** EA's `RulesClass::IQ`, every use of each IQ value (`HOUSE.CPP`, `BUILDING.CPP`,
-  `UNIT.CPP`, `INFANTRY.CPP`, `VESSEL.CPP`, `TECHNO.CPP`), the skirmish house set-up in `SCENARIO.CPP`
-  (`IQ = Rule.MaxIQ`, `Assign_Handicap`, `IsCompEasyBonus`), and the stock `rules.ini` read from `REDALERT.MIX`
+  `UNIT.CPP`, `INFANTRY.CPP`, `VESSEL.CPP`, `TECHNO.CPP`), the skirmish house set-up in `GlyphX_Assign_Houses`
+  (`DLLInterface.cpp`: `IQ = Rule.MaxIQ`, `Assign_Handicap(Scen.Difficulty)`), `Scen.Difficulty`'s Normal default
+  (`ScenarioClass`'s constructor), `Set_Scenario_Difficulty`'s `GAME_NORMAL` gate and `CNC_Set_Difficulty`, the
+  unused `Assign_Houses` that reads `IsCompEasyBonus` (`SCENARIO.CPP`), `SellBack`'s tech-level test, and TF's
+  `dllinterface.cpp`, which keeps the same `Assign_Handicap(Scen.Difficulty)` call, and the stock `rules.ini` read from `REDALERT.MIX`
   (`[IQ]`, `[Easy]`, `[Normal]`, `[Difficult]`).
 - **The bugs:** each line in EA's source, as listed (`AI_Vessel`'s `GAME_NORMAL` gate included). A working mod's problem inventory found them, and its code
   fixes them.

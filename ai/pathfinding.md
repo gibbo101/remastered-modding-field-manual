@@ -90,8 +90,8 @@ On maps past 128 × 128, long orders need coarse routing over map sectors as wel
 
 ### Give-way and corridor claims at chokepoints
 
-Three layers stop vehicle columns jamming in one-cell gaps. All three are vehicles only, and deterministic, so LAN
-games stay in step:
+Three layers stop vehicle columns jamming in one-cell gaps. All three are vehicles only. They need no care for
+LAN games, since only the host simulates (see [LAN games](../engine/lan-games.md)):
 
 - **Give way.** Before entering a narrow corridor on its *actual* path (not the straight line to its goal), a vehicle
   checks for an allied vehicle coming the other way. If one is already inside, it holds on open ground, or backs out

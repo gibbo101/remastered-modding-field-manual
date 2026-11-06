@@ -34,7 +34,7 @@ From TS's `RULES.INI` and OpenTS (`super.cpp`, `house.cpp`, `building.cpp`, `bul
   included, and kills anything standing on it or moving in.
 - **Aircraft over a live section die,** at any height.
 - **Shots are eaten:** a projectile entering a live cell is deleted unless the wall's owner fired it, and instant
-  weapons stop at the first live cell.
+  weapons stop at the first live cell of another house's wall.
 - **A live section takes no damage.** Each hit drains the field instead (damage × 0.1).
 - **Line fill:** placing a section within 5 cells, in a straight line, of another of the house's sections fills
   the gap.
@@ -48,8 +48,8 @@ From TS's `RULES.INI` and OpenTS (`super.cpp`, `house.cpp`, `building.cpp`, `bul
    toggle. See [Patching the launcher's code from your DLL](../clientg-ram/patching-the-launchers-code.md).
 3. **The field, every frame:** kill what stands on live sections (own units too), and aircraft over them. Make live
    sections block movement, and passable again while the field is down.
-4. **Shots:** in `BulletClass::AI`, delete a projectile in a hostile live cell. Cut instant shots at the first hostile
-   live cell on their path at launch.
+4. **Shots:** in `BulletClass::AI`, delete a projectile in a hostile live cell. Cut instant shots at the first live cell
+   of another house's wall on their path at launch.
 5. **Sections as buildings:** 1×1, not selectable. Their frame comes from their neighbours (north, east, south, west
    as 1, 2, 4, 8), plus an offset while live. Make them sellable only while the field is down.
 
