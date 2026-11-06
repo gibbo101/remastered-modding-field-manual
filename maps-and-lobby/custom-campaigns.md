@@ -6,7 +6,7 @@ holds_for: Steam build 21590013
 clientg_version: 1.153 (745903)
 clientg_sha256: d405ed389548be51c67740bb6309de10a5f02bdfc86324a10c9ad3b663c08897
 status: verified
-unproven: [launching a brand-new campaign instance outside a dev build, a hijacked stock slot moved to another tab by changing its House, where the player's campaign progress is stored]
+unproven: [a campaign map (territory movie and click areas) of your own, branches that unlock different stages instead of rejoining, launching a brand-new campaign instance outside a dev build, a hijacked stock slot moved to another tab by changing its House, where the player's campaign progress is stored]
 ---
 
 > [!NOTE]
@@ -104,6 +104,43 @@ missions in Red Alert's Mission Select therefore takes a launcher code patch on 
 
 The mission's faction is read from the instance at `+0x488`. GDI is 0 and Nod 1, which is why neither passes.
 
+## The campaign map and branching missions (open)
+
+> [!CAUTION]
+> **Unsolved.** Nobody has made a campaign map of their own yet, or a branching campaign that doesn't rejoin. This
+> section records what the stock files show, and where the trail goes cold.
+
+Between missions, Red Alert's campaigns show a map of territories, and the player picks the next mission on it.
+`RA_CAMPAIGNMAPS.XML` (in `CONFIG.MEG`'s `DATA\XML\CAMPAIGNS\`) defines it, one `CampaignMapSelectMapClass` per
+tab:
+
+```xml
+<CampaignMapSelectStageClass>
+    <TerritorySelectMovie>RA/AlliesMap_03.bk2</TerritorySelectMovie>
+    <Maps>
+        <Entry>RA_ALLIES_3A</Entry>
+        <Entry>RA_ALLIES_3B</Entry>
+    </Maps>
+</CampaignMapSelectStageClass>
+```
+
+- **Each stage's map is a pre-rendered movie,** a Bink file in the base game's `MOVIES_RA.MEG`
+  (`DATA\ART\MOVIES\RA\ALLIESMAP_03.BK2`). Stage 1 has no map at all.
+- **A stage's entries are its choices.** Stage 3 offers `3A` or `3B`, and stage 5 offers three.
+- **The original's branches rejoin.** In `RA_ALLIES_MISSIONS.XML`, both `RA_ALLIES_3A` and `RA_ALLIES_3B` unlock stage
+  4 (`MapStageUnlock`). A branch is a choice of which version of a stage to play, and then the story converges.
+- **Units can carry over.** `RA_ALLIES_4` has `<RestoreAllUnits>` naming mission 2's instance, which brings that
+  mission's surviving units back.
+
+**Where it goes cold:**
+
+- **A map of your own.** The file names the movie and the choices, but nothing in it says where each choice sits on
+  the map, or which part the player clicks. That link isn't in any data file read so far, so it's in the movie, in
+  another file, or in the launcher's code. Until it's found, a custom campaign can reuse the stock maps (with the
+  stock territories) but can't draw its own. **Unproven.**
+- **Branches that don't rejoin.** Whether two choices in one stage can unlock *different* stages, so the story
+  splits for good, hasn't been tested. The stock campaigns never do it. **Unproven.**
+
 ## Traps
 
 - **Progress decides what shows.** A mission not yet unlocked doesn't list, even with `ShowOnMissionSelect`
@@ -125,6 +162,9 @@ The mission's faction is read from the instance at `+0x488`. GDI is 0 and Nod 1,
   one) and the abort on 2 (`SCENARIO.CPP`).
 - **Variant order:** observed as instances that listed nowhere until moved after their base. The stock file defines
   every one of its 456 instances' variants before use, and a shipped mod's build appends its instances at the end.
+- **The campaign map:** the stock `RA_CAMPAIGNMAPS.XML` and `RA_ALLIES_MISSIONS.XML` read for this page (stages,
+  movies, entries, `MapStageUnlock`, `RestoreAllUnits`), the movies listed in `MOVIES_RA.MEG`, and a working
+  mod that couldn't make a map of its own or a lasting branch.
 - **Tab sort:** the two side tests and their calls were read from `ClientG.exe` on disk. A shipped mod's patch on
   them lists its GDI and Nod missions.
 
