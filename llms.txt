@@ -221,6 +221,12 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
   in code (the sidebar tab-icon prefixes), rewrite the string in place, never longer, keeping the old tail behind
   the terminator so a patched slot is findable. Fragile: one ClientG build.
 
+## Open questions
+
+- [Open questions](open-questions.md): unproven research only, never a recipe. Scripted co-op missions, players
+  changing the rules, Tiberian Sun theatres, music built from the player's own copy, tileset video memory, which
+  mod's loose file wins, theatre slots past 5, building placement on a 253x253 map. Each entry links TF's design doc.
+
 ## Optional
 
 - [README](README.md): scope, page rules, credits and license.

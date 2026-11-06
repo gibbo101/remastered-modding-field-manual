@@ -12,7 +12,8 @@ them are source material: read them, distil them, never copy them.
 
 ## What belongs here
 The manual holds what's confirmed working, or confirmed impossible. Designs and research stay in TF's docs until
-they're proven. A small marked "unproven" point on a page that otherwise works is fine. Before removing anything
+they're proven. A small marked "unproven" point on a page that otherwise works is fine. Unproven research gets a short entry
+on `open-questions.md` (established, untested, the test, a link to TF's doc), never a page of its own. Before removing anything
 from the manual or from TF's docs, carry every fact it holds to its new home first: knowledge must never regress.
 
 ## Every page

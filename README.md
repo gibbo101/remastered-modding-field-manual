@@ -169,6 +169,10 @@ what it does with the technique.
 - [Rewriting launcher strings in memory](clientg-ram/rewriting-launcher-strings.md): changing a name the
   launcher builds in code, with the sidebar tab icons as the example.
 
+### Open questions
+- [Open questions](open-questions.md): research not yet proven in game, what's established, and the test that
+  would settle each one, with links to Tiberian Factions' design docs.
+
 ## Using this with an AI assistant
 
 The pages are laid out so an AI assistant can gather what it needs to implement a technique in your own mod. Each
