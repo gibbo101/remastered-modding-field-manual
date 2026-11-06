@@ -79,4 +79,6 @@ settings file during a match.
 > units use stock Red Alert's own pathfinder. Each per-player sidebar choice reaches the host as a mod
 > command when a LAN match starts. The page itself is a new front-end screen.
 >
-> <!-- screenshot: the TIBERIAN FACTIONS SETTINGS page, GAMEPLAY tab -->
+> ![The settings page, GAMEPLAY tab](img/settings-gameplay.jpg)
+>
+> The TIBERIAN FACTIONS SETTINGS page, GAMEPLAY tab: each switch's off state is stock Red Alert.

@@ -105,4 +105,6 @@ instead.
 > from the download. Art TF repainted, such as the flame effects and the cameos with their owner badge, still
 > ships.
 >
-> <!-- screenshot: a GDI Medium Tank and Construction Yard in a Red Alert skirmish, both drawn from the base game -->
+> ![GDI's construction yard drawn from the base game](img/td-construction-yard-base-game.jpg)
+>
+> GDI's construction yard in a Red Alert match, drawn from the base game's own TD art.

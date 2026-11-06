@@ -113,4 +113,6 @@ need the DLL or a launcher patch:
 > as duplicates of Allied and Soviet for now, and they're where TF's next factions go: more are on the way. GDI,
 > Nod and TS GDI load TD's sidebar scene.
 >
-> <!-- screenshot: the lobby picker showing GDI, Nod, Soviet, Allies and TS GDI rows with their crests -->
+> ![The lobby faction picker](img/lobby-faction-picker.jpg)
+>
+> The lobby picker's eight rows: TS GDI's coin, Nod's scorpion, Soviet, Allied and GDI's eagle among them, plus random. The player's name is blanked.

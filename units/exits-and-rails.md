@@ -84,4 +84,6 @@ pathfinding takes over.
 > refinery's harvesters dock and roll off on rails too. A deployed mobile war factory still sometimes loses units it
 > has built, which is an open issue.
 >
-> <!-- screenshot: a TS war factory's door up, a vehicle half out on its rail -->
+> ![A Titan leaving the TS war factory](img/war-factory-exit.jpg)
+>
+> A Titan leaving TF's Tiberian Sun war factory, left to right: the door rises, the walker emerges from its seat under the front wall, and the door closes behind it.

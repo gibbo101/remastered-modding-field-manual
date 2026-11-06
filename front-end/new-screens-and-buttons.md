@@ -115,4 +115,6 @@ own refresh, such as a timer on the UI thread.
 > tabs and rows cloned from stock widgets, checkboxes from the Bonus Gallery, and a download bar, and it subscribes,
 > downloads and switches the mod's asset packs on and off.
 >
-> <!-- screenshot: the ADD-ONS screen open over the main menu -->
+> ![TF's ADD-ONS screen](img/add-ons-screen.jpg)
+>
+> TF's ADD-ONS screen: a screen of the mod's own, on the launcher's unused SplashScreen class. The pack logos are blanked here because they use EA's Tiberian Sun logo.

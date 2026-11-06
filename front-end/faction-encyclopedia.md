@@ -143,4 +143,6 @@ click arrives as an event on the row's cell, with the row as its data.
 > entry shows its in-game picture in its house colour, a description from the original games' manuals, what it
 > needs, and its stats (cost, strength, armour, speed or power, sight, weapons, damage, range, reload, seats).
 >
-> <!-- screenshot: the encyclopedia's GDI tab, the Mammoth Tank selected -->
+> ![The faction encyclopedia, Disc Thrower selected](img/faction-encyclopedia.jpg)
+>
+> The encyclopedia's Tiberian Sun tab with the Disc Thrower selected: its picture, description and live stats.

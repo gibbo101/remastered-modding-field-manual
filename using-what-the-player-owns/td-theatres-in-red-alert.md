@@ -118,4 +118,6 @@ Each claim was checked three ways:
 > loaded only on the TD theatres, converted from TD's own iconsets by a build script. TD's skirmish maps play in
 > their own terrain, beside Red Alert's.
 >
-> <!-- screenshot: a skirmish on a TD winter map, Allied and GDI bases on TD's own terrain -->
+> ![A Red Alert skirmish in TD's winter theatre](img/td-winter-theatre-in-ra.jpg)
+>
+> A Red Alert skirmish on TD's Winter Wonderland: TD's own winter terrain, trees and Tiberium, with a GDI MCV, all drawn from the base game.

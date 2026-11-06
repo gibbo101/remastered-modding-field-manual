@@ -132,4 +132,6 @@ why per-faction crests come from [re-pointing records in memory](../clientg-ram/
 > [main-menu restyle guide](https://github.com/gibbo101/cnc-ra-tiberian-factions/blob/main/docs/main-menu-restyle-guide.md)
 > with its scripts.
 >
-> <!-- screenshot: TF's restyled main menu -->
+> ![TF's restyled main menu](img/main-menu.jpg)
+>
+> TF's restyled main menu: the stock menu box, reskinned, with the mod's own buttons added.

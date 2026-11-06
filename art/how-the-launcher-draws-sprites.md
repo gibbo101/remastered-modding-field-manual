@@ -126,4 +126,6 @@ line's colour. TD's Obelisk never hits this: its `LineMaxFrames` is 5. Lines can
 > frames, plus 32 turret frames. The railgun's beam drew giant white squares until its frame count dropped to 5.
 > Every TF vehicle is centred on its canvas after packing, and given a baked shadow fitted to EA's Mammoth tanks.
 >
-> <!-- screenshot: a TS walker with its turret, beside an EA vehicle, both selected, showing matching boxes -->
+> ![A TS Titan, selected](img/ts-titan-selected.jpg)
+>
+> TF's Titan, a Tiberian Sun walker, selected: the box brackets the hull, the turret is a second draw, and the shadow is baked into the art.

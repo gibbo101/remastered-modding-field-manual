@@ -176,4 +176,6 @@ tab:
 > hidden, and each faction tab reads COMING SOON until its campaign ships. TF's proven route for mission content
 > is a stock slot with a shadowed scenario. Its mission carrier is still a development-build experiment.
 >
-> <!-- screenshot: the CAMPAIGNS page with its faction tabs and the COMING SOON panel -->
+> ![TF's CAMPAIGNS page](img/campaigns-page.jpg)
+>
+> TF's CAMPAIGNS page: a tab per faction, each reading COMING SOON until its campaign ships.

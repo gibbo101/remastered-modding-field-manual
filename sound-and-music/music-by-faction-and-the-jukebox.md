@@ -117,3 +117,7 @@ breaks the screen.
 > page and saved to a small INI file that the hook reads at every track. Tiberian Sun's tracks are built from the
 > player's own copy (see [Content built from the player's own games](../using-what-the-player-owns/content-from-the-players-own-games.md)),
 > so the hook falls back to the Mix rotation, and the jukebox hides them, whenever they're missing.
+>
+> ![Music by faction on TF's settings page](img/music-by-faction-settings.jpg)
+>
+> TF's settings page: music chosen per faction. Tiberian Sun's music reads "Not installed" until the player builds it from their own copy.

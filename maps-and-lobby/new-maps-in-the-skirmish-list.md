@@ -153,4 +153,6 @@ Ship it in the mod's `CCDATA/` folder under a name of your own.
 > 986, and Hastings moves to 999. Each map plays in its own TD theatre, and its lobby thumbnail is the base game's
 > own, so TF ships no thumbnails.
 >
-> <!-- screenshot: the skirmish Official list with TD maps beside RA's, a TD map's thumbnail showing -->
+> ![A TD map in the skirmish Official list](img/td-map-in-official-list.jpg)
+>
+> TD's Winter Wonderland in Red Alert's Official list, beside Red Alert's own maps, with the base game's thumbnail. TD's maps show their own climate, Winter.

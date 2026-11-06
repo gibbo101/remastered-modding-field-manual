@@ -82,4 +82,6 @@ there. Comparing those two buildings is how to settle it.
 > its box a tile high, and the box hadn't moved: the art had. TD's construction yard, on the same plot and from the
 > same pipeline, boxes correctly, and TF uses the pair as its control when lining up new buildings.
 >
-> <!-- screenshot: the TD and TS construction yards side by side, both selected -->
+> ![TD's construction yard, selected](img/td-construction-yard-selected.jpg)
+>
+> TD's construction yard selected: its box is centred on the plot, and the art is seated on the plot centre, so they match.

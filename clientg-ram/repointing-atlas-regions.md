@@ -175,4 +175,6 @@ with a joiner.
 > every machine. A hook installed during that load lets each player's launcher run the patch for itself. See
 > [Patching the launcher's code from your DLL](patching-the-launchers-code.md).
 >
-> <!-- screenshot: the GDI eagle in the radar slot of a Red Alert match -->
+> ![The GDI eagle in the radar slot](img/gdi-sidebar-crest.jpg)
+>
+> A GDI player's sidebar in a Red Alert match: the TD eagle in the radar slot, before a radar is built.

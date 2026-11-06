@@ -110,4 +110,6 @@ search `ClientG.exe`'s strings for the name family.**
 > prefixes to TD's for those factions and back to Red Alert's for Allied and Soviet players, in the same pass that
 > sets the radar crest.
 >
-> <!-- screenshot: a GDI player's TD sidebar with TD's green tab icons -->
+> ![TD's tab icons on a GDI sidebar](img/gdi-td-tab-icons.jpg)
+>
+> A GDI player's sidebar tabs: TD's green tab icons, from the rewritten prefix strings.

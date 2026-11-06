@@ -145,3 +145,7 @@ DontCryJustDie pointed out its cost.
 > TF runs A\*, give-way and its harvester changes as three switches on its settings page, all on by default. Turned
 > off, units path with EA's stock edge-follower exactly. The chokepoint layers came from two columns of tanks jamming
 > for good in a one-cell gap on a snow map.
+>
+> ![TF's pathfinding switches](img/settings-units.jpg)
+>
+> TF's UNITS switches: A* pathfinding, give-way and the harvester fixes, each with an off state that is stock Red Alert's.
