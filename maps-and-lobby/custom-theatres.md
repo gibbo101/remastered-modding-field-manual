@@ -113,7 +113,11 @@ only for the tiles a map draws, hasn't been measured. That decides how big a cus
 map uses, with video memory read in the same match with the mod off and then on. If memory rises by roughly the
 size of the extra tiles, tilesets load whole. If it doesn't rise, only drawn tiles load.
 
-## Isometric terrain on a square grid
+## Isometric terrain on a square grid (work in progress, unproven)
+
+> [!CAUTION]
+> **Work in progress.** Nothing in this section has run in game yet. It records the method as worked out so
+> far, so others can build on it or test it.
 
 Tiberian Sun's terrain is isometric, but its cells are squares like Red Alert's: the isometric look is TS's
 camera, rotated 45° and squashed 2:1. So a TS map can be laid on Red Alert's grid:
@@ -160,7 +164,7 @@ the same method would apply to its theatres.
 > [!TIP]
 > **In Tiberian Factions**
 >
-> TF plans Tiberian Sun's Temperate and Snow as theatres 6 and 7, with TS's own multiplayer maps converted onto them
+> **Work in progress, unproven.** TF plans Tiberian Sun's Temperate and Snow as theatres 6 and 7, with TS's own multiplayer maps converted onto them
 > and drawn with TS's art. The converter and art probes exist on a development branch, and the work is parked. The
 > template wall means the art has to be drawn under existing template names, which favours a small set of pieces
 > made from TS's art that tile together over TS's own tiles one piece per cell.
