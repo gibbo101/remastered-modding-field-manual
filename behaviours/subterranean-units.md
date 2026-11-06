@@ -92,4 +92,6 @@ tilt; hide the hull the moment the last step completes, while the mound is still
 > a Mobile Sensor Array shows them to its owner, and an E.M. pulse brings them up. The Devil's Tongue fires TS's own
 > fire stream, with TS's damage formula worked out for Red Alert's smaller cells.
 >
-> <!-- screenshot: a Subterranean APC mid-dive under its dirt mound -->
+> ![A Subterranean APC digging in](img/subterranean-apc-dive.jpg)
+>
+> A Subterranean APC on a long move, left to right: on the surface, sinking into its dirt mound, then underground, its selection box still tracking it beyond the ring of dirt it left. Taken from TF's development build with TS Nod, where the APC is built at the Nod War Factory rather than found in crates.
