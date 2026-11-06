@@ -68,7 +68,7 @@ item's page.
 - **Accept the Workshop agreement.** If the result says you must accept the Workshop legal agreement, open the
   item's page in a browser while logged in, accept it, and publish again.
 - **Follow EA's modding guidelines.** EA's disclaimer goes at the top of the description, and nothing uploaded may
-  hold C&C music. See [Content built from the player's own games](../using-what-the-player-owns/content-from-the-players-own-games.md).
+  hold C&C music.
 
 ## How it was verified
 

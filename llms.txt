@@ -69,10 +69,6 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [TD sounds from the base game](using-what-the-player-owns/td-sounds-from-the-base-game.md): play Tiberian
   Dawn's sound effects and EVA lines in a Red Alert mod from the base game's sound MEGs, by naming each sound in the
   DLL and adding RAC_/RAR_ alias events; your own samples must be MS-ADPCM.
-- [Content built from the player's own games](using-what-the-player-owns/content-from-the-players-own-games.md):
-  EA's guidelines bar music files from any C&C game, so convert Tiberian Sun's soundtrack from the player's own copy
-  (MIX/AUD to the Remastered MS-ADPCM WAVs) instead of shipping it. Conversion proven; in-game importer is design
-  only.
 
 ## Maps and the lobby
 
@@ -85,7 +81,7 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 
 - [Adding a theatre of your own](maps-and-lobby/custom-theatres.md): slot and DLL steps are proven by TD's
   theatres, but a new terrain template name with loose art crashes the launcher; custom terrain reskins existing
-  template names (loose DDS at the stock path). Isometric (TS) conversion is unproven.
+  template names (loose DDS at the stock path).
 - [Custom campaigns: replacing the official ones](maps-and-lobby/custom-campaigns.md): INSTANCES.XML decides what Mission Select shows
   (ShowOnMissionSelect, IsUnlockedAtStart, ExternalGameID), the campaign files what launches; replace a stock
   mission by shipping its scenario (SC<house><nn><dir><var>.INI) in CCDATA/ without [Digest].
@@ -95,9 +91,6 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [A new resource on the official skirmish maps](maps-and-lobby/official-maps-with-tiberium.md): rewrite the 230
   stock SCM<n>EA.INI maps from MAIN.MIX (OverlayPack, MINE lines, [STRUCTURES]), shadow them from CCDATA, repaint
   the MOBIUS_RED_ALERT_MULTIPLAYER_<N>_MAP.DDS thumbnails, add the overlay's tiles to every theatre.
-- [Co-op missions: research](maps-and-lobby/co-op-missions-research.md): co-op skirmish works today; the launcher's
-  co-op campaign is code with no screen or data; scripted LAN missions meet Red Alert's GAME_NORMAL win, lose and
-  briefing gates. Unproven.
 
 ## Sound and music
 
@@ -125,9 +118,6 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
   instead; Vanilla Conquer already has some of its fixes; find changes by "Chthon CFE Note" and the INI keys;
   Vanilla Conquer removed EA's SaveLoadPadding, so ported fields change the save version; zoom is data only;
   attack-move needs named missions and reads Shift per player.
-- [Letting players change the rules](engine/game-rules.md): a player pass goes after MPLAYER.INI (read only with
-  Aftermath units on) and before Fill_In_Data, and again in Load_Game; Read_INI keeps keys a file doesn't name;
-  Strength, Sight, ROF and Verses limits; keys leak into the next match.
 
 ## Units and buildings
 

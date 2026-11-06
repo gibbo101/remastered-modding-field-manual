@@ -10,6 +10,11 @@ contacts, and none of Tiberian Factions' internal history or dated decisions. Pu
 is Gibbo101, and community modders are credited by their alias (DontCryJustDie). TF's docs and the private notes behind
 them are source material: read them, distil them, never copy them.
 
+## What belongs here
+The manual holds what's confirmed working, or confirmed impossible. Designs and research stay in TF's docs until
+they're proven. A small marked "unproven" point on a page that otherwise works is fine. Before removing anything
+from the manual or from TF's docs, carry every fact it holds to its new home first: knowledge must never regress.
+
 ## Every page
 - EA's disclaimer at the top (exact wording in TF's `docs/ea-modding-guidelines.md`). No EA logos, no music files.
 - Opens with "When you need this": the kind of mod or problem that calls for the technique, and when it can be

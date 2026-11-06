@@ -71,8 +71,6 @@ what it does with the technique.
   desert, temperate and winter terrain, drawn from the base game.
 - [TD sounds from the base game](using-what-the-player-owns/td-sounds-from-the-base-game.md): TD weapon,
   building and EVA sounds in a Red Alert mod, with no audio shipped, and the format your own samples need.
-- [Content built from the player's own games](using-what-the-player-owns/content-from-the-players-own-games.md):
-  building content the guidelines don't let you ship, such as Tiberian Sun's music, from the player's own copy.
 
 ### Maps and the lobby
 - [New maps in the skirmish Official list](maps-and-lobby/new-maps-in-the-skirmish-list.md): listing maps
@@ -86,8 +84,6 @@ what it does with the technique.
   reading the launcher's memory.
 - [A new resource on the official skirmish maps](maps-and-lobby/official-maps-with-tiberium.md): Tiberium (or any
   new resource) on Red Alert's own skirmish maps, thumbnails included.
-- [Co-op missions: research](maps-and-lobby/co-op-missions-research.md): what is known about scripted co-op in a
-  mod, and what is still open (unproven).
 
 ### Sound and music
 - [EVA voice lines the launcher plays](sound-and-music/launcher-eva-lines-by-faction.md): giving each faction its
@@ -104,8 +100,6 @@ what it does with the technique.
 - [LAN games](engine/lan-games.md): one simulation on the host, and what that means for per-player code.
 - [Save versions](engine/save-versions.md): keeping players' saves safe as your classes grow.
 - [Porting CFE Patch Redux](engine/cfe-patch-ports.md): bringing CFE's features and fixes into a Vanilla Conquer DLL.
-- [Letting players change the rules](engine/game-rules.md): where a player's rules file fits, and the values it
-  mustn't break.
 
 ### Units and buildings
 - [Adding a unit](units/adding-a-unit.md): a new vehicle type in the DLL, end to end.

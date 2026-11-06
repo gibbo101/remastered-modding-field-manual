@@ -1,10 +1,10 @@
 ---
 title: Adding a theatre of your own
-description: A custom terrain theatre for Red Alert. The slot and DLL steps are proven with TD's theatres, but a new terrain template name with loose art crashes the launcher, so custom terrain is drawn by reskinning existing template names; isometric (Tiberian Sun) conversion is still open.
-tags: [maps, terrain, theatres, tilesets, dll, tiberian-sun]
+description: A custom terrain theatre for Red Alert. The slot and DLL steps are proven with TD's theatres, but a new terrain template name with loose art crashes the launcher, so custom terrain is drawn by reskinning existing template names.
+tags: [maps, terrain, theatres, tilesets, dll]
 holds_for: Steam build 21590013
-status: partly proven
-unproven: [any route to new terrain template names (new names with loose art crash the launcher), a stock tileset copied under a new name and root folder with loose art, TILEPATCHES as a whole-theatre route, whether a terrain tileset costs video memory whole or per tile drawn, theatre slots past 5, a converted Tiberian Sun theatre playing end to end]
+status: verified
+unproven: [any route to new terrain template names (new names with loose art crash the launcher), a stock tileset copied under a new name and root folder with loose art, TILEPATCHES as a whole-theatre route, whether a terrain tileset costs video memory whole or per tile drawn, theatre slots past 5]
 ---
 
 > [!NOTE]
@@ -113,35 +113,6 @@ only for the tiles a map draws, hasn't been measured. That decides how big a cus
 map uses, with video memory read in the same match with the mod off and then on. If memory rises by roughly the
 size of the extra tiles, tilesets load whole. If it doesn't rise, only drawn tiles load.
 
-## Isometric terrain on a square grid (work in progress, unproven)
-
-> [!CAUTION]
-> **Work in progress.** Nothing in this section has run in game yet. It records the method as worked out so
-> far, so others can build on it or test it.
-
-Tiberian Sun's terrain is isometric, but its cells are squares like Red Alert's: the isometric look is TS's
-camera, rotated 45° and squashed 2:1. So a TS map can be laid on Red Alert's grid:
-
-- **Orientation and scale:** rotate so TS's screen-up stays up, which makes TS's cell axes Red Alert's diagonals.
-  At one Red Alert cell per TS screen diamond, each Red Alert cell holds two TS cells, and distances shrink to
-  71%.
-- **Land:** take each Red Alert cell's land type from the TS cell at its centre, through TS's land types (clear,
-  rough, road, water, beach, rock).
-- **Diagonal leaks:** Red Alert's pathfinding cuts corners, and a TS cliff along a TS axis crosses the grid
-  diagonally. Where two blocked cells touch only at a corner, block one of the open cells beside them, so the
-  cliff becomes a staircase units can't slip through.
-- **Height is a rule, not just art.** TS refuses a step between cells unless they're level, or one level apart
-  with the lower cell a ramp. To keep plateaus, the DLL has to apply the same rule on these maps.
-- **Cliffs as objects:** draw TS's cliff pieces as objects over flat ground, with their faces hanging south,
-  rather than as ground tiles.
-
-**Unproven end to end:** a converter written this way lays TS's multiplayer maps on the grid. The shortest routes
-between start points come out at 0.93 to 1.04 times TS's own on 33 of 39 maps, and the art probes draw them with
-TS's tiles. No converted map has been played as a theatre yet. The wall above changes the art plan: TS's pieces
-would have to be drawn under existing template names, which suits a small set of pieces that tile together, not
-TS's tens of thousands of unique ones. Red Alert 2 uses the same map and tile formats, so
-the same method would apply to its theatres.
-
 ## How it was verified
 
 - **The theatre steps:** TD's three theatres, proven in a shipped mod; see
@@ -156,22 +127,14 @@ the same method would apply to its theatres.
   stock template paths and per-map `TILEPATCHES`, with no DLL. A shipped mod's tileset XML names `.tga` frames that
   ship only as `.DDS`, and they draw. The tile and name counts were read from the stock tilesets for this page.
 - **The tileset index:** the stock `TILESETS.XML` in `CONFIG.MEG`, read for this page.
-- **The TS method:** a converter and art probes in a working mod's development branch, with the route measurements
-  above. Nothing past that is proven.
 
 **Credit:** Reilsss's Desert mod is the public proof that terrain reskins need only data.
 
 > [!TIP]
 > **In Tiberian Factions**
 >
-> **Work in progress, unproven.** TF plans Tiberian Sun's Temperate and Snow as theatres 6 and 7, with TS's own multiplayer maps converted onto them
-> and drawn with TS's art. The converter and art probes exist on a development branch, and the work is parked. The
-> template wall means the art has to be drawn under existing template names, which favours a small set of pieces
-> made from TS's art that tile together over TS's own tiles one piece per cell.
->
-> ![Tiers of Sorrow three ways: TS's own view, TS's tiles laid on Red Alert's grid, and a square tile set made from TS's art](img/ts-map-on-ra-grid.jpg)
->
-> Tiers of Sorrow, from left to right: Tiberian Sun's own view; TS's own tiles laid on Red Alert's grid, one piece
-> per cell; and a small square tile set made from TS's art. These are offline renders, not the game.
+> TF plays Red Alert maps in TD's three theatres, slots 3 to 5, through the steps above. Tiberian Sun theatres
+> are a parked design in TF's own docs: the template wall means their art would have to be drawn under existing
+> template names.
 >
 > The memory test is built as a data-only mod and ready to run, but it hasn't been run yet.

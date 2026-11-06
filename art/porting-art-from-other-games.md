@@ -25,8 +25,7 @@ or team colour. A mod porting Tiberian Dawn's art doesn't need this page, becaus
 see [TD art from the base game](../using-what-the-player-owns/td-art-from-the-base-game.md).
 
 **The licence:** EA's modding guidelines license other C&C games' art and sound to mods, revocably, but never
-their music. Take the files from your own install. See
-[Content built from the player's own games](../using-what-the-player-owns/content-from-the-players-own-games.md).
+their music. Take the files from your own install.
 
 ## The target every port has to hit
 

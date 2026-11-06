@@ -41,6 +41,10 @@ Changing the skirmish playlist for everyone is data alone, and doesn't need the 
   of WAV files. A skirmish instance names its music `MUS_RA_MULTIPLAYER_MODE` in `INSTANCES.XML`, and the
   launcher adds the player's audio-setting prefix (`RAR_`, `RAC_` or `RAB_`, for Remastered, Classic or Bonus)
   before looking it up. All three events exist in the stock file.
+- **The tracks are MS-ADPCM WAVs.** Every remastered track in the base game's `MUSIC.MEG` is MS-ADPCM (WAV format
+  tag 2) at 44,100 Hz stereo, and every classic track is MS-ADPCM at 22,050 Hz mono. Write new tracks the same way
+  (`ffmpeg -i in.wav -c:a adpcm_ms -ar 44100 -ac 2 out.wav`). An event names its files as
+  `<Entry> RAR_MUS_Reload_Fire.WAV </Entry>`, and a mod's own tracks go under `Data/AUDIO/MUSIC/`.
 - **Changing the playlist for everyone is data.** Ship a loose `MUSICEVENTS.XML` with your tracks in those events
   (see [Overriding the launcher's data](../launcher-data/overriding-launcher-data.md)).
 - **Nothing in the data picks by faction.** `AUDIO_FACTIONS.XML` has a `<MusicMap>` per faction, but EA's own
@@ -101,6 +105,8 @@ breaks the screen.
   `INSTANCES.XML` (the event name, with EA's comment that the prefixes are added in code), `AUDIO_FACTIONS.XML`
   (the unused maps and EA's comment) and `AUDIO_SYSTEM_CONSTANTS.XML` (the jukebox entry fields), all from
   `CONFIG.MEG`.
+- **The track format:** every music file in the base game's `MUSIC.MEG` read for its WAV header, and tracks
+  converted with the command above played in skirmish rotations and the jukebox.
 - **The DLL can't play music:** the remaster build compiles `soundio_null.cpp`, and EA's `DLLInterface.cpp` has its
   theme queueing commented out.
 - **The patch:** both call sites and their stock targets read from `ClientG.exe` on disk. In a shipped mod,
@@ -114,9 +120,8 @@ breaks the screen.
 > **In Tiberian Factions**
 >
 > Each TF faction plays its own choice of Mix, Red Alert, Tiberian Dawn or Tiberian Sun, set on TF's own settings
-> page and saved to a small INI file that the hook reads at every track. Tiberian Sun's tracks are built from the
-> player's own copy (see [Content built from the player's own games](../using-what-the-player-owns/content-from-the-players-own-games.md)),
-> so the hook falls back to the Mix rotation, and the jukebox hides them, whenever they're missing.
+> page and saved to a small INI file that the hook reads at every track. Tiberian Sun's tracks are optional: EA's guidelines
+> bar shipping them, and building them from the player's own copy is still a design. The hook falls back to the Mix rotation, and the jukebox hides them, whenever they're missing.
 >
 > ![Music by faction on TF's settings page](img/music-by-faction-settings.jpg)
 >
