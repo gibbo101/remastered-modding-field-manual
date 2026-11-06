@@ -4,7 +4,7 @@ description: The rules the HD renderer applies to unit, building, effect and bea
 tags: [art, sprites, hd, tilesets, launcher]
 holds_for: Steam build 21590013
 status: verified
-unproven: [the exact alpha cutoff (observed near 128), why second draws drop shapes from 128 up]
+unproven: [the exact alpha cutoff (observed near 128), why second draws drop shapes from 128 up, whether SHAPE_GHOST darkens an effect]
 ---
 
 > [!NOTE]
@@ -47,7 +47,7 @@ and takes only the size from the DLL. See [Building selection boxes](building-se
 | Rule | What goes wrong otherwise |
 |---|---|
 | **Second draws use shape numbers 0 to 127 only.** A turret, radar dish or overlay is a second draw on the same object, and shapes from 128 up draw nothing. | The turret silently vanishes. A body drawn in the first draw can use shapes up to 255. |
-| **Sprites are never rotated.** `CNCObjectStruct::Rotation` is ignored for every export. | Anything that must follow an angle draws flat. Build it from round pieces laid along the line, or use the beam line below. |
+| **Sprites can't be rotated usefully.** In play, an export with `CNCObjectStruct::Rotation` set drew flat, or at best rotated but cut to its unrotated frame. | Anything that must follow an angle can't be one sprite. Build it from round pieces laid along the line, or use the beam line below. |
 | **Pixels below about half alpha are discarded.** | A soft, low-alpha shadow or glow draws as nothing. |
 | **Every animation stage needs a tile.** Declare as many tiles as the animation has stages. | A stage with no tile draws as a white box. |
 | **An effect with HD art only still needs `ImageData`.** An animation with no classic image gets a null `ImageData`. | It draws as a green placeholder. Give it another animation's `ImageData` (a donor), and its HD tile is then found by name. |
@@ -66,6 +66,35 @@ under the sprite. Keep it above the alpha cutoff after any resize. A shadow anch
 hull's bounding box collapses into a detached blob at the diagonal facings. An offset of the whole silhouette hugs
 the hull at every facing.
 
+## Worked example: a beam the launcher can't draw
+
+Tiberian Sun's Disruptor fires a sonic wave: a shimmering band from the tank to its target. TS draws it by
+displacing screen pixels along the line (OpenTS's `wave.cpp`), and ships no art for it. The Remastered launcher has
+no per-pixel effect a mod can use for that, so the band has to be built from sprites. It took one mod weeks of
+builds, and it's a good map of the limits above:
+
+| Tried | Result |
+|---|---|
+| One long band sprite, rotated to the target | Rotation is unusable (above), so the band only lined up at one angle. |
+| A thin bar, rotated | Drew unrotated in play. |
+| A chain of round discs along the line | **Works.** Round pieces don't need rotating. Discs 32 leptons apart read as a band; at 64 they showed as beads. |
+| The discs owned by the firing player | The launcher tints an owned effect in its house colour, which turned the band gold. The discs carry no owner. |
+| `Cloak` on the discs, for a shimmer | Ignored, on an effect and on discs exported as units alike. |
+| `SHAPE_PREDATOR` (the stealth shimmer) | Draws nothing, and warps nothing. |
+| `FlashingFlags` | A strobe, not a shimmer. |
+| A lit window sliding down the band, like TS's pulse | Works as a mechanism, but TS's pulse is smaller than one disc, so it can't read like TS. |
+| TS's brightness ladder as a pale overlay | TS multiplies the colours beneath. An overlay can only add, so it never looks the same. |
+| The chronal vortex | The only true screen warp the launcher offers. It ignores the exported width and height and always draws Red Alert's whole chronosphere whirlpool. |
+| `SHAPE_FADING` plus a small, repeating change of scale (12%, every 6 stages) | **Shipped.** The only motion that read like TS's shimmer. |
+
+Two things this shows for any effect along a line:
+
+- **A chain of overlapping sprites can't give a hard edge, or keep a texture.** Discs overlapping several deep fade
+  out at the band's edge whatever the disc's own edge does, and they smear any mottling in the art. If you need a
+  hard edge, the beam line (below) is the only primitive that follows an angle.
+- **Make the effect the weapon.** Once the band was a chain of discs, its damage could ride the discs too: each
+  cell's disc damages what stands in it, so the band hurts what it visibly crosses.
+
 ## Beams
 
 A beam weapon such as the Obelisk's is drawn by the launcher as lines, not as a sprite. Each object exports at most
@@ -83,6 +112,9 @@ line's colour. TD's Obelisk never hits this: its `LineMaxFrames` is 5. Lines can
 - **Each rule:** found in a shipped mod's art, where a build drew wrong and the fix was confirmed in game. The
   canvas-centre anchor was also tested against the competing idea that the crop's centre is the anchor. A tall
   sprite placed by its content centre sank into its own platform, and placing it by the canvas centre fixed it.
+- **The beam example:** the attempts and their results recorded in a working mod's notes and history, OpenTS's
+  `wave.cpp` (TS's per-pixel displacement), and the vortex fields (`VortexActive`, `VortexX/Y`, `VortexWidth/Height`)
+  in EA's `DLLInterface.h`. Each result was seen in play.
 - **Observed only, not read from code:** the 128-shape limit on second draws, the ignored rotation, the alpha
   cutoff, the white box, the green placeholder and the squares at frame 5. Each was seen in play and worked around.
   The cause behind each one is inside the launcher.
