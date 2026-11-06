@@ -83,4 +83,6 @@ cloaked ones attackable through the copy (the cell carries the attack action), a
 > TF picked 3 because it's what the pulse's ring covers on screen; TS's 11 swallowed a Red Alert base. The Mobile
 > Sensor Array shows cloaked and buried enemies to its owner with an EVA warning and a radar ping.
 >
-> <!-- screenshot: vehicles sparking under an EMP ring -->
+> ![An E.M. pulse stunning two walkers](img/emp-stun.jpg)
+>
+> TS GDI's E.M. Pulse Cannon fired between a Titan and a Wolverine (left); a moment later both walkers are stunned, sparking purple (right). The EMP hits its owner's own units too.
