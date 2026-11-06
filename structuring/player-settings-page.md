@@ -21,6 +21,10 @@ When your mod changes how Red Alert *plays* (pathfinding, the AI, controls, the 
 want the old behaviour back. A switch per change lets them keep the rest of your mod. A mod that only adds content
 or changes balance doesn't need one.
 
+Most mods expose their options as an INI file the player edits by hand. That works for players comfortable
+finding and editing a file in their mod folder, and it's still how the settings are stored here. An in-game page
+puts the same choices in front of everyone else, with no file to find or syntax to get wrong.
+
 ## The rule: off means exactly vanilla
 
 A switch is only honest if turning it off gives Red Alert's own behaviour, not a near copy. So:
