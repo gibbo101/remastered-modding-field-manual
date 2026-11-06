@@ -18,8 +18,11 @@ unproven: [the start-position field (reported, not checked here), heap behaviour
 
 When your mod's AI should play at the difficulty the player picked for each AI in the skirmish lobby. The lobby lets
 the player set Easy, Medium or Hard per AI, but the launcher never passes those picks to the DLL, so every AI
-plays the default. If one difficulty for all AIs is enough, or your mod sets difficulty some other way (an INI
-setting, say), you don't need this page.
+plays the default. If one difficulty for all AIs is enough, you don't need this page.
+
+A mod can set difficulty some other way, such as an INI file the player edits, and that works without touching the
+launcher's memory. But reading the lobby is far friendlier for players: they pick each AI's difficulty where the game
+already offers it, in the same lobby, every match, with no file to find and edit.
 
 > [!WARNING]
 > **Fragile: this reads the running launcher's memory.**
