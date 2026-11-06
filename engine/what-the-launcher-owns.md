@@ -23,6 +23,12 @@ drawn and decided by the launcher, `ClientG.exe`, which your DLL can't touch thr
 those behaviours really are walls. Many are not: they can be reached through the launcher's own data, through its
 cached records in memory, or through a patch to its code. This page lists each one and its route.
 
+> [!IMPORTANT]
+> **"Real wall" means not found yet, not impossible.** Every wall in this table is one nobody has found a way round
+> *so far*. Several rows here started out as walls. The sidebar's faction crest was listed as one for months: data
+> couldn't change it, and attempts kept failing, until re-pointing the launcher's cached records in memory got
+> round it. If you find a route past any wall here, it's a wall no longer.
+
 ## The walls, and the way through
 
 | Behaviour the launcher owns | Status | Route, and the page that covers it |
@@ -51,7 +57,7 @@ cached records in memory, or through a patch to its code. This page lists each o
 | A new superweapon's sidebar cameo showing "Cost: $0" | **Open** | The launcher hides the cost line only for its own superweapons' asset names (`SW_Nuke`, `SW_Chrono` and others). Not tried since code patching became possible. |
 | The build hotkeys for new buildings and units | **Open** | Each build command names one stock object. Not tried since code patching became possible. |
 
-"Real wall" means routes were tried and failed. "Observed" marks a row resting on fewer than three independent
+"Real wall" means the routes tried so far failed. "Observed" marks a row resting on fewer than three independent
 sources. "Open" means nobody has tried the code route yet.
 
 ## How to tell who owns a behaviour
