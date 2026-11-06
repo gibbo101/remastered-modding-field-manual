@@ -4,3 +4,6 @@
 
 # Session hand-off, local only.
 HANDOFF.md
+
+# Next-session working files (cut plan, inventories), local only.
+handoff/
