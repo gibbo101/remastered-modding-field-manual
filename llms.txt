@@ -92,7 +92,7 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 
 ## Sound and music
 
-- [Launcher-played EVA lines by faction](sound-and-music/launcher-eva-lines-by-faction.md): nine EVA lines are
+- [EVA voice lines the launcher plays](sound-and-music/launcher-eva-lines-by-faction.md): nine EVA voice lines are
   played by ClientG itself; write each faction's recording over the launcher's sample names at match start, and
   over ClientG's cached copy (same-length payloads, whole-file compare before writing). Fragile: one ClientG build.
 - [Credit tick and radar sounds by faction](sound-and-music/credit-tick-and-radar-by-faction.md): the launcher

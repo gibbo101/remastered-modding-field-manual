@@ -17,7 +17,7 @@ source in January 2025, so this should hold.
 
 ## When you need this
 
-When a Red Alert mod wants Tiberian Dawn's sounds: TD weapon reports, building sounds, EVA lines. Every player
+When a Red Alert mod wants Tiberian Dawn's sounds: TD weapon reports, building sounds, EVA voice lines. Every player
 already owns them in the base game's sound MEGs, so the mod ships no audio for them, only a name in the DLL and a
 few lines of XML. The same route plays new sounds of your own. A mod that only uses Red Alert's own sounds, under
 their own names, doesn't need this page.

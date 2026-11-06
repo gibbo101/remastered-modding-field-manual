@@ -75,7 +75,8 @@ need the DLL or a launcher patch:
   [Re-pointing launcher UI art in memory](../clientg-ram/repointing-atlas-regions.md).
 - **TD's HUD scene picks its logo by Red Alert side,** so a TD-scene faction on the Allied side shows TD's GDI
   eagle until it's re-pointed.
-- **Lines the launcher plays itself** (mission won or lost, low power and others) follow the side, not the faction.
+- **EVA voice lines the launcher plays itself** ("Mission accomplished", "Low power" and others) follow the side,
+  not the faction.
 - **Sounds and EVA the DLL sends** follow whatever name the DLL chooses, so pick them by `ActLike`:
   [TD sounds from the base game](../using-what-the-player-owns/td-sounds-from-the-base-game.md).
 

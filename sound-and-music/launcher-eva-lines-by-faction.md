@@ -1,6 +1,6 @@
 ---
-title: Launcher-played EVA lines by faction
-description: Nine EVA lines (mission won and lost, battle control terminated, cannot deploy, low power and others) are played by the launcher itself, never by the DLL. Give each faction its own voice by writing its recording over the launcher's sample names at match start, and over ClientG's cached copy for a switch within one session.
+title: EVA voice lines the launcher plays
+description: Nine EVA voice lines (mission won and lost, battle control terminated, cannot deploy, low power and others) are played by the launcher itself, never by the DLL. Give each faction its own voice by writing its recording over the launcher's sample names at match start, and over ClientG's cached copy for a switch within one session.
 tags: [audio, eva, clientg, ram-patch, factions, advanced]
 holds_for: Steam build 21590013
 clientg_version: 1.153 (745903)
@@ -12,15 +12,15 @@ unproven: [whether languages other than English need their own payloads (only th
 > [!NOTE]
 > EA has not endorsed and does not support this product.
 
-# Launcher-played EVA lines by faction
+# EVA voice lines the launcher plays, by faction
 
 ## When you need this
 
 When a faction needs its own EVA voice, and some of its lines never pass through your DLL. Most EVA lines are sent
 by the DLL, and routing those by faction is data plus a name in the DLL (see
-[TD sounds from the base game](../using-what-the-player-owns/td-sounds-from-the-base-game.md)). Nine lines are
+[TD sounds from the base game](../using-what-the-player-owns/td-sounds-from-the-base-game.md)). Nine EVA voice lines are
 played by the launcher itself, in its own voice, whoever the player is. A mod with only Allies and Soviets, or one
-happy for every faction to share Red Alert's EVA on those nine lines, doesn't need this page.
+happy for every faction to share Red Alert's EVA on those nine voice lines, doesn't need this page.
 
 > [!WARNING]
 > **Fragile: part two of this writes into the running launcher's memory.**
@@ -39,7 +39,7 @@ happy for every faction to share Red Alert's EVA on those nine lines, doesn't ne
 **Holds for:** the client in the box above. EA has stopped patching the game and archived the source in January
 2025, so the build should stay put.
 
-## The nine lines
+## The nine EVA voice lines
 
 | Line | Launcher sample (classic `RAC_`, remastered `RAR_`) |
 |---|---|
@@ -58,7 +58,7 @@ The launcher has its own events for these: `ClientG.exe` names `Faction_Event_GU
 callback, so the DLL can't choose their voice.
 
 **Speech the DLL sends at the end of a match is dropped as well.** Lines the DLL sends during or after
-`On_Multiplayer_Game_Over` stay silent, even through a valid route. So a faction's end-of-game lines have to use
+`On_Multiplayer_Game_Over` stay silent, even through a valid route. So a faction's end-of-game EVA lines have to use
 the same route as the nine. (Observed. The cause is inside the launcher.)
 
 ## Part one: write the faction's recording at match start
@@ -130,6 +130,6 @@ file**, header included, as raw MS-ADPCM bytes in read-write memory. So:
 > [!TIP]
 > **In Tiberian Factions**
 >
-> TF's GDI and Nod hear TD's EVA on all nine lines, TS GDI hears Tiberian Sun's, and Allies and Soviets keep Red
+> TF's GDI and Nod hear TD's EVA on all nine voice lines, TS GDI hears Tiberian Sun's, and Allies and Soviets keep Red
 > Alert's. Each line's three recordings are generated at the same byte length, with their needles, so adding
-> another faction's voice is one more column in a build script. TF's end-of-game lines ride the same route.
+> another faction's voice is one more column in a build script. TF's end-of-game EVA lines ride the same route.

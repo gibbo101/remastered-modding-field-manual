@@ -84,8 +84,8 @@ what it does with the technique.
   reading the launcher's memory.
 
 ### Sound and music
-- [Launcher-played EVA lines by faction](sound-and-music/launcher-eva-lines-by-faction.md): giving each faction
-  its own voice on the lines the launcher plays itself.
+- [EVA voice lines the launcher plays](sound-and-music/launcher-eva-lines-by-faction.md): giving each faction its
+  own EVA voice on announcements the launcher plays itself, such as "Mission accomplished" and "Low power".
 - [Credit tick and radar sounds by faction](sound-and-music/credit-tick-and-radar-by-faction.md): faction sounds
   for the money counter and the radar.
 - [Music by faction, and the jukebox](sound-and-music/music-by-faction-and-the-jukebox.md): skirmish music per
