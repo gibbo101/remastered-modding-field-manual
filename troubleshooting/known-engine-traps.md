@@ -66,6 +66,24 @@ in a column. A mod with several factions' trees can.
 
 **Fix:** change the guard to `<`, and raise `MAX_BUILDABLES` to fit your largest column, in both files.
 
+## About 25 named types fill the name table
+
+Every unit, building or other type whose INI section sets `Name=` takes a slot in `NameOverride`, a table of 25
+(`GLOBALS.CPP`, filled in `TechnoTypeClass::Read_INI` in `TECHNO.CPP`). Three things combine:
+
+- **There's no de-duplication.** The game reads `rules.ini` and then `aftrmath.ini`, so a type named in both takes
+  two slots.
+- **When the table is full, new names are silently dropped.**
+- **The lookup can't reach the last slot.** `Text_String` (`INLINE.H`) tests `abs(string) < ARRAY_SIZE(NameOverride)`
+  and then reads slot `-(string + 1)`, so slot 24 is never returned.
+
+A mod that keeps adding named types runs out of slots, and a name comes back `NULL`. In a working mod that showed as
+the launcher crashing when a refinery was placed or an MCV deployed, at around the 30th type. Stock Red Alert names
+few enough types never to hit it.
+
+**Fix:** make the table much bigger (one working mod uses 256), skip a type already in the table before taking a
+new slot, change the lookup test to `<=`, and treat a `NULL` name as no override.
+
 ## A crate that kills the unit driving onto it
 
 When a unit starts towards a cell, `FootClass::Start_Driver` checks the cell for a crate (`Goodie_Check`). An
@@ -88,9 +106,9 @@ Each trap three ways:
   mod path; the search order in `CDFileClass::Set_Name` and the bare-name loads in `INIT.CPP`, `SCENARIO.CPP` and
   `SAVELOAD.CPP`; the `<=` guard and `MAX_BUILDABLES=75` in `SIDEBAR.H`, `SIDEBAR.CPP` and `SIDEBARGlyphx.CPP`;
   the crate chain through `FOOT.CPP`, `CELL.CPP` and `DRIVE.CPP`, with `Set_Speed` declared `virtual` in
-  `FOOT.H`. Vanilla Conquer inherits the search-path code unchanged.
+  `FOOT.H`; `NameOverride[25]` in `GLOBALS.CPP`, its fill loop in `TECHNO.CPP` and the `<` test in `INLINE.H`. Vanilla Conquer inherits the search-path code unchanged.
 - **A working mod hit each one:** the search-path crash, reported by another modder running several mods; another
-  rules mod's `RULES.INI` replacing its own; the sidebar overrun, found as its roster grew; and the crate crash,
+  rules mod's `RULES.INI` replacing its own; the sidebar overrun and the name table, both found as its roster grew; and the crate crash,
   found from minidumps.
 - **The fixes** are in that mod's code and released, and the crashes stopped.
 - **Unproven:** that the stock `RedAlert.dll` behaves exactly as the released source on each trap (it's built from

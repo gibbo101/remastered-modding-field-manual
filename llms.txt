@@ -163,7 +163,8 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
   unstripped DLL gives the line; ClientG RVA 0x56A539 is a deliberate assert write, so read the assert text.
 - [Known engine traps](troubleshooting/known-engine-traps.md): bugs in EA's released RA source every DLL mod
   inherits: the 512-byte mod search-path buffer overruns at about four mods; RULES/AFTRMATH/MPLAYER.INI resolve the
-  current directory first; a sidebar column of 75 writes past its array; a crate that kills its driver.
+  current directory first; a sidebar column of 75 writes past its array; the 25-slot NameOverride table fills
+  (no dedup, last slot unreachable); a crate that kills its driver.
 
 ## Patching the launcher in memory (advanced)
 

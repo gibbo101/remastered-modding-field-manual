@@ -34,6 +34,7 @@ it.
 | Bullets, anims, factories, teams | 50, 100, 32, 60 | `[Maximums]` | `rules.ini` |
 | Per-house unit and infantry caps | a sixth of the global cap, adjusted per scenario | `HouseClass::Control.MaxUnit` and the rest | These throttle only the **AI's** production (`AI_Unit`, `AI_Infantry`). Human players aren't capped by them. |
 | Entries in one **sidebar column** | 75 | `MAX_BUILDABLES` in `SIDEBAR.H` | DLL code, and fix the off-by-one (below) |
+| Types with a `Name=` override in the INI | 25, with no de-duplication and the last slot unreachable | `NameOverride` in `GLOBALS.CPP` | DLL code, with the lookup fixed: see [Known engine traps](../troubleshooting/known-engine-traps.md) |
 | Cells in a building's footprint | 36 | `MAX_OCCUPY_CELLS` in `DLLInterface.h` | Can't: it's part of the interface the launcher reads |
 
 ## Traps
