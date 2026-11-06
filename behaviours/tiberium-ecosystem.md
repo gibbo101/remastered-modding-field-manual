@@ -82,4 +82,6 @@ TD turns some infantry killed by Tiberium into Visceroids, hostile to everyone.
 > infantry round it. Tiberian Sun's Ghost Stalker is immune and heals in it. About 1 in 100 infantry killed by
 > Tiberium rise as a Visceroid.
 >
-> <!-- screenshot: a blossom tree in a Tiberium field beside an ore field -->
+> ![A blossom tree in a Tiberium field](img/blossom-tree.jpg)
+>
+> A TD blossom tree standing in a Tiberium field on Keep off the Grass, one of the official Red Alert maps TF converts, where it replaced an ore mine.

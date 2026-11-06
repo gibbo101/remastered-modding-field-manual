@@ -86,4 +86,6 @@ Hidden objects stay hidden from the AI too, since `Is_Cloaked` hides them from e
 > a weak point, so its power cost was halved to 100 in exchange. The Nod AI builds one once it has the Temple.
 > On a development branch, Tiberian Sun's own Nod Stealth Generator takes its place (built, not in a release).
 >
-> <!-- screenshot: a cloaked Nod base seen by its owner, the generator solid in the middle -->
+> ![A cloaked Nod base](img/stealth-generator-cloak.jpg)
+>
+> A Nod base under its Stealth Generator, as its owner sees it: the Temple, Hand of Nod, refinery and airstrip are faint outlines over their bibs, and the generator stays solid.

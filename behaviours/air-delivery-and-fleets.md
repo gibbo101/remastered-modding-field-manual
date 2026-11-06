@@ -75,4 +75,6 @@ it delivers, so a captured building of another era gives its own era's version.
 > airfield with TD's A-10, and Nod a sub pen with two submarines. Every side shares Red Alert's transport. Nod gets TD
 > paratroops and a recon flight as support powers of its own.
 >
-> <!-- screenshot: a cargo plane setting a vehicle down beside the Nod airstrip -->
+> ![TD's cargo plane delivering to the Nod airstrip](img/cargo-plane-delivery.jpg)
+>
+> TD's cargo plane coming in over the Nod airstrip (left); a moment later it's leaving, and the Light Tank it carried is on the ground (right).
