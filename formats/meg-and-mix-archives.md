@@ -35,8 +35,8 @@ EA's own reader and builder are in the released source, in the map editor (`CnCT
 and `MegafileBuilder.cs`). The layout, little-endian:
 
 ```
-u32  0xFFFFFFFF             magic (0x8FFFFFFF is also accepted)
-f32  0.99                   version (0x3F7D70A4)
+u32  0xFFFFFFFF             magic (0x8FFFFFFF is also accepted)   } optional: EA's reader skips these
+f32  0.99                   version (0x3F7D70A4)                 } 8 bytes only when the magic is there
 u32  header size            where the file data starts
 u32  file count
 u32  string count
