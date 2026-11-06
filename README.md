@@ -61,6 +61,8 @@ what it does with the technique.
   whole screens.
 - [New screens and buttons](front-end/new-screens-and-buttons.md): adding main-menu buttons and whole screens the
   launcher doesn't have.
+- [A faction encyclopedia screen](front-end/faction-encyclopedia.md): an in-game reference for your factions' units,
+  with pictures and live stats.
 
 ### Using what the player already owns
 - [TD art from the base game](using-what-the-player-owns/td-art-from-the-base-game.md): drawing Tiberian Dawn's

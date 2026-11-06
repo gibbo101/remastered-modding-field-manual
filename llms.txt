@@ -55,6 +55,9 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [New screens and buttons](front-end/new-screens-and-buttons.md): clone a stock button in a loose RA_MAIN_MENU.BUI
   and bind its click from a hook; a new screen is a loose .BUI on ClientG's unused SplashScreen class, opened with
   GUIManager/Create_Scene_Instance. Fragile: one ClientG build.
+- [A faction encyclopedia screen](front-end/faction-encyclopedia.md): a new SplashScreen-class screen listing each
+  faction's units with picture, description and live stats; the DLL processes the mod's rules inside ClientG, draws
+  pictures into a canvas texture shipped at start-up, and fills a stock list box. Fragile: one ClientG build.
 
 ## Using what the player already owns
 
