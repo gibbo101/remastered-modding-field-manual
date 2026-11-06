@@ -145,7 +145,10 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 
 - [The skirmish AI and its IQ levels](ai/skirmish-ai-and-iq.md): skirmish runs as GAME_GLYPHX_MULTIPLAYER so campaign
   AI paths are skipped; [IQ] gates each behaviour and every skirmish AI gets MaxIQ; IQ below Production (5) stops base
-  building; difficulty is a stat handicap; stock gaps: no skirmish ships, radar only vs air, stubbed urgency checks.
+  building; stock skirmish gives every house the Normal handicap whatever the lobby says; stock gaps: no ships, naval
+  yards, silo, Iron Curtain or Chronosphere; only the spy plane, paratroopers and self-launching GPS get used; no
+  parabombs in skirmish; radar only vs air; targets picked through the shroud; stubbed urgency checks; build picks
+  are weighted dice; attacks are a timer and a 1-in-3 roll.
 - [Pathfinding](ai/pathfinding.md): stock RA has no A* (EA's edge-following Find_Path); zones ignore buildings;
   allied vehicles head-on are MOVE_NO. Fixes: cfehunter's CFE A* (expansion cap, binary heap, per-cell visited
   table), give-way plus corridor claims, a no-progress give-up.
