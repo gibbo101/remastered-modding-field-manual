@@ -165,4 +165,9 @@ the same method would apply to its theatres.
 > template wall means the art has to be drawn under existing template names, which favours a small set of pieces
 > made from TS's art that tile together over TS's own tiles one piece per cell.
 >
-> <!-- screenshot: a converted TS map preview beside TS's own view of the same map -->
+> ![Tiers of Sorrow three ways: TS's own view, TS's tiles laid on Red Alert's grid, and a square tile set made from TS's art](img/ts-map-on-ra-grid.jpg)
+>
+> Tiers of Sorrow, from left to right: Tiberian Sun's own view; TS's own tiles laid on Red Alert's grid, one piece
+> per cell; and a small square tile set made from TS's art. These are offline renders, not the game.
+>
+> The memory test is built as a data-only mod and ready to run, but it hasn't been run yet.
