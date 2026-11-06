@@ -79,6 +79,10 @@ stock unit of similar size, then tune them by eye. For a turret, see [Turrets](t
 > registrations were moved to match the enum. Append new types at the end of both the enum and `Init_Heap`, in
 > the same order.
 
+The same rule holds for every type heap, animations included: `AnimTypeClass::Init_Heap` (`ADATA.CPP`) carries EA's
+own warning that its types "must be allocated in the exact order that they are specified in the AnimType
+enumeration", and `AnimTypeClass::As_Reference` reads `AnimTypes.Ptr(type)`.
+
 Stock Red Alert sizes each type heap to exactly its enum's count (`UnitTypes.Set_Heap(UNIT_COUNT)` in `INIT.CPP`).
 A type you add to the enum grows the heap with it. Types created at run time from INI data, as some extension
 DLLs do, need spare slots: see [Raising the limits](raising-the-limits.md).
@@ -142,7 +146,8 @@ A sound plays by name: add it to the DLL's sound table, and route it in the laun
 ## How it was verified
 
 - **EA's source:** the `UnitTypeClass` constructor and a stock tank's values (`UDATA.CPP`); `Init_Heap`, and
-  `As_Reference` reading `UnitTypes.Ptr(type)`; `UnitTypes.Set_Heap(UNIT_COUNT)` (`INIT.CPP`); `One_Time` loading
+  `As_Reference` reading `UnitTypes.Ptr(type)`; the same pair for animations in `ADATA.CPP`, with its ordering
+  comment; `UnitTypes.Set_Heap(UNIT_COUNT)` and `AnimTypes.Set_Heap(ANIM_COUNT)` (`INIT.CPP`); `One_Time` loading
   `ImageData` with `MFCD::Retrieve`; the null check in `Techno_Draw_Object_Virtual` (`TECHNO.CPP`); `Image=`
   (`TECHNO.CPP`), `Tracked=` (`UDATA.CPP`) and `Burst=` (`WEAPON.CPP`); and `new MFCD(...)` for EA's own MIXes.
 - **The game's files:** stock `rules.ini`'s land speeds, from `REDALERT.MIX`.

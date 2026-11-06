@@ -69,8 +69,8 @@ owns the placement ghost, so the line appears only when the second end is placed
   half damage"), so double the field's damage to airborne targets to kill them.
 - **Sections chain only from your own sections,** and the placement ghost's distance map is the real gate, so
   limit it there too.
-- **Wall seams.** Keep wall-section classic stubs even, or each piece lands a fraction of a pixel off its neighbour
-  (see [Gates](gates.md)).
+- **Wall seams.** Keep wall-section classic stubs even, or each piece lands half a classic pixel (about 2.7 HD
+  pixels) off its neighbour (see [Gates](gates.md)).
 - **One click counts once.** The launcher can deliver a click more than once, so ignore repeats within a fraction
   of a second.
 

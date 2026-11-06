@@ -105,7 +105,7 @@ why per-faction crests come from [re-pointing records in memory](../clientg-ram/
 - **A combo box's list only takes clicks inside the group that holds the combo.** Stretch a drop-down list past
   its group and its lower rows draw, but close the list when clicked. Grow the group too, and scale its other
   widgets so nothing moves on screen (observed). The list's row height is the micro-chunk `05 04 <float>` in the
-  list's property leaf, a fraction of the combo's height: 0.0975 in Red Alert's faction combo, 0.1711 in TD's.
+  list's property leaf (leaf id 4), a fraction of the combo's height: 0.0975 in Red Alert's faction combo, 0.1711 in TD's.
 - **A cloned group keeps its source group's tint**, and places its children differently from the original
   (observed). To add a group of widgets, insert them straight into the screen's top group instead.
 - **A widget moved off screen widens the screen's fit**, stretching the whole menu, and its clicks, on ultrawide

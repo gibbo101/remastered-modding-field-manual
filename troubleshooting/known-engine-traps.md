@@ -80,8 +80,10 @@ Every unit, building or other type whose INI section sets `Name=` takes a slot i
   and then reads slot `-(string + 1)`, so slot 24 is never returned.
 
 A mod that keeps adding named types runs out of slots, and a name comes back `NULL`. In a working mod that showed as
-the launcher crashing when a refinery was placed or an MCV deployed, at around the 30th type. Stock Red Alert names
-few enough types never to hit it.
+a crash when a refinery was placed or an MCV deployed, at around the 30th type. The crash is in `InstanceServerG.exe`,
+the process your DLL runs in, not the launcher: the export's `OverrideDisplayName` is a `const char*`
+(`DLLInterface.h`), copied into a string there, and a `NULL` crashes the copy. Stock Red Alert names few enough types
+never to hit it.
 
 **Fix:** make the table much bigger (one working mod uses 256), skip a type already in the table before taking a
 new slot, change the lookup test to `<=`, and treat a `NULL` name as no override.
@@ -127,7 +129,8 @@ Each trap three ways:
   never the key the code reads.
 - **A working mod hit each one:** the search-path crash, reported by another modder running several mods; another
   rules mod's `RULES.INI` replacing its own; the sidebar overrun and the name table, both found as its roster grew; and the crate crash,
-  found from minidumps. Its projectile code reads both spellings of the inaccuracy key.
+  found from minidumps. The name table's crash was a string built from `NULL` in `InstanceServerG.exe`. Its
+  projectile code reads both spellings of the inaccuracy key.
 - **The fixes** are in that mod's code and released, and the crashes stopped.
 - **Unproven:** that the stock `RedAlert.dll` behaves exactly as the released source on each trap (it's built from
   it, but the binary wasn't checked), and the order in which the launcher registers enabled mods' folders, which

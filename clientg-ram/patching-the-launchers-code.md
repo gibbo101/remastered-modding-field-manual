@@ -109,7 +109,7 @@ every launcher through EA's message callback, and a hook can read the message be
    byte at `0x1FB6D40` is non-zero. Compare it with the ID in the text, and hand the work to a thread of your own,
    off the launcher's thread.
 
-Send it more than once (a mod sends at match start and again about 2 and 6 seconds later), since a joiner's
+Send it more than once (a mod sends on game frames 1, 45 and 150 after match start), since a joiner's
 launcher may still be loading at the first.
 
 ## How it was verified

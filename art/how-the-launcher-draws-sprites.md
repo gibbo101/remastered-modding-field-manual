@@ -47,7 +47,7 @@ and takes only the size from the DLL. See [Building selection boxes](building-se
 | Rule | What goes wrong otherwise |
 |---|---|
 | **Second draws use shape numbers 0 to 127 only.** A turret, radar dish or overlay is a second draw on the same object, and shapes from 128 up draw nothing. | The turret silently vanishes. A body drawn in the first draw can use shapes up to 255. |
-| **Sprites can't be rotated usefully.** In play, an export with `CNCObjectStruct::Rotation` set drew flat, or at best rotated but cut to its unrotated frame. | Anything that must follow an angle can't be one sprite. Build it from round pieces laid along the line, or use the beam line below. |
+| **Sprites can't be rotated.** In play, an export with `CNCObjectStruct::Rotation` set drew flat: as an effect, as a unit-typed export, and either one drawn fading. | Anything that must follow an angle can't be one sprite. Build it from round pieces laid along the line, or use the beam line below. |
 | **Pixels below about half alpha are discarded.** | A soft, low-alpha shadow or glow draws as nothing. |
 | **Every animation stage needs a tile.** Declare as many tiles as the animation has stages. | A stage with no tile draws as a white box. |
 | **An effect with HD art only still needs `ImageData`.** An animation with no classic image gets a null `ImageData`. | It draws as a green placeholder. Give it another animation's `ImageData` (a donor), and its HD tile is then found by name. |
@@ -75,7 +75,7 @@ builds, and it's a good map of the limits above:
 
 | Tried | Result |
 |---|---|
-| One long band sprite, rotated to the target | Rotation is unusable (above), so the band only lined up at one angle. |
+| One long band sprite, rotated to the target | Rotation is ignored (above), so the band only lined up at one angle. |
 | A thin bar, rotated | Drew unrotated in play. |
 | A chain of round discs along the line | **Works.** Round pieces don't need rotating. Discs 32 leptons apart read as a band; at 64 they showed as beads. |
 | The discs owned by the firing player | The launcher tints an owned effect in its house colour, which turned the band gold. The discs carry no owner. |
@@ -118,6 +118,8 @@ line's colour. TD's Obelisk never hits this: its `LineMaxFrames` is 5. Lines can
 - **Observed only, not read from code:** the 128-shape limit on second draws, the ignored rotation, the alpha
   cutoff, the white box, the green placeholder and the squares at frame 5. Each was seen in play and worked around.
   The cause behind each one is inside the launcher.
+- **The ignored rotation:** the DLL logged the `Rotation` it exported, and every form drew flat. An earlier test that
+  seemed to show a rotated sprite cut to its unrotated frame hadn't recorded which way the art itself faced.
 
 > [!TIP]
 > **In Tiberian Factions**

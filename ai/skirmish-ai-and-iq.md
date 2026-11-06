@@ -51,7 +51,8 @@ Each house has an `IQ`, and `rules.ini`'s `[IQ]` section sets the level at which
 above is on whatever the difficulty. IQ is a lever the stock skirmish never uses.
 
 `[IQ]` also has `SellBack`, but despite its section it isn't an IQ check: a damaged building sells itself when the
-house's **tech level** is at least `SellBack` (`BuildingClass::AI`, `BUILDING.CPP`), not its IQ.
+house's **tech level** is at least `SellBack` (`BuildingClass::Repair_AI`, which `BuildingClass::AI` calls,
+`BUILDING.CPP`), not its IQ.
 
 > [!WARNING]
 > **Lowering IQ can stop an AI building at all.** A computer house only starts base building if
@@ -116,7 +117,7 @@ Each confirmed in EA's released source:
 | **Four urgency checks and five build actions are stubs.** `Check_Build_Defense`, `Check_Build_Engineer`, `Check_Build_Income` and `Check_Build_Offense` always return `URGENCY_NONE`; `AI_Build_Defense`, `AI_Build_Engineer`, `AI_Build_Income`, `AI_Build_Offense` and `AI_Build_Power` always return `false`. | `HOUSE.CPP` | Those strategies never drive a decision. Power is the one rated but not acted on. |
 | **The power check's `|`.** "Under attack, so power is urgent" tests `BScan \| STRUCTF_CHRONOSPHERE`, which is always true. | `HOUSE.CPP`, `Check_Build_Power` | Any threatened house rates power as high urgency. |
 | **Target choice keeps the last candidate, not the best.** In `Greatest_Threat`'s ring scan, a candidate sets `bestobject` but never updates `bestval`, which stays at its starting -1 (or the best aircraft's score). | `TECHNO.CPP` (extended ASCII: use `grep -a`) | Every valid target replaces the last, so a unit attacks the last one the scan reaches, not the most valuable. |
-| **Harvester bugs:** the "ore is short" latch that never resets, an idle harvester's overwritten order, and no replacement harvesters on Hard. See [Harvesters](harvesters.md). | `UNIT.CPP`, `HOUSE.CPP` | The AI's economy can stop for good. |
+| **Harvester bugs:** the "ore is short" latch that never resets, an idle harvester's overwritten order, and, in the campaign only, no replacement harvesters for a computer on a Hard handicap. See [Harvesters](harvesters.md). | `UNIT.CPP`, `HOUSE.CPP` | The AI's economy can stop for good. |
 | **The factory pool is small.** `[Maximums]` `Factory=` defaults to 20 in code (stock `rules.ini` raises it to 32), and every factory in production takes one. | `RULES.CPP`, `INIT.CPP` | Late in a big game, production silently stops. See [Raising the limits](../units/raising-the-limits.md). |
 
 ## What a mod can do about it

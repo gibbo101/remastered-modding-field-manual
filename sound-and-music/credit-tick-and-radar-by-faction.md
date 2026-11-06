@@ -26,7 +26,9 @@ this page.
 
 - **Radar on/off:** the launcher. EA's own source says so. Where the DLL would play `VOC_RADAR_ON`, `RADAR.CPP`
   carries the call commented out: "These are never being sent to the client, so handled there". `ClientG.exe`
-  holds the sample names `_SFX_RADARON2` and `_SFX_RADARDN1`.
+  holds the sample names `_SFX_RADARON2` and `_SFX_RADARDN1`. Vanilla Conquer restores the calls, but under
+  `#ifndef REMASTER_BUILD`, for its standalone builds only, so a DLL built with its remaster preset still never sends
+  them.
 - **The credit tick:** the launcher too. In EA's code the tick sound is in `CreditClass::Graphic_Logic`, but the
   Remastered DLL runs the credit roll logic-only (`HouseClass::AI` calls `VisibleCredits.AI(false, this, true)`),
   so the DLL never plays it. `ClientG.exe` has its own `GUI_Credits_Up_Tick` and the sample name
@@ -82,7 +84,8 @@ sound needs a copy under a new name, because the stock *sample* is the one repla
 
 ## How it was verified
 
-- **Who plays them:** EA's `RADAR.CPP` comment, EA's `CreditClass` (`Graphic_Logic` holds the sound, and
+- **Who plays them:** EA's `RADAR.CPP` comment, Vanilla Conquer's `radar.cpp` (the same calls inside
+  `#ifndef REMASTER_BUILD`, which its CMake defines for the remaster build), EA's `CreditClass` (`Graphic_Logic` holds the sound, and
   `HouseClass::AI` calls the roll logic-only), and the sample and event names in `ClientG.exe`.
 - **Silencing:** the stock events and samples read from `CONFIG.MEG` and `SFX3D.MEG`. A shipped mod silences the
   four credit-tick events with a silent ADPCM sample, and the two radar samples with 44-byte header-only WAVs.

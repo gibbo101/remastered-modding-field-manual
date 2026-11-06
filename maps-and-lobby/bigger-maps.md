@@ -161,7 +161,7 @@ Three things cap a side at 256 cells, and none moves without rewriting both side
   reach the launcher as those 16-bit leptons.
 - **`TARGET` packs a coordinate in 12 bits per axis:** 255 cells × 16 + 8 = 4088, inside 4095.
 
-A width of exactly 256 also wraps `Cell_To_Lepton` to 0, so clamp the map and its one-cell border to end by cell
+A side of exactly 256, across or down, also wraps `Cell_To_Lepton` to 0, so clamp the map and its one-cell border to end by cell
 255. That leaves 253 × 253 playable, about four times the old 126 × 126.
 
 ### Going past 255: what would have to change

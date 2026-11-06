@@ -76,7 +76,10 @@ so every unit behind the first re-paths each tick and the group jams round one c
 When a unit's path fails, it retries. Infantry abort their destination only if it's in a **different zone**
 (`INFANTRY.CPP`'s give-up branch: "Only perform the abort of the target is in a different zone"). A destination
 walled in by buildings is in the same zone, and so is the unit's own cell, so the unit asks for the same failing
-path forever. Vehicles have a similar loop.
+path forever. Stock vehicles don't: `DriveClass` counts down `TryTryAgain` from `PATH_RETRY` (10) and then drops the
+destination, and a vehicle whose target is out of reach gets `IsScanLimited`, so its next target scan stays in
+range (`DRIVE.CPP`, `FOOT.CPP`). A mod that resets that count while traffic blocks the way (waiting its turn at a
+pinch) brings the endless loop back to vehicles in a busy base, unless it also gives up on no progress.
 
 ## What one mod ships
 
@@ -159,6 +162,9 @@ Any movement or successful path starts the count again, so a queue that advances
   `Zone_Reset` caller.
 - **The head-on rule and the give-up gate:** EA's `UNIT.CPP` (`face == techface && Distance <= 0x1FF`, `MOVE_NO`)
   and `INFANTRY.CPP` (the zone-mismatch abort). No such rule in `INFANTRY.CPP`'s own `Can_Enter_Cell`.
+- **Vehicles give up:** EA's `DRIVE.CPP` (`TryTryAgain--`, then `Assign_Destination(TARGET_NONE)`; `IsScanLimited`),
+  `PATH_RETRY=10` in `FOOT.H` and the limited scan in `FOOT.CPP`'s `Greatest_Threat`. The loop came back in a working
+  mod whose traffic wait reset the count; neither EA's source nor Vanilla Conquer's has that reset.
 - **Move thresholds:** EA's `MoveType` (`DEFINES.H`), the ally ratings in `UnitClass::Can_Enter_Cell` and the
   escalation loop in `Basic_Path` (`FOOT.CPP`). A working mod's diagnostic log recorded thousands of head-on
   `MOVE_NO` ratings at the jammed pinch.

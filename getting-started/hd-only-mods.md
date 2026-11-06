@@ -60,7 +60,8 @@ add, and the last three points (shared shapes, HD-only art, and the DLL not know
   owns it. The fix is to rewrite every frame of every TD shape offline. Move 176–191 onto 80–95 position for
   position, and map every other index to the nearest Red Alert colour, never to 0 or 80–95.
 - **Colours in the code are TD's indices too.** TD's code draws some colours by palette index. The Obelisk's
-  beam is index `0x7D`, which is red in TD's palette and green in Red Alert's. Each one has to be changed to the
+  beam is three lines, two at index `0x7D` and the middle one at `0x7F` (TD's `TECHNO.CPP`), red in TD's palette and
+  green in Red Alert's. Each one has to be changed to the
   nearest Red Alert index. The DLL's lines go through Red Alert's palette in both modes, so one change fixes HD as
   well.
 - **Some classic shapes are shared.** Red Alert loads a few shapes once and draws them for every building of a
@@ -80,7 +81,7 @@ add, and the last three points (shared shapes, HD-only art, and the DLL not know
 - A shipped mod sets it to `True` this way. In play, the classic option and the spacebar toggle are gone.
 - DontCryJustDie gave the same setting independently, for his own mod.
 - The classic-mode problems: the palette ranges in EA's TD source (the house-colour remap tables change exactly
-  176–191) and in Red Alert's own `PALETTE.CPS` (row 0 is 80–95, read from the base game). The Obelisk beam index,
+  176–191) and in Red Alert's own `PALETTE.CPS` (row 0 is 80–95, read from the base game). The Obelisk beam indices,
   the shared `WEAP2.SHP` overlay and the input handler are all in EA's source. Each problem was also hit in a working
   mod, and another TD-in-RA mod's changelog lists the same colour and laser problems.
 

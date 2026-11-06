@@ -30,7 +30,7 @@ Each confirmed in EA's released source:
 | **"Ore is short" is a latch that never resets.** When one harvester's search finds no ore, it sets the house's `IsTiberiumShort`, and nothing ever clears it. | `UNIT.CPP` (set), `HOUSE.CPP` (initialised once) | The computer player stops building refineries, stops replacing harvesters, and its idle harvesters stop going back to work, for the rest of the match, even after new ore appears. |
 | **Only computer harvesters go back to work by themselves.** The re-queue from guard is gated on `!House->IsHuman`. | `UNIT.CPP` | A player's harvester that runs out of ore sits there until it's given an order. |
 | **An idle harvester's repair or hunt order is overwritten.** The `GOINGTOIDLE` case assigns repair or hunt, then always `MISSION_GUARD`. | `UNIT.CPP` | It just stops where it is. |
-| **No replacement harvesters on Hard.** The computer's replacement check requires `Difficulty != DIFF_HARD`. | `HOUSE.CPP`, `AI_Unit` | A Hard AI that loses its harvesters doesn't rebuild them that way. |
+| **No replacement harvesters for a computer on a Hard handicap: campaign only.** The computer's replacement check requires its house's `Difficulty != DIFF_HARD`. A computer house takes that from `Scen.CDifficulty`, which only the original game's campaign menus set to Hard (on the player's two easiest settings). A skirmish AI gets `Scen.Difficulty`, which the lobby can't change from Normal, and the Remastered DLL never sets `CDifficulty`, so in Remastered the check only bites a mod that gives a computer house a Hard handicap. | `HOUSE.CPP`, `AI_Unit` | A campaign computer on a Hard handicap that loses its harvesters doesn't rebuild them that way. A stock skirmish AI always passes the check. |
 | **The refinery choice is sticky.** `Find_Best_Refinery` returns the last refinery used whenever it's still valid ("Remember our last refinery and prefer that one"). | `UNIT.CPP` | Harvesters queue at one refinery while another stands idle. |
 | **Ore picks ignore danger.** `Tiberium_Check` scores a cell by land type, ore, fog and zone only, and the harvester returns first to the last cell it mined (`ArchiveTarget`). | `UNIT.CPP` | A harvester that once mined in an enemy's base keeps going back. |
 | **Zones ignore buildings.** A field walled off by a turret still counts as reachable. See [Pathfinding](pathfinding.md). | `CELL.CPP`, `MAP.CPP` | A harvester heads for ore it can never reach. Because the edge-following pathfinder nearly always returns *some* path, nothing reports a failure. It just never arrives. |
@@ -93,7 +93,8 @@ Each is a DLL change, behind one "harvesters" switch on a settings page that res
 - **The stock problems:** EA's `UNIT.CPP` (the `IsTiberiumShort` set, the `!House->IsHuman` re-queue, the
   `GOINGTOIDLE` case, `Find_Best_Refinery`'s cache, `Tiberium_Check` and `ArchiveTarget`) and `HOUSE.CPP` (the
   latch's only initialisation, its use in refinery building and harvester replacement, and the `DIFF_HARD` check),
-  each read with `grep -a`.
+  each read with `grep -a`. Where a computer's `Difficulty` comes from: `HouseClass`'s constructor (`Scen.CDifficulty`), `CDifficulty`'s only writers in `INIT.CPP` and `NULLDLG.CPP` (the original menus, which the
+  DLL never calls), and `GlyphX_Assign_Houses` (`DLLInterface.cpp`, `Assign_Handicap(Scen.Difficulty)`).
 - **The rules.ini knobs:** each key read in EA's `RULES.CPP` (`OreNearScan` and `OreFarScan` into `TiberiumShortScan`
   and `TiberiumLongScan`), used in `UNIT.CPP` (`Goto_Tiberium`, `Tiberium_Check`'s `GemValue*4`, the bail count) and
   `HOUSE.CPP` (`RefineryRatio`, `RefineryLimit`), and the stock values in the base game's `rules.ini`. A working

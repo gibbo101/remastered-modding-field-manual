@@ -35,7 +35,8 @@ From OpenTS's `empulse.cpp` (`EMPulseClass::Create`) and TS's `RULES.INI`:
   part of it is inside; and anything in a cell that holds a building, since such a cell affects only the building, so
   aircraft parked on a pad come through. Limpet mines in the circle are destroyed rather than stunned.
 - **The stun counts down** on each object (`StunDuration`), with TS's `EMPulseSparkles` animation (`EMP_FX01`)
-  attached. While it runs the object can't move, fire, produce or deploy. At zero, a building's power comes back.
+  attached. While it runs the object can't move, fire or deploy. A stunned factory still produces, since TS's
+  production tests read a flag the pulse leaves set. At zero, a building's power comes back.
 - **No lingering field.** The pulse marks its cells, but nothing reads the mark: a unit driving in afterwards is
   unaffected. Only each object's own timer matters.
 
@@ -81,6 +82,8 @@ cloaked ones attackable through the copy (the cell carries the attack action), a
   that skips everything else in it, the cyborg-only infantry rule, `StunDuration`, and `IsAffectedByEMP`, which is
   only ever cleared), and TS's `RULES.INI` (`[EMPulseWeapon]` `Damage=1200`, `[EMPuls]` `Spread=11`,
   `[EMPulseSpecial]`, `[AudioVisual]` `EMPulseSparkles=EMP_FX01`).
+- **What keeps running:** in OpenTS the pulse calls a building's `Power_Off`, which leaves `IsOn` set, and
+  `Power_Output` and `Who_Can_Build_Me` (the factory and construction yard test) read `IsOn`, never the stun timer.
 - **The stun gates:** EA's `EVENT.CPP` (the `MEGAMISSION`, `IDLE`, `SCATTER` and `PRIMARY` orders), and the working
   mod's code, which gates exactly those four.
 - **A working mod:** the E.M. Pulse Cannon, a Mobile EMP and the Mobile Sensor Array in its release, played under

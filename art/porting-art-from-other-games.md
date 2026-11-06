@@ -1,10 +1,10 @@
 ---
 title: "Porting art from other C&C games"
-description: "Turning Tiberian Sun voxels and SHPs, and Command & Conquer 3 models, into HD Remastered sprites; the target every port must hit (canvas, centring, team-colour green, baked shadow), the 32-degree camera and facing order that match EA's HD art, where each game keeps its art (Firestorm's expand01.mix, one-theatre buildings), and TS's SHP layout (shadow half, damaged frame, Rate= in frames per minute)."
+description: "Turning Tiberian Sun voxels and SHPs, and Command & Conquer 3 models, into HD Remastered sprites; the target every port must hit (canvas, centring, team-colour green, baked shadow), the 32-degree camera and facing order that match EA's HD vehicles, ships' 16 facings, where each game keeps its art (Firestorm's expand01.mix, one-theatre buildings), and TS's SHP layout (shadow half, damaged frame, Rate= in frames per minute)."
 tags: [art, pipelines, tiberian-sun, cnc3, voxels, hd]
 holds_for: Steam build 21590013
 status: verified
-unproven: [Red Alert 2's own archives and models, beyond its voxel tanks rendered as TS voxels]
+unproven: [Red Alert 2's own archives and models, beyond its voxel tanks rendered as TS voxels, the camera angle EA's HD ships are drawn at]
 ---
 
 > [!NOTE]
@@ -44,10 +44,16 @@ Whatever the source, the output is a ZIP of frames in Remastered's form (see
 
 ## The camera and facings
 
-EA's HD vehicles are drawn from about **32° above the horizon**, orthographic. A render at a steeper angle (54°,
-say) reads as top-down beside them. Render **32 facings, counter-clockwise, frame 0 facing north**, which is the
-order Red Alert's HD vehicle frames use (frame 0 north, frame 8 west). Render at two or three times the final size,
-then scale down with a good filter.
+EA's HD ground vehicles are drawn from about **32° above the horizon**, orthographic. A render at a steeper angle
+(54°, say) reads as top-down beside them. Render **32 facings, counter-clockwise, frame 0 facing north**, which is
+the order Red Alert's HD vehicle frames use (frame 0 north, frame 8 west). Render at two or three times the final
+size, then scale down with a good filter.
+
+**Ships are different.** Red Alert picks a ship's body from **16 facings** (`VesselClass::Shape_Number`,
+`VESSEL.CPP`), and EA's HD ship tilesets match: `DD`, `CA`, `PT`, `SS` and `MSUB` each have shapes 0 to 15, and each
+shape is a loop of 8 frames played at 5 frames a second, 128 frames in all. **Unproven:** the camera angle EA's ships
+are drawn at. One working mod renders its ships at 54°, matched to the destroyer's proportions (bow-on, its drawn
+extent is about 0.81 of its side-on length), but a hull's height inflates that ratio, so it doesn't fix the angle.
 
 ## Tiberian Sun
 
@@ -104,6 +110,10 @@ The step-by-step recipe, written for an AI coding assistant to follow, is Tiberi
   shadow at alpha 191), and the classic-to-HD sizes on [HD tilesets and ZIPs](hd-tilesets-and-zips.md).
 - **The camera and facings:** compared with Red Alert's HD vehicle frames (frame 0 north, 8 west), and checked by
   eye beside them in a working mod at 32° and 54°.
+- **Ships' facings:** EA's `DD.ZIP`, `CA.ZIP`, `PT.ZIP` and `SS.ZIP` (128 frames each, named shape then frame) and
+  their entries in `RA_UNITS.XML` from `CONFIG.MEG` (16 shapes for each of these and `MSUB`, `FPS` 5), read for this
+  page, against `Dir_To_16` in EA's `VesselClass::Shape_Number`. The destroyer's 0.81 is its frame-0 crop height
+  over its west-facing crop width.
 - **Tiberian Sun:** `TIBSUN.MIX`'s header read for this page, and a working mod's extractor and renderer, which ship
   Tiberian Sun units built this way. The lighting tables come from TS's own `VOXELS.VPL`, cross-checked with
   OpenTS's source.

@@ -168,8 +168,9 @@ Red Alert doesn't need CFE's code for this. Red Alert's `[HARV]` sets `SelfHeali
 
 CFE's 1.7 and 1.8 changelogs list many more fixes: crashes, sounds and unit flashes played to the wrong player in
 multiplayer, crate and ore-growth bugs, and planes firing one extra shot after their ammo runs out. Several are
-gated behind INI keys because they change play: the inaccuracy fix (a bug stops Red Alert's weapon inaccuracy
-working as intended), the timequake fix, the ore index fix (harvesters scooping without gaining a bale) and the gem
+gated behind INI keys because they change play: the inaccuracy fix (it reads the `Inaccurate` key in place of the
+misspelt `Inaccuate`, see [Known engine traps](../troubleshooting/known-engine-traps.md), and puts back the
+commented-out `ROT != 0` test in `BULLET.CPP`, so homing projectiles scatter too), the timequake fix, the ore index fix (harvesters scooping without gaining a bale) and the gem
 overload fix. The MIG ammo fudge gives certain planes one more round, to keep the balance they had with the
 extra-shot bug, so port it with that fix. CFE's balance options (veterancy, OpenRA-style
 superweapons, instant capture) are design choices, not fixes.
@@ -192,7 +193,8 @@ superweapons, instant capture) are design choices, not fixes.
   `MISSION_ATTACKMOVE` comment, the `Missions[]` names, `DLL_Export_Get_Input_Key_State` in `AIRCRAFT.CPP`, the
   owner-only rally drawing, the Smarter SAMs code in TD's `BUILDING.CPP`, `AttackMoveBoatClock` (`TECHNO.CPP`),
   `MinelayerFindSpot` and its comment (`UNIT.CPP`), the commented-out `private:` in `AIRCRAFT.H`, and
-  `Find_Best_Refinery` taking the optimised choice whenever `HARVY_OPTIMIZE` is on (its README says the same). Its
+  `Find_Best_Refinery` taking the optimised choice whenever `HARVY_OPTIMIZE` is on (its README says the same), and
+  the inaccuracy fix's two changes in `BBDATA.CPP` and `BULLET.CPP`, each gated on `INACCURACY_BUGFIX`. Its
   Workshop item (2268301299) ships
   `Data/RedAlert.dll` and a whole `GAMECONSTANTS.XML`.
 - **Vanilla Conquer:** ChthonVII's four commits on its `vanilla` branch, and its commit removing `SaveLoadPadding`

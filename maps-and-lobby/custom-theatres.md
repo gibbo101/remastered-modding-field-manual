@@ -103,7 +103,9 @@ open new art anyway.
 ## What's open: video memory
 
 The launcher keeps every texture it draws in video memory. Whether a terrain tileset costs memory as a whole, or
-only for the tiles a map draws, hasn't been measured. That decides how big a custom tileset can be:
+only for the tiles a map draws, isn't settled. One desktop reading, one match each, saw 4,796 MiB on an interior
+map with the stock interior tileset and 4,812 MiB with 163 tiles added to it that the map never draws: too small a
+sample to tell a cost from noise. That decides how big a custom tileset can be:
 
 - **Per tile drawn:** a large tileset is fine, and each map pays only for what it uses.
 - **Whole:** a large tileset costs every map that uses the theatre. Keep it small: a set of pieces that tile

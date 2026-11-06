@@ -74,8 +74,8 @@ gate. Vehicles barely consult zones, so they drive through, and the bug only sho
 - **Draw order:** a gate should sort just north of its own northern row, so a unit anywhere in the gate draws over
   it, while a building north of it still draws first.
 - **Even classic stub widths.** The launcher places a sprite half its classic stub width from its centre, so an odd
-  width lands a fraction of a pixel off its neighbours and leaves a seam where a wall meets the gate. Keep wall,
-  tower and gate stubs even.
+  width lands half a classic pixel (about 2.7 HD pixels, at 128 HD pixels to 24 classic) off its neighbours and
+  leaves a seam where a wall meets the gate. Keep wall, tower and gate stubs even.
 
 ## Power, and energy gates
 
