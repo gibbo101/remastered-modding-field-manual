@@ -38,6 +38,11 @@ fix this: it only hands the launcher each cell's template name, and the art behi
 TD's theatres work because every TD template name is already in the base game. New *object* names (units,
 effects, trees with art of their own) are a different system, and they do render.
 
+**The wall is specific to templates.** Other new entries in a terrain tileset draw. A working mod's Red Alert
+temperate tileset adds one new name, its Tiberium overlay `TIB01`, which renders from a ZIP under the tileset's
+root. In Tiberian Dawn, new bib tiles draw from loose folders, though not from a ZIP. Only a new *template*, the
+ground a map is painted with, hits the crash.
+
 ## What works: new art under existing names
 
 **A loose file at an existing template's path replaces its art.** For example,
@@ -141,6 +146,8 @@ the same method would apply to its theatres.
 - **The wall:** a working mod's investigation, which hit the crash with several new template names and ruled out
   the DDS format, a replacement `CONFIG.MEG` and the load path; the crash address disassembled from `ClientG.exe`
   on disk (a deliberate write after an assert flag test); and no published mod adding new terrain template names.
+- **Templates only:** a shipped Red Alert temperate tileset whose single new name, `TIB01`, draws; and a working
+  mod's Tiberian Dawn asset packs, whose new bib tiles draw from loose folders but not from ZIPs.
 - **Reskinning existing names:** Reilsss's Desert mod (Workshop 2833233740) ships 8,305 loose `.DDS` frames at
   stock template paths and per-map `TILEPATCHES`, with no DLL. A shipped mod's tileset XML names `.tga` frames that
   ship only as `.DDS`, and they draw. The tile and name counts were read from the stock tilesets for this page.
