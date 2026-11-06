@@ -1,5 +1,5 @@
 ---
-title: Custom campaigns
+title: "Custom campaigns: replacing the official ones"
 description: Replace or add to Red Alert's official campaigns. INSTANCES.XML decides what Mission Select shows, the campaign files decide what launches, and a stock mission slot plays your own scenario INI shipped in CCDATA with its [Digest] removed; brand-new instances still need a launch route.
 tags: [maps, campaigns, missions, mission-select, instances, ccdata]
 holds_for: Steam build 21590013
@@ -12,7 +12,7 @@ unproven: [launching a brand-new campaign instance outside a dev build, a hijack
 > [!NOTE]
 > EA has not endorsed and does not support this product.
 
-# Custom campaigns
+# Custom campaigns: replacing the official ones
 
 **Holds for:** C&C Remastered Collection, Steam build 21590013. EA has stopped patching the game and archived the
 source in January 2025, so this should hold.

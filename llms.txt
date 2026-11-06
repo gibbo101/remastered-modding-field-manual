@@ -83,7 +83,7 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [Adding a theatre of your own](maps-and-lobby/custom-theatres.md): slot and DLL steps are proven by TD's
   theatres, but a new terrain template name with loose art crashes the launcher; custom terrain reskins existing
   template names (loose DDS at the stock path). Isometric (TS) conversion is unproven.
-- [Custom campaigns](maps-and-lobby/custom-campaigns.md): INSTANCES.XML decides what Mission Select shows
+- [Custom campaigns: replacing the official ones](maps-and-lobby/custom-campaigns.md): INSTANCES.XML decides what Mission Select shows
   (ShowOnMissionSelect, IsUnlockedAtStart, ExternalGameID), the campaign files what launches; replace a stock
   mission by shipping its scenario (SC<house><nn><dir><var>.INI) in CCDATA/ without [Digest].
 - [Per-AI lobby difficulty](maps-and-lobby/per-ai-lobby-difficulty.md): the launcher never sends per-AI skirmish
