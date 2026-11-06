@@ -4,7 +4,7 @@ description: A custom terrain theatre for Red Alert. The slot and DLL steps are 
 tags: [maps, terrain, theatres, tilesets, dll, tiberian-sun]
 holds_for: Steam build 21590013
 status: partly proven
-unproven: [any route to new terrain template names (new names with loose art crash the launcher), TILEPATCHES as a whole-theatre route, whether a terrain tileset costs video memory whole or per tile drawn, theatre slots past 5, a converted Tiberian Sun theatre playing end to end]
+unproven: [any route to new terrain template names (new names with loose art crash the launcher), a stock tileset copied under a new name and root folder with loose art, TILEPATCHES as a whole-theatre route, whether a terrain tileset costs video memory whole or per tile drawn, theatre slots past 5, a converted Tiberian Sun theatre playing end to end]
 ---
 
 > [!NOTE]
@@ -58,6 +58,23 @@ with no DLL needed. The radar samples the new art too, so the minimap matches.
 **Per-map art without new names:** `Data/XML/TILEPATCHES/` holds per-map cell placements
 (`MAPS/<game>/<MAP>_MAPPATCHES.XML`) and animated multi-cell texture blocks (`PATCHES/<name>_PATCH.XML`, with a
 frame rate). Loose copies override them, with no size rule. **Unproven** as a route for a whole custom theatre.
+
+## Can there be a seventh theatre?
+
+**As a theatre, yes.** A slot is one more entry in the launcher's list, plus a matching `TheaterType` in your DLL
+(below). A working mod uses six slots, and nothing found so far caps the list there. Slots past 5 haven't been
+tried, so that part is unproven.
+
+**What limits it is the art.** A seventh theatre has to draw with terrain the launcher can render:
+
+| Route | Result |
+|---|---|
+| Point the slot at a stock tileset | Works, but it looks like that stock theatre. |
+| Reskin a stock tileset's names | Works, but the reskin replaces that stock theatre everywhere. In effect you trade a theatre you don't use for your own. |
+| New art under new template names | Crashes the launcher (the wall above). |
+| A copy of a stock tileset under a new file name, keeping its template names but with a new root folder holding your art | **Untested.** It works if the launcher's crash is about unknown template names, and fails if the art must come from the base game's archives. It also needs the loose `TILESETS.XML` route (below). |
+
+The last route is the one that could give a seventh look beside all six stock ones, and it's a cheap test to run.
 
 ## The theatre itself
 
