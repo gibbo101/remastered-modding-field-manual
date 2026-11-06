@@ -236,4 +236,6 @@ At its worst the server spends about 8 ms of each 17 ms tick, and the match ran 
 > times Red Alert's largest, with every existing official and TD map loading unchanged on the new grid. A 200×200
 > test map plays on the Steam Deck without a felt slowdown.
 >
-> <!-- screenshot: a 253x253 map zoomed out, the radar showing the whole map -->
+> ![A 253x253 map at the farthest zoom](img/megamap-253.jpg)
+>
+> TF's 253×253 maze test map on the development branch, at the launcher's farthest zoom: the construction yard, top right, is a speck beside the maze's water channels, and the view covers only a corner of the map. Inset: the lobby reads the map as 253x253, but draws its eight start markers bunched in the left half of the preview (observed once; how the lobby reads them is still open).
