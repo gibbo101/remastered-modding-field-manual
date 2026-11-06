@@ -125,8 +125,9 @@ mod's root instead. Whether the launcher also reads it there hasn't been tested.
 > [!TIP]
 > **In Tiberian Factions**
 >
-> TF ships its front end almost entirely as loose files: tilesets, sound events, its map list and preview data,
-> screens and text. Its constants are in `GameConstants_Mod.xml`. Its add-on packs carry art and sound. Each pack
+> TF ships its front end both ways. A replacement `CONFIG.MEG` carries some rebuilt screens (its confirmation box,
+> loading screen and lobbies), and loose files carry the rest: tilesets, sound events, its map list and preview
+> data, more screens and text. Its constants are in `GameConstants_Mod.xml`. Its add-on packs carry art and sound. Each pack
 > also holds XML files with its entries, under names of their own (`TSHD_UNITS.XML`), but the launcher never loads
 > those. They're there for other modders to merge into their own lists, and TF's build merges them into the
 > files it ships.

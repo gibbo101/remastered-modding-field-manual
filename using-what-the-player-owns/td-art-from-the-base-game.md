@@ -4,7 +4,7 @@ description: Draw Tiberian Dawn's HD art in a Red Alert mod straight from the ba
 tags: [art, tilesets, red-alert, tiberian-dawn]
 holds_for: Steam build 21590013
 status: verified
-unproven: [load time and memory compared with shipping copies]
+unproven: [load time compared with shipping copies, memory on the Steam Deck (one desktop measurement found no difference)]
 ---
 
 > [!NOTE]
@@ -91,7 +91,9 @@ shipped mod, and its copies were deleted from the mod. Medium Tank and MCV house
 yard and power plant build-ups, and missile effects were checked by eye under Proton on Linux and on the Steam
 Deck, in skirmish and over LAN. Red Alert's own effects in the re-rooted tileset still drew.
 
-**Not measured yet:** whether load time or memory changes when art is read this way instead of shipped.
+**Measured once:** on a Linux desktop, a match on a TD map used the same video memory, 5,052 MiB, whether TD's
+unit art came from the base game or from the mod's copies. **Not measured yet:** load time, and memory on the Steam
+Deck.
 
 **Credit:** DontCryJustDie's [TD-Assets](https://steamcommunity.com/sharedfiles/filedetails/?id=3003163891) first
 showed TD's HD art drawing in Red Alert, from `TD`-prefixed copies. This page reads the same art from the base game
