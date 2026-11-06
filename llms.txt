@@ -115,6 +115,13 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
   sounds are addressed per house, DLL keyboard reads see the host only, and every player needs the same mods.
 - [Save versions](engine/save-versions.md): SAVEGAME_VERSION is the sum of class sizes and DLLLoad runs before
   the version check, so lead the DLL's save data with your own marker and version.
+- [Porting CFE Patch Redux into your DLL](engine/cfe-patch-ports.md): CFE ships its own RedAlert.dll, so port it
+  instead; Vanilla Conquer already has some of its fixes; find changes by "Chthon CFE Note" and the INI keys;
+  Vanilla Conquer removed EA's SaveLoadPadding, so ported fields change the save version; zoom is data only;
+  attack-move needs named missions and reads Shift per player.
+- [Letting players change the rules](engine/game-rules.md): a player pass goes after MPLAYER.INI (read only with
+  Aftermath units on) and before Fill_In_Data, and again in Load_Game; Read_INI keeps keys a file doesn't name;
+  Strength, Sight, ROF and Verses limits; keys leak into the next match.
 
 ## Units and buildings
 

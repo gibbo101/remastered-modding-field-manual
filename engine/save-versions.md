@@ -28,6 +28,9 @@ constant plus the `sizeof()` of every saved game class (`AircraftClass`, `Buildi
 
 - **Any change that grows a saved class changes the version,** so no save made before the change matches it any
   more. That includes adding a field, or growing a fixed table to hold more types.
+- **There's no padding to grow into on a Vanilla Conquer base.** EA's saved classes end in a spare
+  `SaveLoadPadding` array that a patch could take fields from; Vanilla Conquer removed it. See
+  [Porting CFE Patch Redux](cfe-patch-ports.md).
 - **A change of the same size keeps the version,** even if it reorders things. A save then loads with its data
   in the wrong places. Reordering an enum of types is the usual way to do this by accident.
 

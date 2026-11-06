@@ -64,7 +64,8 @@ end of the array, corrupting whatever follows the sidebar object (`SIDEBAR.CPP`)
 sidebar (`SIDEBARGlyphx.CPP`), which the DLL keeps per player for the launcher (`DLLExportClass::MultiplayerSidebars`). Stock Red Alert never comes near 75 items
 in a column. A mod with several factions' trees can.
 
-**Fix:** change the guard to `<`, and raise `MAX_BUILDABLES` to fit your largest column, in both files.
+**Fix:** change the guard to `<`, and raise `MAX_BUILDABLES` to fit your largest column, in both files. CFE Patch
+Redux fixes the same guard (its `Chthon CFE Note` in `SIDEBAR.CPP`).
 
 ## About 25 named types fill the name table
 

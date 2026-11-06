@@ -74,7 +74,8 @@ Each of these is a DLL change, and each can be switched off for EA's stock behav
 `Find_Path` tries an **A\*** search first, and runs EA's edge-follower only when A\* finds no route. The A\* comes from
 **cfehunter's CFE Patch**, as carried in CFE Patch Redux. It retries with weaker threat-avoidance in stages before it
 gives up. As DontCryJustDie pointed out, that A\* wasn't written with performance in mind, and most mods that use it
-take it as it is. Three changes made it affordable:
+take it as it is. CFE also uses the search to keep infantry out of Tiberium: see
+[Porting CFE Patch Redux](../engine/cfe-patch-ports.md). Three changes made it affordable:
 
 - **A budget.** A search stops after `ASTAR_MAX_EXPANSIONS` (4096) nodes. Without it, a search for an unreachable
   destination floods the whole connected area, up to about 16,000 cells, and a capped miss falls to the

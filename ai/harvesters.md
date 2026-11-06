@@ -84,8 +84,9 @@ Each is a DLL change, behind one "harvesters" switch on a settings page that res
 - **The zone trap:** EA's `Zone_Span` and `Is_Clear_To_Move` (the cleared building bit), and a working mod's failed
   attempt to rebuild zones on placement.
 
-**Credit:** the refinery load-balancing and queue-jumping come from CFE Patch Redux, whose credits list ChthonVII's
-harvester refinery-selection work.
+**Credit:** the refinery choice (CFE's Harvester Optimization, not its separate Harvester Load Balancing) and
+queue-jumping come from CFE Patch Redux, whose credits list ChthonVII's harvester refinery-selection work. See
+[Porting CFE Patch Redux](../engine/cfe-patch-ports.md).
 
 > [!TIP]
 > **In Tiberian Factions**
