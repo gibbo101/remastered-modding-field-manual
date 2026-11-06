@@ -92,6 +92,12 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [Per-AI lobby difficulty](maps-and-lobby/per-ai-lobby-difficulty.md): the launcher never sends per-AI skirmish
   difficulty to the DLL; read ClientG's AIPLAYERn records (stride 0xA8: team +0x50, ActLike +0x54, difficulty
   +0x64, colour +0x68) and pick the live copy. Read-only. Fragile: one ClientG build.
+- [A new resource on the official skirmish maps](maps-and-lobby/official-maps-with-tiberium.md): rewrite the 230
+  stock SCM<n>EA.INI maps from MAIN.MIX (OverlayPack, MINE lines, [STRUCTURES]), shadow them from CCDATA, repaint
+  the MOBIUS_RED_ALERT_MULTIPLAYER_<N>_MAP.DDS thumbnails, add the overlay's tiles to every theatre.
+- [Co-op missions: research](maps-and-lobby/co-op-missions-research.md): co-op skirmish works today; the launcher's
+  co-op campaign is code with no screen or data; scripted LAN missions meet Red Alert's GAME_NORMAL win, lose and
+  briefing gates. Unproven.
 
 ## Sound and music
 
@@ -138,6 +144,10 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
   saved); a new exit path is a per-unit straight-line rail, never a shared static table; sort under the doorway.
 - [Porting Tiberian Dawn units](units/porting-td-units.md): Speed = round(MPH x 100 / 256); Tracked= for SPEED_TRACK;
   fill RA-only geometry; ANIM_FRAG2 loads "FRAG3"; TD text IDs don't exist in RA; cloak/scanner is one system.
+- [Porting Tiberian Dawn buildings and defences](units/porting-td-buildings-and-defences.md): own type per port
+  (hardcoded STRUCT_ checks, INI-name namespace, 32-bit prerequisite bitfield, From_Name below STRUCT_COUNT); TD's
+  SAM rise/lower cycle, Obelisk charge and laser lines, muzzle offsets, MAKE build-ups, the WEAP2 overlay, Points=
+  for AI targeting.
 
 ## AI and pathfinding
 

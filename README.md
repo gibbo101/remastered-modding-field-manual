@@ -84,6 +84,10 @@ what it does with the technique.
   what launches.
 - [Per-AI lobby difficulty](maps-and-lobby/per-ai-lobby-difficulty.md): honouring each AI's lobby difficulty by
   reading the launcher's memory.
+- [A new resource on the official skirmish maps](maps-and-lobby/official-maps-with-tiberium.md): Tiberium (or any
+  new resource) on Red Alert's own skirmish maps, thumbnails included.
+- [Co-op missions: research](maps-and-lobby/co-op-missions-research.md): what is known about scripted co-op in a
+  mod, and what is still open (unproven).
 
 ### Sound and music
 - [EVA voice lines the launcher plays](sound-and-music/launcher-eva-lines-by-faction.md): giving each faction its
@@ -111,6 +115,8 @@ what it does with the technique.
 - [Units leaving buildings: exits and rails](units/exits-and-rails.md): how a unit drives out of a factory, and the
   traps of giving a new building its own exit path.
 - [Porting Tiberian Dawn units](units/porting-td-units.md): bringing TD units' behaviour into Red Alert's engine.
+- [Porting Tiberian Dawn buildings and defences](units/porting-td-buildings-and-defences.md): bringing TD's buildings
+  and defences, with their behaviour, into Red Alert's engine.
 
 ### AI and pathfinding
 - [The skirmish AI and its IQ levels](ai/skirmish-ai-and-iq.md): how the computer player builds and scales with

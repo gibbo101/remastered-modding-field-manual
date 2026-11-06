@@ -53,6 +53,8 @@ it.
 
 - **The 75-entry sidebar column has a stock off-by-one** that crashes the game at the 76th entry. Fix the test
   before raising `MAX_BUILDABLES`: see [Known engine traps](../troubleshooting/known-engine-traps.md).
+- **Prerequisites stop at 32 building types.** `Prerequisite=` is a 32-bit bitfield, and stock Red Alert already
+  fills it: see [Porting Tiberian Dawn buildings and defences](porting-td-buildings-and-defences.md).
 - **Spare type slots for run-time types.** A DLL that creates types from INI data at run time (a `[NewUnits]`-style
   list, as some extension mods do) needs spare heap slots, since the stock heap is exactly full. Such types also sit
   past the enum, so every loop bounded by `UNIT_COUNT`, such as the sidebar's list of what can be built, has to

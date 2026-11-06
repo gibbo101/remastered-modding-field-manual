@@ -21,6 +21,12 @@ When your mod is meant to be played over LAN, and does anything per player: soun
 handling in the DLL, launcher patches, or optional add-ons. A mod that only changes rules and art works in LAN as
 it does in skirmish.
 
+## Mods play over LAN, not online
+
+With a mod enabled, the base game turns its online multiplayer off. Its own text says so: "Multiplayer features are
+unavailable when a mod package is enabled" (in `CONFIG.MEG`'s text file). A mod's multiplayer is LAN games. Checked
+in the game's files.
+
 ## One simulation, on the host
 
 The original Red Alert ran a copy of the game on every machine, in lockstep: each machine ran the same frames from

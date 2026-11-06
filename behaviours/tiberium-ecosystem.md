@@ -37,7 +37,8 @@ keys its resource pips off that range. A new overlay outside it gets no pips. Tw
   name, so the map still draws Tiberium.
 
 **Keep the fields apart.** Make sure Tiberium and ore never convert each other where their fields meet, in the
-spread code.
+spread code. Stock spreading always plants ore, whatever the source cell holds (see
+[A new resource on the official skirmish maps](../maps-and-lobby/official-maps-with-tiberium.md)).
 
 ## Blossom trees
 
