@@ -112,4 +112,6 @@ doors.
 > The Tesla and laser gates drop open when their house is short of power. Each places and builds with its own game's
 > sounds, and stands open for TS's 0.2 minutes once clear.
 >
-> <!-- screenshot: an Allied gate open in a concrete wall line, a tank passing through -->
+> ![TS GDI's gate letting a Titan through](img/gate-opening.jpg)
+>
+> TS GDI's East-West gate beside a concrete wall, left to right: shut as a Titan approaches, slid open as it walks through, still open once it's clear, and shut again.

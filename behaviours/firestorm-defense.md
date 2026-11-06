@@ -86,4 +86,6 @@ owns the placement ghost, so the line appears only when the second end is placed
 > what's left. Sections cost $250, what TS players paid. Line fill works for every wall in the mod, from sandbags to
 > Firestorm sections.
 >
-> <!-- screenshot: a live Firestorm wall around a TS GDI base, a shot sparking off it -->
+> ![A live Firestorm wall](img/firestorm-wall-live.jpg)
+>
+> TS GDI's Firestorm Generator with the field up: its core glows blue, and so does the wall line beside it, posts and bars alike.

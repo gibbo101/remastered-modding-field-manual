@@ -92,4 +92,6 @@ TS's Disc Thrower throws a disc that bounces (`Bouncy=yes`; OpenTS's `bounce.cpp
 > came through these routes. The Juggernaut sets down to fire, the Limpet Drone settles into a mine any unit can drive
 > over, and the Disc Thrower's disc bounces as TS's does.
 >
-> <!-- screenshot: jumpjet infantry hovering over a TS GDI base -->
+> ![Jumpjet Infantry beside a TS GDI base](img/jumpjet-infantry.jpg)
+>
+> TF's Jumpjet Infantry, selected, beside a TS GDI base: wings spread in flight, each with the selection box and health bar the launcher places.
