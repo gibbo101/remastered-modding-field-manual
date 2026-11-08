@@ -103,7 +103,10 @@ list as a 12-byte vector at `+0x38`. At `0x73EA39` it tests the type:
   (`SIDEBAR_CANCEL_PLACE` at -1, -1).
 - **A superweapon, not ready:** a sound at most. Nothing reaches the DLL.
 - **Anything else:** the build path, which sends `START_CONSTRUCTION` with the entry's type and ID at `0x73ECE9`.
-  It goes there at once when the entry is neither busy nor constructing, and also when it's on hold.
+  It goes there at once when the entry is neither busy nor constructing, and also when it's on hold. The click can
+  also arrive as `START_CONSTRUCTION_MULTI`, which EA's comment describes as a 1x or 5x left click resuming a held
+  build. EA's `CNC_Handle_Sidebar_Request` lets it fall through to `START_CONSTRUCTION`, so code of your own that
+  acts on a construction request should accept both.
 
 **The patch.** Replace the 12 bytes at `0x73EA39` with a jump to the cave. There, redo the original test, and for
 each superweapon that should act on one click (`BuildableType` the special type, `BuildableID` its number), jump to
@@ -155,7 +158,10 @@ zero first.
   listed, and the mod-command send's `0x1032` to `0x1035` range. The command names are `ClientG.exe` strings, and
   the input events are in EA's `DLLInterface.h`.
 - **The click handler:** the bytes above read from disk; `0x0B` is `SPECIAL` in EA's `DllObjectTypeEnum`; the
-  cursor function's writes of 0, 4 and 5 to `0x20F1C90` disassembled for this page.
+  cursor function's writes of 0, 4 and 5 to `0x20F1C90` disassembled for this page. The two construction requests:
+  `SIDEBAR_REQUEST_START_CONSTRUCTION_MULTI` in EA's `DLLInterface.h` and its fall-through, with the "1x or 5x Left
+  click" comment, in `CNC_Handle_Sidebar_Request` (`DLLInterface.cpp`); a working mod's handler takes both, after
+  its one-click superweapons were seen arriving as either.
 - **The entry copy's fields:** the handler's byte tests of `+0x44` to `+0x47` and the cursor function's reads of
   `+0x18`, `+0x1C` and `+0x24`, disassembled for this page, line up with EA's `CNCSidebarEntryStruct`
   (`DLLInterface.h`) once the name is a `std::string` (the cursor function checks its capacity at `+0x14`) and the

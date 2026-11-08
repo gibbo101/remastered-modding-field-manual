@@ -32,7 +32,7 @@ Two sets of data drive Mission Select, and they do different jobs:
 | To change | Edit | Effect |
 |---|---|---|
 | Whether a mission **shows** | `INSTANCES.XML`, `<ShowOnMissionSelect>` | `false` hides it, even if the player has completed it |
-| Whether it's **unlocked from the start** | `INSTANCES.XML`, `<IsUnlockedAtStart>` | `true` always shows it; otherwise the player's progress decides |
+| Whether it's **unlocked from the start** | `INSTANCES.XML`, `<IsUnlockedAtStart>` | `true` always shows it; otherwise the player's progress decides. All 34 Counterstrike and Aftermath missions set it `true` |
 | **Which game's** Mission Select lists it | `INSTANCES.XML`, `<ExternalGameID>` | `RedAlert` or `TiberianDawn`. A TD instance never lists in Red Alert. |
 | Its **name and briefing** | `INSTANCES.XML`, `<LocationNameTextID>`, `<MissionBriefingTextID>` | Text IDs, looked up in the game's text |
 | Its **movies and map picture** | `INSTANCES.XML`, `<IntroMovieName>`, `<BriefMovieName>`, `<ActionMovieName>`, `<WinMovieName>`, `<MissionSelectMapTexture>` | Movie names, and the texture Mission Select shows for the mission (`UI_NOD01_MapState.tga` and the like) |
@@ -79,7 +79,10 @@ A stock mission slot plays whatever scenario INI of the right name it finds firs
 1. **Find the slot's file name.** It's built from the instance's `<Mission>` number:
    `SC` + the house's letter + two digits + direction + variant, `.INI`. Aftermath's first Allied mission,
    `Mobius_Allied_Aftermath_Campaign_43_Map` with `<Mission>43</Mission>`, plays `SCG43EA.INI`.
-2. **Write your scenario** in Red Alert's format. Starting from the stock file is easiest.
+2. **Write your scenario** in Red Alert's format. Starting from the stock file is easiest. The stock scenarios are in
+   `general.mix` inside a `MAIN.MIX` under `Data/CNCDATA/RED_ALERT/`: `CD1`'s holds the original Allied and Soviet
+   missions and the multiplayer maps `SCM01EA`–`SCM24EA`; `AFTERMATH`'s holds the expansion missions, `SCG43EA.INI`
+   among them, and `SCM01EA`–`SCM99EA`.
 3. **Remove the `[Digest]` section.** Red Alert checks a scenario's digest at load. A wrong digest aborts the
    load (only multiplayer scenarios numbered below 25 are exempt), but a *missing* digest skips the check. Any edit makes the old
    digest wrong, so delete it. The abort is compiled in only because `DEFINES.H` defines `RELEASE_VERSION`, which
@@ -111,7 +114,9 @@ Three data rules for a new instance:
   using it: append your instances at the end.
 - **The `Variant` picks the tab.** `Mobius_Allied_Campaign_Base` lists on the Allies tab,
   `Mobius_USSR_Campaign_Base` on the Soviets', `Mobius_Aftermath_Allied_Map_Base` and `..._USSR_Map_Base` on the
-  expansion tabs, `Mobius_Ant_Map_Base` on the Ant tab.
+  expansion tabs, `Mobius_Ant_Map_Base` on the Ant tab. The base also carries what its missions inherit:
+  `Mobius_Aftermath_Allied_Map_Base` sets `<House>Greece`, `<DefaultCampaignName>RA_Aftermath_Allied_CAMPAIGN` and
+  `<MissionSelectMapTexture>RA_UI_Retaliation_Allies_MapState.tga`, so a mission on it sets only its own fields.
 - **Its name needs Red Alert text.** A Tiberian Dawn text ID doesn't resolve in Red Alert's Mission Select, and
   shows a placeholder.
 
@@ -190,8 +195,10 @@ campaign map; the Mission Select tabs come from the tab sort above.
 
 - **Progress decides what shows.** A mission not yet unlocked doesn't list, even with `ShowOnMissionSelect`
   true. Only `IsUnlockedAtStart` overrides that. On one player's Ant tab, two of the four missions showed, though all
-  four are `ShowOnMissionSelect` true. Where the player's progress is kept is unknown: it isn't in the
-  local settings file. **Unproven.**
+  four are `ShowOnMissionSelect` true. Where the player's progress is kept wasn't traced. The local settings file
+  (`Player_RA_settings_1.bin`, on [Overriding launcher data](../launcher-data/overriding-launcher-data.md)) names
+  some campaign instances, `MOBIUS_ALLIED_CAMPAIGN_2_MAP` and `MOBIUS_ANT_CAMPAIGN_1_MAP` among them, so it may be
+  there. **Unproven.**
 - **TD's campaigns can't be borrowed.** Their instances are `TiberianDawn` instances on TD's tabs, and TD's scenario
   format doesn't run in Red Alert's engine. A GDI or Nod campaign in Red Alert needs new Red Alert scenarios.
 
@@ -205,6 +212,10 @@ campaign map; the Mission Select tabs come from the tab sort above.
   was completed; removing `RA_ALLIES_14`'s definition left its Start doing nothing while mission 1 still launched; and
   a new `Mobius_Allied_Campaign_99_Map` on the Allied variant listed as "Allies 99" on the Allied tab, its
   deliberately Tiberian Dawn name ID showing a placeholder.
+- **Unlocks, bases and the stock scenarios:** counted in the stock `INSTANCES.XML` for this page (every one of the
+  34 instances on the four expansion bases sets `IsUnlockedAtStart` true; the Aftermath Allied base's three fields);
+  both `general.mix` archives listed by name hash for this page. A shipped mod's hijacked `SCG43EA.INI` started from
+  the Aftermath copy.
 - **The movie and picture fields:** counted in the stock `INSTANCES.XML` (about 395 KB), in `CONFIG.MEG`
   itself, and written by EA's own instance export in `DLLInterfaceEditor.cpp` (TD), which prints
   `<BriefMovieName>`, `<ActionMovieName>` and `<WinMovieName>` from each scenario's movies.

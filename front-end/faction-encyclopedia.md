@@ -6,7 +6,7 @@ holds_for: Steam build 21590013
 clientg_version: 1.153 (745903)
 clientg_sha256: d405ed389548be51c67740bb6309de10a5f02bdfc86324a10c9ad3b663c08897
 status: verified
-unproven: [why a texture added after start-up never loads (observed, not traced)]
+unproven: [why a texture added after start-up never loads (observed, not traced), why a generic column name such as Column0 gives no layout (observed)]
 ---
 
 > [!NOTE]
@@ -114,8 +114,10 @@ Use the copied screen's own list box, with a sample row from a `.BUI` of its own
 
 Each of these addresses was read from `ClientG.exe` on disk, and each opens with a normal function prologue. The
 steps follow the stock Mission Select list's own fill, which clones into its only column, `MissionColumn`
-(`RA_MISSIONSELECT.BUI`), so a copy of that screen passes the same name. The cloned row's widgets are in the
-cell's own scene, at `+0x1F4`. A click arrives as event 4 on the row's cell, with the row as its data.
+(`RA_MISSIONSELECT.BUI`), so a copy of that screen passes the same name; a generic name such as `Column0` clones
+a row that gets no layout (observed). The cloned row's widgets are in the cell's own scene, at `+0x1F4`: find them
+with the find-widget call (`0xF0D980`, on [New screens and buttons](new-screens-and-buttons.md)) on that scene,
+which it takes in `ecx`, not on the screen's. A click arrives as event 4 on the row's cell, with the row as its data.
 
 ## Traps
 

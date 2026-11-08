@@ -47,7 +47,7 @@ changes:
 | `RefineryRatio`, `RefineryLimit` | `[AI]` | .16, 4 | The computer builds a refinery while refineries are under this share of its buildings, and never more than the limit. |
 | `Harvester` | `[IQ]` | 2 | The IQ at which a computer player replaces lost harvesters. |
 | `BailCount` | `[General]` | 28 | Bails a full harvester carries. |
-| `GoldValue`, `GemValue` | `[General]` | 25, 50 | Credits per bail of ore and of gems. The ore search also weighs gem cells at four times `GemValue`. |
+| `GoldValue`, `GemValue` | `[General]` | 25, 50 | Credits per bail of ore and of gems. The ore search weighs each cell by them too: an ore cell at `GoldValue`, a gem cell at four times `GemValue`. |
 | `OreTruckRate` | `[General]` | 1 | How slowly the harvester loads and dumps; larger is slower. |
 
 The stock column is the base game's `rules.ini`. A `rules.ini` of your own that leaves a key out gets the code's
@@ -100,7 +100,7 @@ Each is a DLL change, behind one "harvesters" switch on a settings page that res
   each read with `grep -a`. Where a computer's `Difficulty` comes from: `HouseClass`'s constructor (`Scen.CDifficulty`), `CDifficulty`'s only writers in `INIT.CPP` and `NULLDLG.CPP` (the original menus, which the
   DLL never calls), and `GlyphX_Assign_Houses` (`DLLInterface.cpp`, `Assign_Handicap(Scen.Difficulty)`).
 - **The rules.ini knobs:** each key read in EA's `RULES.CPP` (`OreNearScan` and `OreFarScan` into `TiberiumShortScan`
-  and `TiberiumLongScan`), used in `UNIT.CPP` (`Goto_Tiberium`, `Tiberium_Check`'s `GemValue*4`, the bail count) and
+  and `TiberiumLongScan`), used in `UNIT.CPP` (`Goto_Tiberium`, `Tiberium_Check`'s `GoldValue` and `GemValue*4`, the bail count) and
   `HOUSE.CPP` (`RefineryRatio`, `RefineryLimit`), and the stock values in the base game's `rules.ini`. A working
   mod's harvester notes list the same keys. The code defaults are `RulesClass`'s constructor initialisers
   (`TiberiumLongScan(0x2000)`, `GoldValue(35)`, `GemValue(110)`, `IQHarvester(3)`, `OreDumpRate(2)`), checked

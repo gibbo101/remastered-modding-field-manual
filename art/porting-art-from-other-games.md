@@ -1,6 +1,6 @@
 ---
 title: "Porting art from other C&C games"
-description: "Turning Tiberian Sun voxels and SHPs, and Command & Conquer 3 models, into HD Remastered sprites; the target every port must hit (canvas, centring, team-colour green, baked shadow), the 32-degree camera and facing order that match EA's HD vehicles, ships' 16 facings, where each game keeps its art (Firestorm's expand01.mix, one-theatre buildings, theatre letters, Image= names), TS's SHP layout (shadow half, damaged frame and loop, Rate= in frames per minute), and where TS keeps its voices and music."
+description: "Turning Tiberian Sun voxels and SHPs, and Command & Conquer 3 models, into HD Remastered sprites; the target every port must hit (canvas, centring, team-colour green, baked shadow), the 32-degree camera and facing order that match EA's HD vehicles, ships' 16 facings, where each game keeps its art (Firestorm's expand01.mix, one-theatre buildings, theatre letters, Image= names), TS's SHP layout (shadow half, damaged frame and loop, Rate= in frames per minute), its infantry facing order, level barrel pitch and railgun colours, and where TS keeps its voices and music."
 tags: [art, pipelines, tiberian-sun, cnc3, voxels, hd]
 holds_for: Steam build 21590013
 status: verified
@@ -60,7 +60,8 @@ extent is about 0.81 of its side-on length), but a hull's height inflates that r
 - **The archives.** Tiberian Sun's files are in MIX archives encrypted like Red Alert's (`TIBSUN.MIX` reads
   `0, 0x3`: encrypted, with a checksum), but its filename hash is a padded CRC-32, not Red Alert's. See
   [MEG and MIX archives](../formats/meg-and-mix-archives.md). Voxel models and the rules INIs are in `LOCAL.MIX`,
-  unit SHPs and most cameos in `CONQUER.MIX` (the rest in the per-side sidebar archives, `SIDEC01.MIX` for GDI and
+  unit SHPs and most cameos in `CONQUER.MIX` (the subterranean units' dig anim `DIG.SHP`, 121 × 121 and 37 frames,
+  among them; the rest in the per-side sidebar archives, `SIDEC01.MIX` for GDI and
   `SIDEC02.MIX` for Nod), building SHPs in the theatre MIXes, palettes in `CACHE.MIX`. The Firestorm expansion's
   own files are in `expand01.mix`: its voxels and build-up SHPs at the top level, its other SHPs in the inner
   `ECACHE01.MIX` (the EMP cannon's cameo `MEMPICON.SHP` among them), the inner `E01SC01.MIX` holds just two entries
@@ -77,11 +78,20 @@ extent is about 0.81 of its side-on length), but a hull's height inflates that r
 - **Voxels (vehicles).** A VXL is a voxel model, so render it from Remastered's camera. TS lights voxels with one
   fixed light and a table of 32 brightness steps, indexed by each voxel's own normal, which the VXL stores. Use
   those normals rather than ones worked out from the shape: on flat decks, worked-out normals come out blotchy.
+  The HVA beside it holds a transform per section per frame; a vehicle with no moving parts has one frame (the
+  Subterranean APC's `SAPC.HVA` is 88 bytes: one frame, one section).
+- **Barrels are level at pitch 64.** TS keeps a voxel barrel's pitch as a facing out of 256, and level is `DIR_E`,
+  64: it's the default `StartPitch` (OpenTS `builtype.cpp`), the pitch `Barrel_Pitch` returns for a level shot
+  (`building.cpp`), and TS's own `FIRESTRM.INI` notes `StartPitch=2 ; DIR_E = 2 << 5` (the INI key counts in
+  steps of 32). Render barrels at pitch 64 for the resting pose.
   The full lighting model, measured from TS's own tables, is in Tiberian Factions'
   [render contracts](https://github.com/gibbo101/cnc-ra-tiberian-factions/blob/main/docs/launcher-render-contracts.md).
 - **SHPs (infantry, buildings).** Decode with the right palette: `UNITTEM.PAL` for units and buildings,
   `CAMEO.PAL` for cameos. The terrain palettes give noise. Remap indices 16 to 31 are the team colour; paint them
   green. Upscale with a pixel-art scaler (hq4x) before any smooth resize.
+- **Infantry frames need no reordering.** TS's infantry SHPs run anticlockwise from north, as Red Alert's do. The
+  two games' `InfantryClass::HumanShape` tables (OpenTS `infantry.cpp`, EA's `INFANTRY.CPP`) list the same shapes
+  in the same order, TS's turned by 45 degrees for its isometric facings.
 - **The second half of an SHP is shadows.** An SHP that TS draws with a shadow (infantry, buildings, build-ups)
   holds its image frames first, then a shadow for each: frame n's shadow is frame n + count/2, which TS draws darkened under it. Decoded as art, those
   frames come out as flat purple silhouettes. Drop them, since a Remastered frame bakes its own shadow.
@@ -90,6 +100,10 @@ extent is about 0.81 of its side-on length), but a hull's height inflates that r
 - **An animation's damaged loop usually shares its file.** The damaged section plays a later range of the same SHP:
   `[GADEPT_A]` loops frames 0 to 4 of `GADEPT_A.SHP` and `[GADEPT_AD]` frames 5 to 9, then come the shadows, 10 to 19.
   Read each section's `LoopStart` and `LoopEnd`, since a few animations run one cycle through the whole file.
+- **Railgun colours are in `RULES.INI`.** TS draws a railgun shot as a laser in its particle system's
+  `LaserColor`: `[SmallRailgunSys]`, on the Ghost Stalker's `LtRail`, is `255,128,0` (orange), and
+  `[LargeRailgunSys]`, on the Mammoth Mk. II's `MechRailgun`, is `25,20,255` (blue). OpenTS's `Railgun_AI` passes
+  `Class->LaserColor` to the laser it draws (`partsys.cpp`).
 - **Animation speed:** an anim's `Rate=` in TS's `ART.INI` is frames per minute (the delay is ticks per minute ÷
   `Rate`), so a higher `Rate` is faster.
 - **Sound and music.** Unit voices are in `SOUNDS.MIX` (inside `TIBSUN.MIX`), named by voice set and line,
@@ -161,6 +175,12 @@ The step-by-step recipe, written for an AI coding assistant to follow, is Tiberi
   for this page (header: 22,050 Hz, compression 99; ffprobe: `adpcm_ima_ws`, mono); `SCOMP_SOS=99` in EA's
   `SOUNDINT.H`, used by OpenTS's `dsaudio.cpp`; the voice sets of every unit in TS's `RULES.INI`; and a working
   mod's voice and music builders, which read the same archives and ship TS voices for its units.
+- **Dig anim, HVA, barrels, infantry order and railgun colours:** `DIG.SHP` (in `TIBSUN.MIX`'s `CONQUER.MIX`) and
+  `SAPC.HVA` (in `LOCAL.MIX`) extracted and their headers read for this page; OpenTS's `builtype.cpp`
+  (`StartPitch(DIR_E)`), `building.cpp` (`Barrel_Pitch`), `infantry.cpp` (`HumanShape`) and `partsys.cpp`
+  (`Railgun_AI`), against EA's `INFANTRY.CPP` `HumanShape` and TS's `RULES.INI` and `FIRESTRM.INI`; and a working
+  mod whose TS units use these: its dig anim's 37 frames, its infantry ported with no reordering, its barrels
+  rendered level and its railguns in TS's colours.
 - **Command & Conquer 3:** `StaticStream.big`'s header read for this page (`BIG4`), and a working mod that ships over
   fifteen C&C3 units built this way.
 

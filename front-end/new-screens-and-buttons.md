@@ -1,12 +1,12 @@
 ---
 title: New screens and buttons
-description: A mod can add front-end buttons and whole screens of its own. Clone a stock widget into a loose .BUI, build a new screen on ClientG's registered but unused SplashScreen class, and bind every click from a launcher patch, with each launcher function checked by its opening bytes first. An add-ons screen can also read the launcher's mod list and switch mods on and off by their ID.
+description: A mod can add front-end buttons and whole screens of its own. Clone a stock widget into a loose .BUI, build a new screen on ClientG's registered but unused SplashScreen class, and bind every click from a launcher patch, with each launcher function checked by its opening bytes first. An add-ons screen can also read the launcher's mod list and switch mods on and off by their ID, and a patch can raise the launcher's own message box.
 tags: [front-end, ui, bui, screens, clientg, code-patch, advanced]
 holds_for: Steam build 21590013
 clientg_version: 1.153 (745903)
 clientg_sha256: d405ed389548be51c67740bb6309de10a5f02bdfc86324a10c9ad3b663c08897
 status: verified
-unproven: [new widgets on the in-match HUD by the same route, other unused screen classes besides SplashScreen, the launcher dropping a mod's old ID after an update (observed), Steam holding a plain subscription's download while the game runs (observed)]
+unproven: [new widgets on the in-match HUD by the same route, other unused screen classes besides SplashScreen, the launcher dropping a mod's old ID after an update (observed), Steam holding a plain subscription's download while the game runs (observed), the message box's button numbers (observed) and its five integers]
 ---
 
 > [!NOTE]
@@ -91,6 +91,7 @@ own refresh, such as a timer on the UI thread.
 | Bind an event | `0x6A9F50` | `55 8B EC 51 53 8B` |
 | Main menu's binding site (hook) | `0x6B185B` | `6A 15 68 F0 7E C1 01` |
 | Skirmish lobby's Back handler | `0x71C790` | `56 8B F1 E8 B8 FB` |
+| Show a message box | `0x1502EA0` | `55 8B EC A1 D8 83` |
 
 **Leaving the skirmish lobby from your code,** say to send the player to a screen of your own, is the lobby's own
 Back handler, called on the lobby's behaviour object with data 0. The lobby binds it to its `Back_Button` widget
@@ -98,6 +99,18 @@ Back handler, called on the lobby's behaviour object with data 0. The lobby bind
 closes and the main menu underneath shows again. A working mod first checks the button is usable, and leaves the
 lobby alone when it isn't, and it calls the handler on the UI tick after the click that asked for it, not from
 inside that click.
+
+**A message box of the launcher's own,** say to warn a player that a pack is missing, is `0x1502EA0`. It's
+`__cdecl` and takes, in order:
+- a callback: a target and an invoker, called as a member function with the clicked button's number;
+- the body text, then a key and a text for each of the two buttons (MSVC `std::wstring`s);
+- five integers;
+- three empty MSVC `std::string`s.
+
+A stock two-button call (at `0x5A97C0`) passes `1, 0, 0, 0, 3`. A working mod passes the same for a box with an
+action button and OK, and `1, 1, 0, 2, 3` for OK alone; what each integer does wasn't worked out. Look button
+text up as the stock caller does: the text manager at `0x1FE4CE8` with `0x9C1590`, for example `TEXT_OK`. The box
+reports its first button as 2 and OK as 3 (observed in a working mod; no stock callback was read to confirm it).
 
 ## Switching mods on and off from your screen
 
@@ -161,6 +174,9 @@ player's.
   by the ID worked out as above, restarted, and found the pack loaded. Per-account subscriptions: each account's
   `userdata/<id>/ugc/1213210_subscriptions.vdf` against the one shared `workshop/content/1213210/` folder.
   Observed only: the ID dropped after an update, and Steam holding a download while the game runs.
+- **The message box:** the stock call at `0x5A97C0` disassembled for this page: it looks its text up through the
+  text manager at `0x1FE4CE8` with `0x9C1590` and pushes `1, 0, 0, 0, 3` before the three empty strings. A released
+  mod's lobby pop-up runs its action on button 2, and its OK closes it.
 - **In play:** a released mod adds three main-menu buttons and three screens of its own this way (an add-ons
   manager, a faction encyclopedia and a settings page), on Linux under Proton and on the Steam Deck.
 

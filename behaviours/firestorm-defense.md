@@ -1,6 +1,6 @@
 ---
 title: Firestorm Defense
-description: "Tiberian Sun's Firestorm Defense in Red Alert, which has nothing like it: a charge-drain superweapon toggled from the sidebar, wall sections that become a lethal, shot-eating field, and line-fill placement for every wall; OpenTS and TS's rules as the model."
+description: "Tiberian Sun's Firestorm Defense in Red Alert, which has nothing like it: a charge-drain superweapon toggled from the sidebar, wall sections that become a lethal, shot-eating field, line-fill placement for every wall, and how the field drops, sounds and sells; OpenTS and TS's rules as the model."
 tags: [behaviours, firestorm, superweapons, walls, tiberian-sun, dll]
 holds_for: Steam build 21590013
 clientg_version: 1.153 (745903)
@@ -30,7 +30,8 @@ From TS's `RULES.INI` and OpenTS (`super.cpp`, `house.cpp`, `building.cpp`, `bul
   drain time is the charge × `ChargeToDrainRatio` (.333, so a full charge buys about a minute). Turned off early,
   each frame of drain left comes back as three frames of charge (1 ÷ .333), and the weapon stays usable while it
   charges on, so a part charge buys a shorter field. It can be raised in any state except charging from zero. A
-  drain that runs out, low power, or losing the last generator drops the field and starts the charge from zero.
+  drain that runs out, low power, the player switching off every generator (TS's power toggle; one generator left
+  on keeps the field), or losing the last generator drops the field and starts the charge from zero.
   OpenTS's `SuperClass` keeps four states for it, `SUSPENDED`, `CHARGING`, `READY` and `FIRESTORM_ON`, and
   `Can_Place` accepts a click in every one but `CHARGING`.
 - **Computer houses toggle it without a drain,** and never raise it of their own accord: the AI's superweapon logic
@@ -55,12 +56,16 @@ From TS's `RULES.INI` and OpenTS (`super.cpp`, `house.cpp`, `building.cpp`, `bul
   the gap. The 5 is the section's `GuardRange=5`, the search runs only north, east, south and west, and the filling
   sections are free.
 - **What it looks like:** a live section draws its neighbour frame plus 32. `GAFSDF_A` plays on live sections that
-  aren't a straight run, and every 8 frames each such section with no column showing has a 1 in 16 chance to throw up
+  aren't a straight run (8 frames; `NewTheater=yes`, so it ships as `GTFSDF_A.SHP` in `TEMPERAT.MIX` and
+  `GAFSDF_A.SHP` in `SNOW.MIX`; `ART.INI` gives it `LoopStart=0`, `LoopEnd=4`), and every 8 frames each such section with no column showing has a 1 in 16 chance to throw up
   `FSIDLE`, played once at 50% translucency. So the field reads as flickering columns, not a steady wall.
 - **EVA:** `00-I162` "Firestorm defense ready" (the superweapon's `RechargeVoice`), and `00-I170` "Firestorm defense
   offline" when the field drops.
+- **No Firestorm sound in code.** TS's code plays no sound of its own for the field. The crackle, `FIRSTRM1`, is the
+  `Report=` of `FSIDLE`, `FSAIR` and `FSGRND` in `ART.INI`, and an anim plays its `Report=` when it starts.
 - **Sections as buildings:** placing or removing one refreshes its four neighbours' frames, and the player's power
-  toggle (the `POWERON` and `POWEROFF` events) skips sections.
+  toggle (the `POWERON` and `POWEROFF` events) skips sections. A section can be sold only while the field is down,
+  and selling it refunds nothing: it's removed outright.
 
 ## The method in Red Alert's DLL
 
@@ -74,7 +79,9 @@ From TS's `RULES.INI` and OpenTS (`super.cpp`, `house.cpp`, `building.cpp`, `bul
 4. **Shots:** in `BulletClass::AI`, delete a projectile in a hostile live cell. Cut instant shots at the first live cell
    of another house's wall on their path at launch.
 5. **Sections as buildings:** 1×1, not selectable. Their frame comes from their neighbours (north, east, south, west
-   as 1, 2, 4, 8), plus 32 while live, as in TS. Make them sellable only while the field is down.
+   as 1, 2, 4, 8), plus 32 while live, as in TS. Make them sellable only while the field is down, with no refund.
+   Red Alert's anims take their sound from the C++ table, not from an INI `Report=`, so play the crackle yourself
+   with each column and burst you spawn.
 
 ## Line fill, for every wall
 
@@ -112,7 +119,14 @@ owns the placement ghost, so the line appears only when the second end is placed
   (`Place_Firestorm_Wall`: four directions, `ThreatRange >> 8` cells, sections created without a charge),
   `techtype.cpp` (`ThreatRange` read from `GuardRange`) and `vox.cpp` (`00-I162`, `00-I170`); TS's `RULES.INI`
   (`[GAFSDF]` `GuardRange=5`, `[FirestormSpecial]` `RechargeVoice=00-I162`, `[AudioVisual]`'s four Firestorm anims,
-  `[CombatDamage]` `C4Warhead=HE` and `DefaultFirestormExplosionSystem=FirestormSparkSys`). The working mod
+  `[CombatDamage]` `C4Warhead=HE` and `DefaultFirestormExplosionSystem=FirestormSparkSys`). The generator toggle:
+  `house.cpp`'s `Update_Present_Super_Weapons` (the field stays enabled while any generator `IsOn`) and `super.cpp`'s
+  `Suspend` (`SUSPENDED`, `Deactivate_Firestorm`, then a fresh `RechargeTime`), with `event.cpp`'s `POWEROFF`
+  turning off any building but a section, and `[GAFIRE]`'s `Power=-200`. The sale: `building.cpp`'s `Sell_Back`
+  (`Limbo`, then `Delete_Me`, the cost read and discarded) and `Can_Demolish` (only while
+  `FirestormDefenseActivated` is false). The sounds: `ART.INI`'s three `Report=FIRSTRM1` lines, `animtype.cpp`
+  reading `Report` and `AnimClass::Start` playing it, and no Firestorm sound call anywhere in OpenTS. The frames:
+  the SHP headers of `GTFSDF_A.SHP` and `GAFSDF_A.SHP` (8 frames, 48 × 48). The working mod
   reproduces the +32 frame, the `FSIDLE` rule and both EVA lines. The AI rule, the 5 × 5 kill, jumpjets, the
   neighbour refresh and the power toggle are OpenTS's reading of TS, not tested in TS itself.
 - **The placement map:** EA's `DLLInterface.cpp` (`Calculate_Placement_Distances`), the same in Vanilla Conquer,

@@ -46,7 +46,7 @@ The second argument is the change note, which isn't stored in the manifest. On a
 | `previewfile` | A JPG or PNG under 1 MB. Empty or left out, the tool sets no preview and the item keeps the one it has. |
 | `visibility` | `0` public, `1` friends only, `2` private, `3` unlisted. |
 | `title`, `description` | The description takes Steam BBCode. |
-| `tags` | The game's mods use `RedAlertMod` or `TiberianDawnMod`, some with `RA` or `TD`. |
+| `tags` | The game's mods use `RedAlertMod` or `TiberianDawnMod`, some with `RA` or `TD`; those two are the tags the launcher's Workshop query in `ClientG.exe` names. Maps from EA's map editor carry `RA` or `TD`, and `SinglePlayer` or `MultiPlayer`; the community fork of it adds `FFA`, `1v1` or `2v2` to a multiplayer map. |
 | `metadata` | Leave it empty, as installed mods' manifests do. |
 
 Start a new item as private, subscribe to it yourself, check it installs and runs, then make it public from the
@@ -87,6 +87,9 @@ item's page.
 
 - **The manifest and setters:** EA's map editor source (`SteamworksUGC.cs` calls the setters in this order), the
   tool's source and README, and the `.workshop.json` files of installed Workshop mods (their tags).
+- **The tags:** `RedAlertMod` and `TiberianDawnMod` beside the launcher's `steamworkshopmods.cpp` Workshop query in
+  `ClientG.exe`; EA's map editor's `SteamDialog.cs` (its map tags); `SteamMultiExtraTags` in the community map
+  editor's source; and a working mod's publish manifest.
 - **The limits:** `k_cchPublishedDocumentDescriptionMax = 8000` and the visibility enum in the Steamworks.NET
   copy bundled with EA's source, and a real publish that failed at 8660 characters. Steamworks' newer enum adds
   `3` for unlisted.

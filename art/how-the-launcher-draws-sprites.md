@@ -1,10 +1,10 @@
 ---
 title: How the launcher draws sprites
-description: The rules the HD renderer applies to unit, building, effect and beam art (canvas-centre anchoring, height drawn as a shift north, the 128-shape limit on second draws, no rotation, draw scale about each draw's anchor, an alpha cutoff near half, baked shadows, beam frames 0 to 4), each one learned from a build that drew wrong.
+description: The rules the HD renderer applies to unit, building, effect and beam art (canvas-centre anchoring and how EA centres its vehicles, height drawn as a shift north, the 128-shape limit on second draws, no rotation, draw scale about each draw's anchor, an alpha cutoff near half, baked shadows, beam frames 0 to 4), each one learned from a build that drew wrong.
 tags: [art, sprites, hd, tilesets, launcher]
 holds_for: Steam build 21590013
 status: verified
-unproven: [the exact alpha cutoff (observed near 128), why second draws drop shapes from 128 up, whether SHAPE_GHOST darkens an effect, why a draw scale leaves the selection box and health bar unscaled]
+unproven: [the exact alpha cutoff (observed near 128), why second draws drop shapes from 128 up, whether SHAPE_GHOST darkens an effect, why a draw scale leaves the selection box and health bar unscaled, whether the vortex's exported size changes what the launcher draws]
 ---
 
 > [!NOTE]
@@ -36,8 +36,12 @@ The crop only says where on the canvas the pixels go.
 
 **So compose every frame with its visual centre at the canvas centre.** Art placed low on the canvas draws low on
 the map. Shots then hit the real, undrawn spot, and the selection box floats above the art. Fix it by placing the
-art, not by changing the crop. EA's own HD vehicles centre their hulls on the canvas to within about 1.5 classic
-pixels, with turrets and barrels sticking up past the centre.
+art, not by changing the crop. EA's own HD vehicles centre their hulls on the canvas. Measured over 27 of them
+from both games (the 32 hull frames, counting pixels of alpha 200 and up so the soft baked shadow stays out), the
+middle of the hull's opaque box sits within about 1.5 classic pixels of the canvas centre. The Mammoth Tanks are
+the exception, about 2.5 pixels high. Turrets and barrels stick up past the centre, and the hull's lowest pixels sit
+6 to 14 classic pixels below it, further for bigger vehicles, so check a ground line against several of EA's
+vehicles, never the Mammoths alone.
 
 **The ground line.** Because the canvas centre is the anchor, how far the art's lowest opaque pixels sit below the
 canvas centre is the object's ground line. Measure it in full canvas space (add the `.meta` crop's offset) and
@@ -104,7 +108,7 @@ builds, and it's a good map of the limits above:
 | `FlashingFlags` | A strobe, not a shimmer. |
 | A lit window sliding down the band, like TS's pulse | Works as a mechanism, but TS's pulse is smaller than one disc, so it can't read like TS. |
 | TS's brightness ladder as a pale overlay | TS multiplies the colours beneath. An overlay can only add, so it never looks the same. |
-| The chronal vortex | The only true screen warp the launcher offers. It ignores the exported width and height and always draws Red Alert's whole chronosphere whirlpool. |
+| The chronal vortex | The only true screen warp the launcher offers, and the DLL can place it anywhere through the map export's `VortexActive` and `VortexX/Y`. But it always draws Red Alert's whole chronosphere whirlpool, about 350 px across where EA's export sends a fixed 64 px size, anchored at the coordinate's top-left rather than its centre, and churning for as long as the flag stays on. EA fills the fields straight from the one `ChronalVortex`, so a real chronosphere vortex takes the slot over. |
 | `SHAPE_FADING` plus a small, repeating change of scale (12%, every 6 stages) | **Shipped.** The only motion that read like TS's shimmer. |
 
 Two things this shows for any effect along a line:
@@ -133,6 +137,9 @@ line's colour. TD's Obelisk never hits this: its `LineMaxFrames` is 5. Lines can
 ## How it was verified
 
 - **The `.meta` format and the baked shadow:** read from the base game's own `MTNK.ZIP`.
+- **EA's vehicle centring:** measured on the hull frames of 14 Red Alert and 13 Tiberian Dawn vehicles from
+  `TEXTURES_RA_SRGB.MEG` and `TEXTURES_TD_SRGB.MEG`, at 128/24 canvas pixels per classic pixel, matching a
+  working mod's earlier measurement of 21 of them, which its centring tool for voxel vehicles is built on.
 - **Shadows only in the air, and three lines per object:** EA's released source (`BULLET.CPP`, `TECHNO.CPP`,
   `DLLInterface.h`). The Obelisk's 5 line frames are
   in EA's TD source.
@@ -156,7 +163,9 @@ line's colour. TD's Obelisk never hits this: its `LineMaxFrames` is 5. Lines can
   sprite placed by its content centre sank into its own platform, and placing it by the canvas centre fixed it.
 - **The beam example:** the attempts and their results recorded in a working mod's notes and history, OpenTS's
   `wave.cpp` (TS's per-pixel displacement), and the vortex fields (`VortexActive`, `VortexX/Y`, `VortexWidth/Height`)
-  in EA's `DLLInterface.h`. Each result was seen in play.
+  in EA's `DLLInterface.h`, which EA's `DLLInterface.cpp` fills from `ChronalVortex` with the size fixed at
+  `Pixel_To_Lepton(64)`. Each result was seen in play. The vortex was only ever sent EA's 64 px size, so whether
+  another size changes what the launcher draws is untested.
 - **Observed only, not read from code:** the 128-shape limit on second draws, the ignored rotation, the alpha
   cutoff, the white box, the green placeholder and the squares at frame 5. Each was seen in play and worked around.
   The cause behind each one is inside the launcher.

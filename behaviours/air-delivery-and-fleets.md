@@ -1,6 +1,6 @@
 ---
 title: Air delivery, fleets and support powers
-description: Delivering vehicles by cargo plane as Tiberian Dawn's airstrip does, which Red Alert has no cargo plane, aircraft box or fixed-wing landing run for; giving a new faction its own ships, aircraft and support powers without opening Red Alert's types to it; a new superweapon's launcher type and cameo name; the traps of bringing a TD aircraft into Red Alert's engine, and short-range aircraft weapons that never fire.
+description: Delivering vehicles by cargo plane as Tiberian Dawn's airstrip does, which Red Alert has no cargo plane, aircraft box or fixed-wing landing run for; giving a new faction its own ships, aircraft and support powers without opening Red Alert's types to it; a new superweapon's launcher type and cameo name; the traps of bringing a TD aircraft into Red Alert's engine (an empty cargo plane that never leaves, a parked one that can be force-attacked), and short-range aircraft weapons that never fire.
 tags: [behaviours, aircraft, naval, superweapons, reinforcements, tiberian-dawn, dll]
 holds_for: Steam build 21590013
 status: verified
@@ -40,7 +40,9 @@ the map edge, sets the vehicle down beside the strip, and leaves (TD's `BUILDING
    `Mission_Hunt`. TD's has a fixed-wing branch: pick an airstrip, fly to it, set the cargo down, leave. Port it
    for the cargo plane alone, so Red Alert's own planes keep hunting. TD's `Enter_Idle_Mode` is what starts it: an
    airborne loaner with cargo and no team gets `MISSION_UNLOAD`. Red Alert's has no such branch, so without one
-   the plane falls back to its idle mission instead of unloading.
+   the plane falls back to its idle mission instead of unloading. TD's run sets the cargo down when the plane is
+   within `0x80` leptons of the strip (`FLY_TO_AIRSTRIP`). A working mod's plane, flown at Red Alert's speeds,
+   overshot that window, turned back and circled, until the window was widened to `0x200`.
 6. **Several deliveries in a row:** a second plane can arrive while the first is still in radio contact with the
    strip. Placement has to retry instead of giving up, planes should come in from a fixed edge with a fallback when
    the strip is busy, and the approach should fly straight in rather than circle.
@@ -75,6 +77,14 @@ A new `SpecialWeaponType` falls to `SW_UNKNOWN` there, so add a case:
 
 - **An aircraft with no `rules.ini` section** gets a speed of zero and never moves.
 - **A null `ImageData`** makes an aircraft invisible, as for any unit.
+- **An empty cargo plane doesn't leave by itself.** `AircraftClass::Edge_Of_World_AI` deletes an aircraft off the
+  map's edge only while it's on `MISSION_RETREAT`. Both games' source carry, commented out, the clause that would
+  also delete an empty cargo plane: `/*|| (*this == AIRCRAFT_CARGO && !Is_Something_Attached())*/`. Restore it for
+  your plane, or give the plane `MISSION_RETREAT` once it's empty.
+- **`IsLegalTarget=no` doesn't stop a forced attack on a landed aircraft.** With Ctrl held, Red Alert's
+  `TechnoClass::What_Action` skips the legal-target test, and an aircraft at height 0 can be attacked with any
+  weapon, anti-aircraft or not. TD makes the same exception for a landed aircraft but leaves out its cargo plane by
+  type (`*aircraft != AIRCRAFT_CARGO`). A ported cargo plane parked on its strip needs that test too.
 - **Opening a stock building to a new owner** leaks its roster and superweapons.
 - **A carrier that sets its load down** (Tiberian Sun's Carryall) has to place it at its own exact coordinate.
   Snapping to the cell's centre slid the load most of a cell in one frame. Lift the landed carrier off the map
@@ -102,6 +112,11 @@ A new `SpecialWeaponType` falls to `SW_UNKNOWN` there, so add a case:
   `SW_ION_CANNON` among TD's values), the stock `RA_SW_*` entries in `RABUILDABLES.XML`, and the working mod's four
   new targeted powers routed as `SW_ION_CANNON`, and others as `SW_NUKE`, `SW_PARA_INFANTRY` and `SW_SPY_MISSION`,
   each with its own `RA_SW_*` entry.
+- **The landing window, the edge and the forced attack:** TD's `AIRCRAFT.CPP` (`navdist < 0x0080` in
+  `FLY_TO_AIRSTRIP`), the commented-out cargo clause in both games' `Edge_Of_World_AI`, Red Alert's `What_Action`
+  (`ctrldown ||` before `IsLegalTarget`, the `Height == 0` test) and TD's (`AIRCRAFT_CARGO` left out, `Altitude
+  == 0`) in each `TECHNO.CPP`. The working mod's cargo plane drops at `0x200`, restores the edge clause for its
+  type, and adds the cargo-plane test to its `What_Action` after its parked plane could be force-attacked.
 - **The short-range trap:** EA's `AIRCRAFT.CPP` (`Mission_Attack` handing fixed-wing aircraft to `Mission_Hunt`,
   `Good_Fire_Location`'s loop, and `PICK_ATTACK_LOCATION` falling to `RETURN_TO_BASE` when it returns nothing), the
   same in Vanilla Conquer, and the working mod's Orca Bomber, whose 1.5-cell bombs needed the target cell as the

@@ -51,7 +51,12 @@ already offers it, in the same lobby, every match, with no file to find and edit
 - **The per-player struct** the DLL receives (`CNCPlayerInfoStruct`) carries a name, house, colour, team and an
   AI flag, but no difficulty.
 - **No file holds it.** The launcher's saved settings keep the map, faction and mode, but not the AIs' difficulty,
-  and after a full restart the lobby resets to one Medium AI.
+  and after a full restart the lobby resets to one Medium AI. The settings file (its layout is on
+  [Overriding launcher data](../launcher-data/overriding-launcher-data.md)) is a run of tagged records: tag, length,
+  value. One record is a `CASUAL` label (tag `0x21`), but nothing in it is per AI. The record that changes at each
+  launch, tag `0x31`, counts match starts (measured across launches). The Wine registry and the files the launcher writes on exit hold nothing
+  about difficulty either (observed). Until the launcher restarts, the lobby comes back with the last-launched
+  picks, so they live in its memory.
 
 The picks live only in `ClientG.exe`'s memory, where they last from the lobby into the match. In a LAN game only the
 host runs the simulation (see [LAN games](../engine/lan-games.md)), and the host's launcher holds the whole
@@ -145,6 +150,10 @@ array in place.
   `CNCPlayerInfoStruct`); the values the launcher sent, logged by a mod's DLL across five skirmish lobbies (mixed,
   all Easy twice, all Hard, and Hard in the campaign difficulty option) and in LAN games; DontCryJustDie's own
   finding that the per-AI setting exists only on the launcher's side.
+- **The settings file:** decompressed and walked record by record for this page (the `CASUAL` record at tag `0x21`,
+  the counter at tag `0x31`); a mod's own measurements diffed the file, the Wine registry and the launcher's exit-time
+  writes across launches with different picks: nothing tracked the picks, and the byte that moved at each launch
+  was the counter.
 - **The name trap:** EA's `GlyphX_Assign_Houses` (the `IniName` copy, the `TXT_COMPUTER` overwrite for computer
   houses, `InitialName` under `#ifdef WOLAPI_INTEGRATION`), no `WOLAPI_INTEGRATION` define in `DEFINES.H` or the
   project file, the same loop in Vanilla Conquer's `dllinterface.cpp`, and a shipped mod that hit it and now records

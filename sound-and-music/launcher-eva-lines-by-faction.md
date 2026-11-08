@@ -96,7 +96,10 @@ file**, header included, as raw MS-ADPCM bytes in read-write memory. So:
 ## Traps
 
 - **Never write on a needle match alone.** The needle also turns up in freed and partly reused heap buffers that
-  once held the file. One whole-file write into such a buffer overran a live heap block header, and the launcher
+  once held the file. Part one's copy leaves some when it runs inside the launcher (which loads your DLL too; see
+  [Patching the launcher's code](../clientg-ram/patching-the-launchers-code.md)): under Proton, Wine's `CopyFile`
+  copies through a 64 KiB buffer from the process heap and frees it without clearing it, so each copy leaves up to
+  64 KiB of the recording behind. One whole-file write into such a buffer overran a live heap block header, and the launcher
   crashed on the next skirmish load. This is the crash Tiberian Factions 5.0.0 hit. Comparing the whole recording
   before writing fixed it: a typical match start skips three or four partial copies and replaces one or two whole
   ones.
@@ -123,6 +126,10 @@ file**, header included, as raw MS-ADPCM bytes in read-write memory. So:
 - **The cache and the overwrite:** a probe found each cached sample as raw file bytes in read-write memory. The
   shipped patch switched all the lines tested, in both directions within one session, with no crash. Tested under
   Proton on Linux and on the Steam Deck.
+- **Where the stale copies come from:** Wine's `copy_file` (`dlls/kernelbase/file.c`, behind `CopyFileW`,
+  `CopyFileExW` and `CopyFile2`) takes its 65,536-byte buffer with `HeapAlloc(GetProcessHeap(), 0, …)` and returns
+  it with `HeapFree` uncleared; the working mod copies each recording with `CopyFileA` at match start from a thread inside the launcher, and
+  its scans found partial copies in freed blocks.
 - **The crash and its fix:** traced to a whole-file write into a freed buffer. Fixed by the whole-recording compare,
   and not seen since.
 - Observed only: the dropped end-of-game speech, and the teardown loader rejecting `block_align` 1024.

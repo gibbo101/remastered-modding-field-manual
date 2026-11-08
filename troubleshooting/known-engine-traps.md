@@ -1,7 +1,7 @@
 ---
 title: Known engine traps
-description: Crashes and misbehaviour in EA's released Red Alert source that any DLL mod built from it inherits. The mod search-path buffer overruns with about four mods enabled; another folder's RULES.INI is read before yours; a sidebar column of exactly 75 entries writes past its array; the name table fills; a crate that destroys the unit driving onto it leaves a call on a dead unit; a misspelt INI key makes Inaccurate=yes do nothing; fixes under switches that are off (FIXIT_HELI_LANDING, TOFIX) never compile; a dead target's coordinate is the map's origin. Production contracts new code must keep: orders never ask Can_Build, Get_Quantity counts from production start, an entry with production in flight must stay, a builder must be freed, a cheap refinery gets no harvester, the draw export's name can be NULL. Each with its fix.
-tags: [troubleshooting, crashes, engine, dll, ini, sidebar, crates, projectiles, defines, targets, production]
+description: Crashes and misbehaviour in EA's released Red Alert source that any DLL mod built from it inherits. The mod search-path buffer overruns with about four mods enabled; another folder's RULES.INI is read before yours; a sidebar column of exactly 75 entries writes past its array; the name table fills; a crate that destroys the unit driving onto it leaves a call on a dead unit; a misspelt INI key makes Inaccurate=yes do nothing; fixes under switches that are off (FIXIT_HELI_LANDING, TOFIX) never compile; a dead target's coordinate is the map's origin; an animation's first stage runs no stage work; Cell_Building ignores a building's overlap cells. Production contracts new code must keep: orders never ask Can_Build, Get_Quantity counts from production start, an entry with production in flight must stay, a builder must be freed, a cheap refinery gets no harvester, the draw export's name can be NULL. Each with its fix.
+tags: [troubleshooting, crashes, engine, dll, ini, sidebar, crates, projectiles, defines, targets, production, animations, cells]
 holds_for: Steam build 21590013
 status: verified
 unproven: [whether the stock RedAlert.dll shipped with the game behaves exactly as EA's released source on each trap, the order in which the launcher registers enabled mods' folders]
@@ -143,6 +143,28 @@ flight across the whole map.
 **Fix:** test `Target_Legal(target)` before using `As_Coord(target)`, and pick your own fallback. Vanilla Conquer's
 `target.cpp` returns the same zero.
 
+## An animation's first stage runs none of its stage work
+
+`AnimClass::AI` (`ANIM.CPP`) does its per-stage work only when `StageClass::Graphic_Logic` (`STAGE.H`) moves the
+animation on a stage, and only for the stage it has just reached: the ground change (`Middle()`) at the type's
+`Biggest` stage and the end-or-loop test both sit inside that branch. `Set_Stage` only stores the number. So the
+stage an animation starts on is never "reached": a `Biggest` equal to the animation's first frame never calls
+`Middle()`, and code of your own keyed to the starting stage never runs.
+
+**Fix:** key per-stage code to a stage after the first, or run it yourself when you start the animation.
+
+## `Cell_Building()` doesn't see a building's overlap cells
+
+`CellClass::Cell_Building` (`CELL.CPP`) is `Cell_Find_Object(RTTI_BUILDING)`, which walks only the cell's occupier
+chain. A building puts its footprint on that chain (`Occupy_Down`) and the cells its art only overlaps in a separate
+`Overlapper` array (`Overlap_Down`). So `Cell_Building()` on a cell the building only overlaps returns `NULL`.
+Stock code that finds a building from a neighbouring cell breaks when a new building's footprint is shaped
+differently: Red Alert's harvester docks only when its refinery is in the cell north of it (`UNIT.CPP`, the
+`RADIO_IM_IN` test), where TD's tests the harvester's own cell. A ported TD refinery whose top row is overlap only
+never docks under Red Alert's test.
+
+**Fix:** test the cell the footprint really covers, or both, as the TD test does.
+
 ## Production contracts that catch new code out
 
 None of these is a bug in the stock game, which never reaches them. Each catches a mod that adds caps, cooldowns
@@ -189,7 +211,9 @@ Each trap three ways:
   in the source tree, its 15 `#ifdef TOFIX` lines counted over the `.CPP` files, and the helicopter branch in
   `HOUSE.CPP` with `Who_Can_Build_Me`'s "in theory" test (`OBJECT.CPP`); Vanilla Conquer's `redalert/defines.h`
   for its own settings. The dead target: `As_Coord`, `Target_Legal` and its `IsActive` test in `TARGET.CPP`, and
-  the same zero in Vanilla Conquer's `target.cpp`. The production contracts: `Begin_Production` (`HOUSE.CPP`) and
+  the same zero in Vanilla Conquer's `target.cpp`. The first stage: `StageClass::Set_Stage` and `Graphic_Logic` in
+  `STAGE.H` and the `Graphic_Logic` branch of `AnimClass::AI` in `ANIM.CPP`. The overlap cells: `Cell_Find_Object`,
+  `Cell_Building` and `Overlap_Down` in `CELL.CPP`, and the harvester tests in both games' `UNIT.CPP`. The production contracts: `Begin_Production` (`HOUSE.CPP`) and
   `Construction_Action` (`DLLInterface.cpp`) with no `Can_Build` call, `Can_Build`'s callers in
   `Update_Buildables` (`BUILDING.CPP`) and the house's recalc in `HouseClass::AI`, the `Who_Can_Build_Me` test in
   `SIDEBARGlyphx.CPP`'s `Recalc`; `Tracking_Add` in the `BuildingClass` constructor and `Create_One_Of` in
@@ -207,8 +231,9 @@ Each trap three ways:
   target lived map-wide once the target died, until it tested `Target_Legal` first. Its unit caps refuse orders in
   `Begin_Production` and count standing buildings; its sidebar skips entries with production in flight; a building
   that installs without `MISSION_CONSTRUCTION` locked the yard out of placing until it sent `RADIO_OVER_OUT` and ran
-  `Grand_Opening`; a token-price test lever lost the free harvester, so it gives credits instead; and its draw
-  intercept keys its per-unit changes on `AssetName`.
+  `Grand_Opening`; a token-price test lever lost the free harvester, so it gives credits instead; its draw
+  intercept keys its per-unit changes on `AssetName`; an effect keyed to an animation's starting stage never fired;
+  and its TD refinery docked only once the harvester's own cell was tested too.
 - **The fixes** are in that mod's code and released, and the crashes stopped.
 - **Unproven:** that the stock `RedAlert.dll` behaves exactly as the released source on each trap (it's built from
   it, but the binary wasn't checked), and the order in which the launcher registers enabled mods' folders, which

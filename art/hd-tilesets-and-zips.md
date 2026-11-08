@@ -4,7 +4,7 @@ description: "Ship HD art for a new unit, building or effect: a ZIP of frames wi
 tags: [art, tilesets, zip, buildables, hd]
 holds_for: Steam build 21590013
 status: verified
-unproven: [why a tile named like a stock tile resolves to the stock one (observed, not traced)]
+unproven: [why a tile named like a stock tile resolves to the stock one (observed, not traced), why the launcher skips house colour on smudges (observed, not traced)]
 ---
 
 > [!NOTE]
@@ -123,6 +123,10 @@ type's `ImageData` as a donor, fixes it. The DLL side is on [Adding a unit](../u
   the terrain tilesets, the sandbag wall `SBAG` (not theatre-specific) only in `RA_STRUCTURES.XML`. Register such
   art in a patched copy of each theatre's terrain tileset (how the launcher picks one is on
   [TD theatres in Red Alert](../using-what-the-player-owns/td-theatres-in-red-alert.md#how-the-launcher-picks-a-terrain-tileset)).
+- **Ground art gets no house colour.** The launcher recolours team green on a unit's or building's sprite, but not
+  on a smudge such as a bib or apron, although EA's export sends each smudge with its cell's owner
+  (`smudge_entry.Owner` in `DLLInterface.cpp`). Paint ground art in its final colours. (Observed; the launcher's
+  side isn't traced.)
 - **Crop the frames, and describe them in `.meta`.** A frame's TGA is cropped to its visible pixels, and its
   `.meta` gives the canvas `size` and the `crop` box. A full-canvas TGA with a smaller `crop` is squeezed into
   the crop box.
@@ -148,6 +152,8 @@ type's `ImageData` as a donor, fixes it. The DLL side is on [Adding a unit](../u
   build-up donor didn't match its footprint drew a squashed build-up, fixed by a donor of the right size; its
   Disc Thrower's disc, on another bullet's shape, flew at that bullet's size until it got a classic shape of its
   own; and its build gives every new overlay its own classic shape.
+- **No house colour on ground art:** EA's `DLLInterface.cpp` (the smudge entry's `Owner` set from the cell), and a
+  working mod's building aprons, whose hazard stripes it bakes in gold because the launcher never remapped them.
 - **Theatre art:** `IsTheaterShape` set from the type's `IsTheater` in EA's `CELL.CPP`, `BUILDING.CPP` and the
   overlay export, and always for smudges (`SDATA.CPP`, and the smudge export: "Smudges are always
   theater-specific"); `GOLD01` (theatre art) and `SBAG` (not) in `ODATA.CPP`; `GOLD01`, `BIB1` and `SBAG` counted in

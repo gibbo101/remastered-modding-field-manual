@@ -1,6 +1,6 @@
 ---
 title: New maps in the skirmish Official list
-description: Add maps to Red Alert's skirmish Official list with INSTANCES.XML and CNCMAPPREVIEWDATA.XML, then launch them under an entry the instance server already knows (Hastings, D6), handing the real map to the DLL. Tiberian Dawn's skirmish maps are the example.
+description: Add maps to Red Alert's skirmish Official list with INSTANCES.XML and CNCMAPPREVIEWDATA.XML, then launch them under an entry the instance server already knows (Hastings, D6), handing the real map to the DLL. Tiberian Dawn's skirmish maps are the example. Also the player's custom-maps folder, and how Workshop maps are named in it.
 tags: [maps, skirmish, lobby, instances, clientg, code-patch, advanced]
 holds_for: Steam build 21590013
 clientg_version: 1.153 (745903)
@@ -139,6 +139,11 @@ Starting one, the launcher calls the DLL's `CNC_Start_Custom_Instance` with the 
 DLL loads `<folder><name>.mpr` as an INI (`[Basic]` `Name`, `[Digest]`). With its `multiplayer` flag false, EA's
 DLL plays it as `GAME_NORMAL`. The map shows under the player's custom maps, not in the Official list.
 
+A Workshop map the player subscribes to shows up in the same folder as `UGC_<a>_<b>_MAPDATA.MPR`. Both fields are
+16 hex digits: `<a>` is the uploader's 64-bit Steam ID, and `<b>` is the Workshop item's ID. The Workshop download
+itself is a `MAPDATA.PGM`. Its preview picture is kept apart, in `Documents\CnCRemastered\Custom_Map_Previews\`,
+as `UGC_<a>_<b>_RADAR_SMALL.TGA`.
+
 ## Traps
 
 - **D6 must always resolve.** A client told to load D6 that finds no entry for it stalls the whole match. If your
@@ -170,6 +175,10 @@ DLL plays it as `GAME_NORMAL`. The map shows under the player's custom maps, not
   it writes, with the JSON's fields), `CNC_Start_Custom_Instance` in EA's `DLLInterface.cpp`, a Proton prefix's
   `Local_Custom_Maps\Red_Alert\` holding such triplets, and a working mod's notes, which found the same folder on a
   Steam Deck.
+- **Workshop maps:** the `UGC_..._MAPDATA.MPR` files seen on a Steam Deck; EA's map editor publishing a
+  `MAPDATA.PGM` (`SteamDialog.cs`); a Proton prefix's `Custom_Map_Previews\`, whose
+  second fields match Workshop items in Steam's own records, each a `MAPDATA.PGM`, and whose first fields carry the
+  Steam ID prefix `0110000100`.
 - Observed, not re-tested for this page: that an unresolved D6 stalls a match.
 
 > [!TIP]

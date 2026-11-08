@@ -1,6 +1,6 @@
 ---
 title: Porting Tiberian Dawn buildings and defences
-description: The lessons for bringing Tiberian Dawn's buildings and defences into Red Alert's engine as types of their own. Why sharing a Red Alert type fails, reading TD's constructor (which doubles a building's strength) and its per-type code, turret and damaged frames, the SAM site's rise-and-lower cycle, the Obelisk's charge (and the Tesla-only tests it needs) and laser, TD's building Fire_At, muzzle flashes and offsets, crews and where they appear, build-ups, overlays, a refinery that takes its harvester inside, placement (size and footprint set apart, the foundation facing that moves the aim) and the bib in its preview, Points=, the prerequisite bitfield and its AND rule, hardcoded factory roles, and the traps.
+description: The lessons for bringing Tiberian Dawn's buildings and defences into Red Alert's engine as types of their own. Why sharing a Red Alert type fails, reading TD's constructor (which doubles a building's strength) and its per-type code, turret and damaged frames, the SAM site's rise-and-lower cycle, the Obelisk's charge (and the Tesla-only tests it needs) and laser, TD's building Fire_At, muzzle flashes and offsets, crews and where they appear, build-ups, door frames, overlays, the classic image a building needs, a refinery that takes its harvester inside, placement (size and footprint set apart, the foundation facing that moves the aim) and the bib in its preview, Points=, the prerequisite bitfield and its AND rule, hardcoded factory roles, and the traps.
 tags: [buildings, defences, tiberian-dawn, porting, dll, rules-ini]
 holds_for: Steam build 21590013
 status: verified
@@ -133,6 +133,19 @@ its SAM launcher at 15 a tick against 12 for its gun turret. Red Alert turns a b
 `ROT=` (`Rotation_Adjust(Class->ROT)`), so that one is data. Red Alert's `Can_Fire` allows `STRUCT_SAM` a firing
 arc of 64 instead of 8: add your SAM to that test.
 
+The details a port has to copy from TD's code:
+
+- **The state lives in the building's `Status`.** TD's enum starts at `SAM_NONE` (-1), for every other building, so
+  a new SAM starts at 0, underground, with no set-up.
+- **Losing the target while raised** moves to locking, after a one-second wait (`return(TICKS_PER_SECOND)`).
+- **`FIRE_FACING` from `Can_Fire`** sends the site back a state (ready, or ready-again after the first shot) to turn
+  to the target again, rather than giving up the shot.
+- **No building animation.** TD's `_anims` table in `BuildingTypeClass::One_Time` (`BDATA.CPP`) has no SAM entry:
+  the rise and lower are the mission's own `Set_Rate` and `Set_Stage` calls, so leave the type's animation ranges
+  at their defaults.
+- **Air only.** TD's `BuildingClass::Greatest_Threat` gives the SAM `THREAT_AREA`, plus `THREAT_AIR` from its
+  anti-aircraft projectile, and never the ground, infantry or building threats other buildings get.
+
 ### The Obelisk: charge, then a laser
 
 TD's Obelisk charges before every shot. In TD's `BuildingClass::AI`, a powered Obelisk with a target sets stage 0,
@@ -253,9 +266,17 @@ offsets. The Obelisk's sideways shift doesn't: a building's constructor passes n
       <Value><Frames><Frame /></Frames></Value>
   </Tile>
   ```
+- **A building with no classic image is invisible.** `BuildingClass::Draw_It` returns at once when
+  `Get_Image_Data()` is `NULL`, so a new building needs a classic shape, its own or a donor's, as a unit does (see
+  [Adding a unit](adding-a-unit.md)).
 - **The war factory's door is hardcoded.** Red Alert draws its weapons factory's door as a second shape,
   `WarFactoryOverlay`, loaded from `WEAP2.SHP` and drawn by the name `WEAP2`, only for `STRUCT_WEAP` and its fake.
   A factory with a door of its own needs its own overlay shape and its own draw call under its own name.
+- **A door's frames follow its `Open_Door(rate, stages)` call.** `DoorClass` (`DOOR.CPP`) shows stages 0 to
+  `stages` − 2, and the factory adds a damaged set after them. Red Alert's opens with `Open_Door(8, 5)`: four door
+  frames, plus 4 when damaged. TD's opens with `Open_Door(2, 11)`: ten, plus 10, the 20 frames TD's `WEAP2` has.
+  Give the overlay's tileset a shape for every frame the code can ask for. A working mod that kept Red Alert's eight
+  shapes under TD's call drew white squares for the rest.
 - **`One_Time` runs after `rules.ini`.** `Init_Game` processes `rules.ini` (then `aftrmath.ini`) first, and
   `Init_Bulk_Data` runs every type's `One_Time` later. Anything `One_Time` sets, such as the `_anims` table's
   animation ranges, overrides an INI key your DLL reads for the same field.
@@ -335,6 +356,14 @@ offsets. The Obelisk's sideways shift doesn't: a building's constructor passes n
   `Allowed_Threats` (`WEAPON.CPP`); `Legal_Placement` walking `Occupy_List(true)` (`TECHNO.CPP`); and in Red Alert's
   `AIRCRAFT.CPP`, `Ammo = Class->MaxAmmo`, `Good_Fire_Location`, `Pip_Count`, the rotor test in `Draw_It` and the
   Hind check under `TOFIX`, with `MaxAmmo` defaulting to -1 (`TECHNO.CPP`).
+- **The SAM's details, the door and the image check:** TD's `SAMState` with `SAM_NONE`, the one-second return on a
+  lost target, the `FIRE_FACING` cases in `Mission_Attack` and `Greatest_Threat`'s SAM branch (`BUILDING.CPP`),
+  and the `_anims` table without `STRUCT_SAM` (`BDATA.CPP`); `DoorClass::Open_Door` storing `stages-1` and
+  `Door_Stage` (Red Alert's `DOOR.CPP`), `Open_Door(DOOR_RATE, DOOR_STAGES)` with 8 and 5 and the `+4` damaged
+  overlay in Red Alert's `BUILDING.CPP`, `Open_Door(2, 11)` and `+10` in TD's; and the `NULL` return at the top of
+  Red Alert's `BuildingClass::Draw_It`. The working mod's TD SAM uses TD's states under its own type, its TD war
+  factory calls `Open_Door(2, 11)` with a 20-shape overlay tileset, and its TD buildings without a classic shape
+  of their own were invisible until they got donors.
 - **The refinery stubs, the size and the facing:** EA's TD `BUILDING.CPP` (`RADIO_IM_IN` returning `RADIO_ATTACH`
   for `STRUCT_REFINERY`, `Mission_Harvest`), TD's `UNIT.CPP` (`RADIO_ATTACH`: `Limbo()` and `Attach`) and
   `DRIVE.CPP` (`Offload_Tiberium_Bail` paying credits); Red Alert's `BUILDING.CPP` (`MISSION_UNLOAD` for the

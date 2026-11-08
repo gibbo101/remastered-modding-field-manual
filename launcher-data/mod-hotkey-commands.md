@@ -25,10 +25,13 @@ reach it). EA built four spare commands for modders. A mod with no new key actio
 ## What EA left in
 
 1. **A constant.** `GameConstants.xml` has
-   `<CNCEnableModHotKeyGameCommands network="client"> False </CNCEnableModHotKeyGameCommands>`, default off.
+   `<CNCEnableModHotKeyGameCommands network="client"> False </CNCEnableModHotKeyGameCommands>`, default off. EA's
+   comment above it, dated 2020, calls it a "Community-requested Mod option so that players can have customized mod
+   hotkey commands", and says the four commands below must be set too.
 2. **Four commands.** `INPUTTRANSLATORCONFIGURATIONS.XML` declares `GAME_COMMAND_CNC_MOD_COMMAND_1` to `_4` in the
    `TACTICAL_CNC` (in-match) context, each with an empty `<Key></Key> <!-- TBD -->`, under EA's comment
-   "To apply, also need to set `<CNCEnableModHotKeyGameCommands>` to True in GameConstants.xml".
+   "To apply, also need to set `<CNCEnableModHotKeyGameCommands>` to True in GameConstants.xml". A bound key is
+   written as the stock bindings in the same file write theirs, by virtual-key name: `<Key>VIRTUAL_KEY_F3</Key>`.
 3. **A DLL input event.** The launcher sends a press as `INPUT_REQUEST_MOD_GAME_COMMAND_1_AT_POSITION` to `_4`
    (in `DLLInterface.h`) through `CNC_Handle_Input`, with the mouse position. EA's own handler turns that into a
    map cell, then stops at a placeholder:
@@ -72,8 +75,9 @@ Cloud and kept after the mod is removed, so a mod shouldn't write it even if it 
 
 ## How it was verified
 
-- **What EA left in:** the constant (default `False`) and the four commands with their `TBD` keys and EA's comment
-  in the stock `CONFIG.MEG`; the four `INPUT_REQUEST_MOD_GAME_COMMAND_*` values in `DLLInterface.h` and the
+- **What EA left in:** the constant (default `False`) with its 2020 comment, and the four commands with their `TBD`
+  keys and EA's comment, in the stock `CONFIG.MEG` (`GAMECONSTANTS.XML` and `INPUTTRANSLATORCONFIGURATIONS.XML`,
+  extracted for this page, whose stock bindings name keys as `VIRTUAL_KEY_F3` and the like); the four `INPUT_REQUEST_MOD_GAME_COMMAND_*` values in `DLLInterface.h` and the
   placeholder in `DLLInterface.cpp`; the four command names in `ClientG.exe`.
 - **Turning them on:** a working mod sets the constant in `GameConstants_Mod.xml`, the commands appear in Options
   > Controls, and its DLL handles them, in skirmish and in LAN.

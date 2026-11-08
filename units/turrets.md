@@ -1,6 +1,6 @@
 ---
 title: Turrets
-description: Giving a Red Alert unit a turret. The constructor flag, the frame layout the code expects (32 body facings, then 32 turret facings), the turret as a second draw limited to shapes 0-127 in HD, where shots leave the barrel, and why a turretless direct-fire unit needs IsLockTurret to aim.
+description: Giving a Red Alert unit a turret. The constructor flag, the frame layout the code expects (32 body facings, then 32 turret facings), the turret as a second draw limited to shapes 0-127 in HD, the clockwise order of a turret-seat table against anticlockwise frames, where shots leave the barrel, and why a turretless direct-fire unit needs IsLockTurret to aim.
 tags: [units, turrets, dll, art]
 holds_for: Steam build 21590013
 status: verified
@@ -47,6 +47,14 @@ body's facing (`Turret_Adjust`). In HD, the launcher draws nothing from a second
 more. A turret's frames must stay in 0 to 127, while a hull can use up to 255. See
 [How the launcher draws sprites](../art/how-the-launcher-draws-sprites.md).
 
+**A seat table runs clockwise; the frames don't.** For a turret off the hull's centre, give the type a 32-entry
+table of offsets in `UnitTypeClass::Turret_Adjust`, as EA does for the Mobile Gap Generator. `Turret_Adjust` gets
+the hull's `DirType` and indexes the table with `Dir_To_32(dir)`, which counts clockwise from north (east is
+entry 8). The body frames run the other way: `TechnoClass::BodyShape` maps that same east to frame 24. So a table
+generated in frame order is wrong for every facing but north and south: reorder it clockwise, or index it through
+`BodyShape[Dir_To_32(dir)]`. Don't go by the compass labels in the comments on EA's own table: they don't follow
+its index.
+
 ## Where shots leave
 
 `TechnoClass::Fire_Coord` places the muzzle from the unit's centre:
@@ -89,10 +97,12 @@ rule above.
 
 - **EA's source:** the turret flag and `is_lock_turret` in the `UnitTypeClass` constructor, off on the stock artillery and V2 (`UDATA.CPP`); the tracked-only hull turn in `Rotation_AI`; the `+32`
   turret frame and `Turret_Adjust` in `UnitClass::Draw_It`, the `FIRE_FACING` branch (`UNIT.CPP`), and
-  `Fire_Coord` (`TECHNO.CPP`).
+  `Fire_Coord` (`TECHNO.CPP`); the table order from `UnitTypeClass::Turret_Adjust` indexing by `Dir_To_32`
+  (`UDATA.CPP`), `Facing32` (`CONST.CPP`, east = 8) and `TechnoClass::BodyShape` (`TECHNO.CPP`, 8 to frame 24).
 - **A working mod:** turreted vehicles laid out hull 0–31 and turret 32–63; a turret block placed from 120 that
   vanished until it moved under 128; and a hull-fixed gun unit that wouldn't turn to fire until `is_lock_turret`
-  was set.
+  was set. Its art packer reorders each per-frame seat table clockwise before emitting it, and one hand-written
+  table of its own is indexed through `BodyShape` instead.
 - **The 128-shape limit:** observed in play, not read from code. See the sprites page.
 
 > [!TIP]

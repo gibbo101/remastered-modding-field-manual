@@ -152,9 +152,12 @@ A scenario numbers its cells `y * width + x`: in the MapPack and OverlayPack, an
 aircraft sections, `[Base]`, and team move-to-cell missions).
 
 - **The MapPack carries no size.** EA's `MapClass::Write_Binary` packs every cell of the grid: 16,384 template
-  types of 2 bytes, then 16,384 icons of 1 byte, 49,152 bytes, LCW-compressed in 8 KB blocks and base64'd into
-  70-character INI lines. The reader takes exactly as many cells as the grid has, and the OverlayPack works the
-  same way. A grid change therefore needs a new format number.
+  types of 2 bytes, then 16,384 icons of 1 byte, 49,152 bytes. A template type is an `unsigned short`, and a cell
+  with no template (clear ground) holds `TEMPLATE_NONE`, `0xFFFF`. `LCWPipe` compresses the bytes in 8 KB blocks,
+  each behind a 4-byte header of two little-endian `unsigned short`s, `CompCount` then `UncompCount`, and
+  `INIClass::Put_UUBlock` base64s the result into 70-character lines keyed `1=`, `2=` and on, with CRLF line
+  endings. The OverlayPack is the same over 16,384 overlays of one signed `char` each, where no overlay is `-1`
+  (`0xFF`). The reader takes exactly as many cells as the grid has, so a grid change needs a new format number.
 - **Write a new format.** Use a new `NewINIFormat` (4) for files on the 256-wide grid, packing 65,536 cells.
 - **Read old maps at their real position.** A format 3 or older file uses width 128, and a cell number in it is a
   different x and y on the 256 grid. Convert every cell number as you read it, and never rewrite the files.
@@ -259,7 +262,9 @@ At its worst the server spends about 8 ms of each 17 ms tick, and the match ran 
 - **The engine side:** each EA starting point (the unchecked fill loops, the bounds-checked exports, `CellClass::ID`,
   the zone bytes, `HIGH_COORD_MASK` and `In_View`, the two shift constants, `_staging_buffer`, the MapPack writer,
   `[Map]`'s compiled-out check, the save writers, `EventClass`, the radar's zoom) read in EA's released source, and
-  each change read in the working build's code.
+  each change read in the working build's code. The MapPack framing (`LCWPIPE.H`'s block header, `Put_UUBlock` in
+  `INI.CPP`, the `TemplateType` and `OverlayType` sentinels in `DEFINES.H`) was also checked by decoding a custom map
+  from the game's `Local_Custom_Maps` folder, and by a TD-to-RA map converter whose maps the game loads.
 - **Play:** a 200×200 skirmish against the AI, and a 25-minute eight-player match at 253×253 with timing logs, on
   the Steam Deck. An official Red Alert map and a converted TD map play unchanged on the 256 grid.
 - **The router:** checked natively against brute-force shortest paths on 253×253 open, maze and random grids,

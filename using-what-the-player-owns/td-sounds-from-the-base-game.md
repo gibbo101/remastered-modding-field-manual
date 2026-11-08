@@ -26,7 +26,10 @@ their own names, doesn't need this page.
 
 1. **The DLL sends a name, not a sound.** For each sound event the DLL copies the sound's name out of its
    `SoundEffectName[]` table into a 16-byte field (`SoundEffectEvent::SoundEffectName` in `DLLInterface.h`), so
-   15 characters at most. EVA works the same way from the `Speech[]` table, into a 16-byte `SpeechName`.
+   15 characters at most. EVA works the same way from the `Speech[]` table, into a 16-byte `SpeechName`. The event
+   also carries the entry's other two fields: `SoundEffectPriority` from its `Priority` (the playback priority) and
+   `SoundEffectContext` from its `Where` (`IN_NOVAR` or `IN_VAR`). An index outside the table sends `BADINDEX`, with
+   -1 for both.
 2. **The launcher adds a prefix:** `RAC_SFX_` when the player uses classic sound effects, `RAR_SFX_` when they use
    remastered ones. `OBELRAY1` becomes `RAC_SFX_OBELRAY1` or `RAR_SFX_OBELRAY1`.
 3. **It looks the prefixed name up as an event** in `Data/XML/AUDIO/SFXEVENTSNONLOCALIZED.XML` (sound effects) or
@@ -148,7 +151,8 @@ such as `Data/AUDIO/EN-US/` for voices. Route them with alias events exactly as 
 ## How it was verified
 
 The DLL side was read in EA's released Red Alert source (the `SoundEffectName[]` and `Speech[]` tables, the
-16-byte fields, and the INI's lookup by name). The data side was read from the base game's `CONFIG.MEG` and sound
+16-byte fields, and the INI's lookup by name). The priority and context copy is in `On_Sound_Effect` in EA's Red
+Alert and TD `DLLInterface.cpp`, unchanged in Vanilla Conquer and in a working mod's DLL. The data side was read from the base game's `CONFIG.MEG` and sound
 MEGs: event counts, prefix pairs, presets, EA's own Red Alert events that play TD samples, and the format of every
 sample measured. In a shipped mod, the TD credit tick and around a hundred TD EVA lines play in game from the base
 game's samples, none of them shipped, and the mod routes its TD weapon reports the same way. The PCM crash was

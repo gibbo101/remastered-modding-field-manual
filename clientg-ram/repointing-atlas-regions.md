@@ -100,7 +100,10 @@ Example: the Allied radar crest, region `x=5698, y=1706, w=794, h=713`, is the r
 1. **Find the process.** `CreateToolhelp32Snapshot` for `ClientG.exe`, then `OpenProcess` with `PROCESS_VM_READ`,
    `PROCESS_VM_WRITE`, `PROCESS_VM_OPERATION` and `PROCESS_QUERY_INFORMATION`. The game's DLL runs in a different
    process (the instance server), so all of this is cross-process. In a LAN game only the host runs that process,
-   so a patch made this way reaches only the host's own launcher.
+   so a patch made this way reaches only the host's own launcher. Under Proton these calls don't trip Linux's
+   `ptrace_scope` at its default of 1: wineserver carries out every `ReadProcessMemory` and `WriteProcessMemory`
+   (with `process_vm_readv`, or ptrace), and each Wine process names wineserver as its allowed tracer when it
+   starts.
 2. **List the thread stacks to skip.** For each thread, read the TEB's `StackBase` with
    `NtQueryInformationThread`, and skip down to the stack's reservation base. Under WoW64 the 32-bit TEB sits at
    `+0x2000` from the 64-bit one.
@@ -162,6 +165,10 @@ write the record, take a screenshot.
 Every finding here was made with that loop against the running client, before any DLL code was written. The shipped
 patch was then checked for each side in skirmish, under Proton on Linux and on the Steam Deck, and across a LAN game
 with a joiner.
+`ptrace_scope`: Wine's `server/ptrace.c` (`read_process_memory` and `write_process_memory` try
+`process_vm_readv`/`process_vm_writev`, then `PTRACE_ATTACH` with `/proc/<pid>/mem`) and `dlls/ntdll/unix/server.c`
+(`prctl(PR_SET_PTRACER, server_pid)` in `server_init_process`, commented "work around Ubuntu's ptrace breakage");
+the shipped patch works on a Linux desktop with `kernel.yama.ptrace_scope` set to 1.
 
 > [!TIP]
 > **In Tiberian Factions**
