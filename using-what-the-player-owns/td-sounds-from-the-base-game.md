@@ -37,6 +37,12 @@ their own names, doesn't need this page.
 
 So a TD sound in Red Alert is an **alias event**: a Red Alert-prefixed event whose sample is TD's.
 
+**Unit responses get a variant suffix.** For a sound marked `IN_VAR` in `SoundEffectName[]` (the infantry and
+vehicle responses, such as `REPORT1`), EA's `On_Sound_Effect` appends `.V00` to `.V03` for a house on the Allied
+side and `.R00` to `.R03` for any other, picked by the response's variation. The suffix goes inside the same 16 bytes,
+so the launcher looks up `RAR_SFX_REPORT1.V01` and its kin. The base game's localized sound XML carries those events.
+An `IN_VAR` sound of your own needs the variant events, under both prefixes. Every other sound is sent bare.
+
 ## The method
 
 **1. Name the sound in the DLL.** Add a `VocType` entry before `VOC_COUNT`, and add the TD sound's bare name to
@@ -98,11 +104,16 @@ New sounds ship loose in the mod, under names of their own: `Data/AUDIO/` for so
 such as `Data/AUDIO/EN-US/` for voices. Route them with alias events exactly as above.
 
 - **MS-ADPCM only** (WAV format tag 2). Every sample in the base game is MS-ADPCM. A plain PCM WAV (tag 1) with sound
-  in it crashes the launcher: its ADPCM decoder divides by zero. A header-only 44-byte PCM WAV with no samples is
-  accepted, and plays silence.
+  in it crashes the launcher: its ADPCM decoder divides by zero (a `div` at `ClientG.exe`+`0xAB5E69`, in client
+  1.153 (745903)). A header-only 44-byte PCM WAV with no samples is accepted, and plays silence.
 - **Match the base rates.** Classic samples are mono at about 22 kHz, remastered ones mono at about 44 kHz, and TD's
-  remastered EVA lines are stereo at about 44 kHz. `ffmpeg -i in.wav -c:a adpcm_ms -ar 22050 -ac 1 out.wav` makes a
-  sample that plays on both settings.
+  remastered EVA lines are stereo at about 44 kHz. The exact rate varies from file to file (TD's remastered EVA lines
+  run from about 44,030 to 44,150 Hz), and the stock EVA samples use ADPCM blocks of 70 bytes a channel (70 mono,
+  140 stereo).
+  `ffmpeg -i in.wav -c:a adpcm_ms -ar 22050 -ac 1 out.wav` makes a sample that plays on both settings.
+- **Lines the DLL sends take ffmpeg's default block.** A voice line encoded with `ffmpeg -c:a adpcm_ms -ar 44077
+  -ac 2` (a 1024-byte block) plays. The exception is a line the launcher itself plays at the end of a match: see
+  [EVA voice lines the launcher plays](../sound-and-music/launcher-eva-lines-by-faction.md#traps).
 - **The XML says `.MP3`, and the file is a WAV.** Localized entries name `..._EN-US.MP3`, and the file that plays
   is `EN-US\..._EN-US.WAV`, an ADPCM WAV.
 - **Sample names ignore case.** EA's own data names `TDC_SFX_appear1.WAV` for the file `TDC_SFX_APPEAR1.WAV`.
@@ -135,7 +146,13 @@ The DLL side was read in EA's released Red Alert source (the `SoundEffectName[]`
 MEGs: event counts, prefix pairs, presets, EA's own Red Alert events that play TD samples, and the format of every
 sample measured. In a shipped mod, the TD credit tick and around a hundred TD EVA lines play in game from the base
 game's samples, none of them shipped, and the mod routes its TD weapon reports the same way. The PCM crash was
-taken from two identical crash records. Tested under Proton on Linux and on the Steam Deck.
+taken from two identical crash records (`EXCEPTION_INT_DIVIDE_BY_ZERO` at the same address), and the instruction
+there is a `div esi` in the client named above. Tested under Proton on Linux and on the Steam Deck.
+
+The variant suffix is in EA's `On_Sound_Effect` (`DLLInterface.cpp`), which appends it with `strncat` into the
+16-byte name, and the `.V00` to `.R03` events are in the stock `SFXEVENTSLOCALIZED.XML` (218 of them). The sample
+rates and block sizes were read from the fmt chunk of every TD EVA sample in `SFX2D_EN-US.MEG`. A shipped mod's
+DLL-sent EVA lines are stereo 44,077 Hz with 1024-byte blocks (fmt chunks read for this page), and play in game.
 
 The commando lines were listed from `SFX2D_EN-US.MEG` and the stock `SFXEVENTSLOCALIZED.XML` (the `TDC_`, `TDR_`,
 `RAC_` and `RAR_` events of the same bare names), against EA's `AUDIO.CPP`, where Tanya's lines take those names. A

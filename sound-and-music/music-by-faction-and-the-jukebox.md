@@ -70,11 +70,15 @@ Each player's launcher runs its own lookup, so in a LAN game each player hears t
 | What | Address | Stock target |
 |---|---|---|
 | The skirmish music lookup (call site) | `0x169D018` | `call 0xE92A90`, the music manager's find |
+| The function holding that call | `0x169CF30` | builds `<prefix>_<event name>`, then calls the find |
 | The jukebox manager's setup (call site) | `0x15CF40E` | `call 0xEA3530` |
 | The lobby faction pick | `0x20E0CF8` | the picker row plus 2 |
 | The jukebox track list, begin and end | `0x2038734`, `0x2038738` | a vector of 0x5C-byte entries |
 
-Both call sites were read from `ClientG.exe` on disk and match.
+Both call sites were read from `ClientG.exe` on disk and match. The prefix is added in the function at
+`0x169CF30` (stock bytes `55 8B EC 83 EC 4C`): it appends `_` (the string at `0x1C13958`) to the audio-setting
+prefix, then the event's name, and passes the result to the find at `0x169D018`. So the redirect sees the
+prefixed name.
 
 ## The jukebox
 

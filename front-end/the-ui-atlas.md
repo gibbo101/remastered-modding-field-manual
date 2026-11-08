@@ -29,9 +29,20 @@ is its own loose texture instead, and doesn't need this page.
 `MT_COMMANDBAR_COMMON.TGA` (6871 × 6716, 32-bit BGRA, 184,582,562 bytes) and its two companions, `.MTD` and `.MTM`.
 The `.MTD` maps each region name to a box `x, y, w, h` in atlas pixels, measured from the top-left corner.
 
-**Reading a region from the `.MTD`:** find the region's name (such as `UI_SIDEBAR_FACTIONLOGO_ALLIES.TGA`). The name
-is padded with NUL bytes to the next multiple of four, at least one. Then come four little-endian `int32`s: x, y,
-width, height. That radar crest region is `(5698, 1706, 794, 713)`.
+**The `.MTD` layout.** All values are little-endian. It opens with an `int32` -2 and a `u32` count of regions (1,554
+in the stock file). Each region record is:
+
+```
+u32     name length, in bytes, NUL padding included
+char[]  the name (UI_SIDEBAR_FACTIONLOGO_ALLIES.TGA), padded with 1 to 4 NULs to a multiple of four
+int32   x, y, width, height       the box, in atlas pixels from the top-left
+int32   0, 0, width, height       the same in every stock record
+u8      a flag, 1 or 0
+```
+
+That radar crest region is `(5698, 1706, 794, 713)`. **Read the length, don't skip NULs.** Skipping NULs after a
+name to find x also skips x's own zero bytes when x is a multiple of 256: two stock regions
+(`RA_UI_RED_SEARCH_BTN_NORMAL_MIDDLE`, `UI_PAPERBUTTON_00_LEFT`) then read wrong.
 
 ## Shipping a repainted atlas
 
@@ -68,7 +79,7 @@ Most lost time here is spent repainting the wrong region. Several look alike:
 
 | What you see | Region | Keyed by |
 |---|---|---|
-| The radar crest, in a match | `UI_SIDEBAR_FACTIONLOGO_ALLIES` / `_SOVIET` (794 × 713) in Red Alert's HUD; `_GDI` / `_NOD` in TD's | side, and the HUD scene |
+| The radar crest, in a match | `UI_SIDEBAR_FACTIONLOGO_ALLIES` / `_SOVIET` (794 × 713) in Red Alert's HUD; `_GDI` (718 × 706, at 1, 1875) / `_NOD` (660 × 660, at 3778, 2221) in TD's | side, and the HUD scene |
 | The big side logo in the skirmish lobby | `RA_UI_MULTIPLAYER_ALLIED_LOGO_LARGE_NORMAL` and its `_HOVER` / `_SELECTED` versions | side |
 | A country's flag in lobby lists | `RA_UI_FLAG_ICON_<COUNTRY>` (73 × 40) | country |
 | The small logo on waypoint and rally markers | `RA_UI_ALLIED_LOGO_SMALL` (25 × 19) / `RA_UI_SOVIET_LOGO_SMALL` (21 × 18) | side |
@@ -94,8 +105,9 @@ grown TGA is about 268 MB, against 184 MB.
 ## How it was verified
 
 - **The atlas and table:** `TEXTURES_SRGB.MEG`'s listing (1,355 DDS plus the atlas TGA, `.MTD` and `.MTM`), the
-  atlas's TGA header, and regions read from the `.MTD` with the padding rule above. Each matches the boxes a
-  working mod's crest patch uses.
+  atlas's TGA header, and the whole stock `.MTD` parsed with the record layout above: 1,554 records, ending exactly
+  at the file's 110,654 bytes. The crest boxes, TD's included, match the ones a working mod's crest patch uses and
+  that mod's notes.
 - **The picker, marker and small-logo regions:** their boxes read from the `.MTD` for this page, and the stock
   `FACTIONS.XML`, whose `SmallIconName`s run `_00`, `_01`, `_03` to `_10`. A shipped mod repaints all of them and
   each shows where the table says; that the map badges also draw on the loading screen is its record (observed).
@@ -106,7 +118,8 @@ grown TGA is about 268 MB, against 184 MB.
   ships one with descriptor `0x08` and a footer that also loads. It's the only loose atlas among the Workshop mods
   surveyed, and no mod surveyed ships an `.MTD`.
 - **DDS:** a shipped release carries the atlas as DXT5 with 13 mip levels at 6872 × 6716 (61.5 MB, measured). Its
-  crest patch computes texture coordinates from that size, and draws correctly.
+  crest patch computes texture coordinates from that size, and draws correctly. `ClientG.exe` holds neither 6871
+  nor 6716 as a float or a double (searched).
 - **Loose DDS tileset frames:** a shipped tileset XML names `.tga` frames that exist only as `.DDS` in the mod.
 - **Growing:** a probe build at 8192 × 8192, with region records read back as 8192 wide during a match, and a crest
   drawn from the new space. Observed in one test session.

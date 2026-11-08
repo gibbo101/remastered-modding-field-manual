@@ -87,6 +87,11 @@ cell against classic's 24):
 A canvas with a different shape from its classic frame is squashed to fit: a square canvas on a 72 × 48 building
 draws flattened. A finer canvas (×8, say) draws at the same size with more detail.
 
+**Converting canvas pixels to leptons.** A cell is 256 leptons and 24 classic pixels (`ICON_LEPTON_W` and
+`ICON_PIXEL_W` in EA's `DISPLAY.H`), so one canvas pixel is 256 / (24 × the canvas's scale) leptons: 2 on EA's ×5.33
+canvases, 4/3 on a ×8 one. Convert fire points and muzzle offsets measured off the art at that rate, for the
+scale that art was packed at.
+
 **An HD-only object still needs a classic shape.** With no classic image, a projectile isn't drawn at all (EA's
 `BulletClass::Draw_It` returns early: "If there is no shape loaded for this object, then it obviously can't be
 rendered") and an animation draws a green placeholder. A transparent classic shape of the size you want, or another
@@ -115,6 +120,9 @@ type's `ImageData` as a donor, fixes it. The DLL side is on [Adding a unit](../u
 - **The × 5.33 sizes:** the classic `2TNK.SHP`, `POWR.SHP` and `WEAP.SHP` from Red Alert's MIXes, against the HD
   `.meta` files, all read for this page. A working mod's squashed buildings, fixed by matching the canvas to the
   classic frame, showed the same rule.
+- **Leptons per canvas pixel:** the constants in EA's `DISPLAY.H` (`PIXEL_LEPTON_W` is their ratio). A working
+  mod packs its units at ×8 and derives its muzzle tables at 4/3 leptons a pixel; an earlier fire point built on
+  a quarter of the real rate fired shells from near the hull's centre, a cell and a half out at long range.
 - **Registration and the white boxes:** a working mod's tileset and buildables files (970 `RA_` entries), its
   port notes, and the base game's tileset index.
 - **Observed only:** the `<Missing>` hover text and the stock-name clash, both from a working mod's early ports.

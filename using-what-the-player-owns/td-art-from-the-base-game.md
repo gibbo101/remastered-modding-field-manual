@@ -33,7 +33,8 @@ launcher open the base game's ZIP for you.
 
 - `Data/MEGAFILES.XML` mounts every texture MEG at start-up, `TEXTURES_TD_SRGB.MEG` included, whichever game is
   being played. The files are reachable from Red Alert.
-- TD's *tilesets* are not. With Red Alert running, the launcher builds its tile maps from a fixed list: `RA_Units`,
+- TD's *tilesets* are not. With Red Alert running, the launcher (`CNCRendererClass::Recreate_Tile_Maps`) builds its
+  tile maps from a fixed list: `RA_Units`,
   `RA_Structures`, `RA_VFX`, `RA_RadarMap`, `RA_Terrain_Shroud`, `Common_VFX`, `Common_UI` and `Common_Misc`.
   `TD_Units` and the other TD tilesets never load in Red Alert.
 - An object's tile is looked up by name in every world tileset, so the tileset it lives in doesn't matter. A unit's
@@ -90,6 +91,11 @@ Every TD unit, building and effect tile whose frames match the base game byte fo
 shipped mod, and its copies were deleted from the mod. Medium Tank and MCV house colours and turrets, construction
 yard and power plant build-ups, and missile effects were checked by eye under Proton on Linux and on the Steam
 Deck, in skirmish and over LAN. Red Alert's own effects in the re-rooted tileset still drew.
+
+The fixed list is in `ClientG.exe`: the strings beside `CNCRendererClass::Recreate_Tile_Maps` and its log line are
+the three `Common_` names, the five `TD_` ones and the five `RA_` ones, and no other tileset name. Which names load
+for which game is a working mod's record, and the reason its TD art needs openers in a Red Alert tileset; the
+choice itself wasn't disassembled for this page.
 
 **Measured once:** on a Linux desktop, a match on a TD map used the same video memory, 5,052 MiB, whether TD's
 unit art came from the base game or from the mod's copies. **Not measured yet:** load time, and memory on the Steam

@@ -54,8 +54,13 @@ has no checksum or signature, so a faithful repack always loads. There is one ha
 > innocent file further down the archive (such as `error reading xml header from .\Data\XML\GameConstants.xml`).
 > Edit in place, pad back to the original size (XML comments are the usual padding), and check both the member's
 > size and the archive's total against the base.
+>
+> **Keep the same members, too.** Adding or removing one changes the size of the archive's name and file tables,
+> which come before the data, so every file's data moves. That follows from the rule above; it hasn't been tried
+> on its own.
 
-The archive is about 44 MB, and you ship all of it for one change. Use a loose file unless one won't do.
+The archive is about 44 MB (44,201,888 bytes in this build), and you ship all of it for one change. Use a loose file
+unless one won't do.
 
 ### `GameConstants_Mod.xml`
 
@@ -103,7 +108,9 @@ Alert's houses, and CFE Patch Redux's Tiberian Dawn copy rearranges TD's multipl
   `InputTranslatorConfigurations_Mod.xml`, and the launcher ignores a mod's copy of the bindings file. The
   player's own settings, bindings included, are in `userdata/<account>/1213210/remote/Player_RA_settings_1.bin`
   (and `Player_TD_settings_1.bin`): a ChunkFile (`CH`, zlib from `0x24`) with a second ChunkFile nested inside,
-  synced by Steam Cloud and kept after the mod is gone. It's the player's file, so a mod shouldn't write it.
+  synced by Steam Cloud and kept after the mod is gone. Its header is laid out like a `.bui` file's (see
+  [BUI screens](../front-end/bui-screens.md)), and its 32-bit value at `0x08` matches no CRC-32, Adler-32, MD5,
+  SHA-1 or SHA-256 of the data. It's the player's file, so a mod shouldn't write it.
 
 ## Traps
 
@@ -135,8 +142,12 @@ Alert's houses, and CFE Patch Redux's Tiberian Dawn copy rearranges TD's multipl
 - **`GameConstants_Mod.xml`:** the path appears in `ClientG.exe`, and it's the only `_Mod` name there. A shipped mod
   uses it to lock out classic graphics, enable the mod hotkeys and add theatre slots, all working in play.
   Vanilla Conquer's TD sample uses the same file and `overwrite="true"`.
-- **The settings file:** read for this page (the nested `CH` header inside the first stream) and listed in Steam's
-  `remotecache.vdf` for the game; a working mod's notes on it match.
+- **The settings file:** read for this page (the nested `CH` header inside the first stream, the compressed length
+  at `0x10` equal to the file's length less `0x24`) and listed in Steam's `remotecache.vdf` for the game; the value
+  at `0x08` was tested against those five algorithms over the compressed stream and the uncompressed data; a
+  working mod's notes on it match.
+- **The member rule:** the stock archive's size read for this page. The MEG layout puts both tables ahead of the
+  data (see [MEG and MIX archives](../formats/meg-and-mix-archives.md#meg)).
 - **The server:** `InstanceServerG.exe` carries its own `\XML\Instances.xml` path and the
   `Creating instance %s` assert from `serveripcmessagehandler.cpp`, which a new instance hits at match start.
 

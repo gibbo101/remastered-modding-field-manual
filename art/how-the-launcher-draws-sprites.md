@@ -39,6 +39,11 @@ the map. Shots then hit the real, undrawn spot, and the selection box floats abo
 art, not by changing the crop. EA's own HD vehicles centre their hulls on the canvas to within about 1.5 classic
 pixels, with turrets and barrels sticking up past the centre.
 
+**The ground line.** Because the canvas centre is the anchor, how far the art's lowest opaque pixels sit below the
+canvas centre is the object's ground line. Measure it in full canvas space (add the `.meta` crop's offset) and
+divide by the canvas's scale to get classic pixels. Two stances of one object, or a unit and the building it
+deploys into, must share a ground line, or the sprite hops north or south when one replaces the other.
+
 Selection boxes follow the same logic: the launcher centres a unit's box on the unit and a building's on its plot,
 and takes only the size from the DLL. See [Building selection boxes](building-selection-boxes.md).
 
@@ -52,6 +57,8 @@ and takes only the size from the DLL. See [Building selection boxes](building-se
 | **Every animation stage needs a tile.** Declare as many tiles as the animation has stages. | A stage with no tile draws as a white box. |
 | **An effect with HD art only still needs `ImageData`.** An animation with no classic image gets a null `ImageData`. | It draws as a green placeholder. Give it another animation's `ImageData` (a donor), and its HD tile is then found by name. |
 | **Write straight (unpremultiplied) alpha.** | Colour pasted through a mask onto a transparent canvas comes out darkened, and the launcher draws it darkened. |
+| **A free animation is always its own object.** The export walks every map layer and starts a new root object for each one (`CurrentDrawCount = 0` before each `Draw_It`, EA's `DLLInterface.cpp`). | An animation placed on a unit never becomes part of that unit's draw, however close it sits. |
+| **A delayed animation is drawn while it waits.** `AnimClass`'s `timedelay` holds back `Start()` until the delay runs out, but the check that would keep it off screen meanwhile (`if (Delay) return(false);` in `AnimClass::Render`) is compiled out (`#ifdef VIC`). | It shows, unstarted, for the whole delay. Leave the delay at 0 for art that must not show early. |
 
 ## Shadows are baked in
 
@@ -98,7 +105,14 @@ Two things this shows for any effect along a line:
 ## Beams
 
 A beam weapon such as the Obelisk's is drawn by the launcher as lines, not as a sprite. Each object exports at most
-3 lines (`MAX_OBJECT_LINES` in `DLLInterface.h`), and each line has an animation `Frame`.
+3 lines (`MAX_OBJECT_LINES` in `DLLInterface.h`), and each line has an animation `Frame`. `MAX_OBJECT_LINES` sizes
+an array inside `CNCObjectStruct`, the packed struct the launcher reads, so a mod can't raise it.
+
+**Only Tiberian Dawn's DLL exports lines.** In EA's TD source, `CC_Draw_Line` hands each line to
+`DLL_Draw_Line_Intercept`, which adds it to the object being drawn, with `TechnoClass::LineFrame` as its frame, and
+drops any past the third. EA's Red Alert DLL has none of this: it sets `NumLines` to 0 and never adds one, and Red
+Alert's `TechnoClass` has no `LineFrame`. A Red Alert mod that wants a beam ports TD's `CC_Draw_Line`, the
+intercept and the two `LineFrame` / `LineMaxFrames` fields.
 
 **Use frames 0 to 4 only.** From frame 5 up, the launcher draws a giant square at each end of the line, in the
 line's colour. TD's Obelisk never hits this: its `LineMaxFrames` is 5. Lines can go at any angle, unlike sprites.
@@ -109,6 +123,14 @@ line's colour. TD's Obelisk never hits this: its `LineMaxFrames` is 5. Lines can
 - **Shadows only in the air, and three lines per object:** EA's released source (`BULLET.CPP`, `TECHNO.CPP`,
   `DLLInterface.h`). The Obelisk's 5 line frames are
   in EA's TD source.
+- **Lines in each game:** EA's TD `CONQUER.CPP` (`CC_Draw_Line`), `TECHNO.CPP` (`LineFrame`, `LineMaxFrames`) and
+  TD's `DLLInterface.cpp` (the intercept); in EA's Red Alert source the only `NumLines` writes set it to 0, and no
+  `LineFrame` exists. A working mod's Red Alert DLL ports the TD path and draws TD's Obelisk beam with it.
+- **Free and delayed animations:** EA's export loop (`DLLInterface.cpp`, the layer loop around `Draw_It`) and
+  `ANIM.CPP` (the `#ifdef VIC` check in `Render`, `Start()` deferred in `AI`); `VIC` is defined nowhere in the
+  released source. A working mod saw delayed animations drawn before they started, and stopped using the delay.
+- **The ground line:** a working mod's walker and its deployed building drew a hop until their art's lowest pixels
+  matched, measured as above.
 - **Each rule:** found in a shipped mod's art, where a build drew wrong and the fix was confirmed in game. The
   canvas-centre anchor was also tested against the competing idea that the crop's centre is the anchor. A tall
   sprite placed by its content centre sank into its own platform, and placing it by the canvas centre fixed it.

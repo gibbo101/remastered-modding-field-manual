@@ -73,8 +73,11 @@ So the DLL can show different cameos for the same type:
 The variant can be chosen per player: by their faction, or by which of their factions can build the entry. The
 cameo widget (`UI_SIDEBAR_CONSTRUCTIONENTRY.BUI`) has no overlay that could add a per-entry badge. Its quads
 (`IconFraming_Quad`, `Unavailable_Quad`, `FakeLoc_Quad`) draw fixed art: `FakeLoc_Quad` shows
-`BuildIcon_RA_FakeText_<language>` on decoy buildings, one picture for every entry. So a badge has to be baked into
-each variant's picture.
+`BuildIcon_RA_FakeText_<language>` on decoy buildings, one picture for every entry. Nor can the entry's other data
+carry one: besides the name and the type fields, EA's `CNCSidebarEntryStruct` (`DLLInterface.h`) holds `Cost`,
+`PowerProvided`, `BuildTime`, `Progress`, the placement list and six flags (`Completed`, `Constructing`,
+`ConstructionOnHold`, `Busy`, `BuildableViaCapture`, `Fake`), each with a fixed meaning. So a badge has to be baked
+into each variant's picture.
 
 ## How it was verified
 
@@ -88,6 +91,10 @@ each variant's picture.
   `BuildIcon_RA_FakeText_*` names in `ClientG.exe`, and EA's `Fake` field in the sidebar entry struct.
 - **New cameos:** a working mod ships 552 loose DDS cameos (344 × 256, DXT1, 9 mip levels, read for this page),
   drawn in its sidebar and encyclopedia.
+- **Sides in multiples of 4:** all 51,748 DXT1 and DXT5 textures in the base game's five texture MEGs have both
+  sides a multiple of 4 (headers read for this page).
+- **The entry's fields:** EA's `DLLInterface.h`; the launcher's cameo click tests four of the flags (see
+  [Launcher key commands and superweapon clicks](../clientg-ram/launcher-key-commands-and-clicks.md)).
 - **Observed only:** that a loose DDS doesn't override a stock region, when a TGA does.
 
 > [!TIP]

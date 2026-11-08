@@ -6,7 +6,7 @@ holds_for: Steam build 21590013
 clientg_version: 1.153 (745903)
 clientg_sha256: d405ed389548be51c67740bb6309de10a5f02bdfc86324a10c9ad3b663c08897
 status: verified
-unproven: [build hotkeys for new types and the superweapon "Cost" line by the same route (not tried), what the launcher does with the other fields of its sidebar-entry copy]
+unproven: [build hotkeys for new types and the superweapon "Cost" line by the same route (not tried), what the launcher does with the cost, power and build-time fields of its sidebar-entry copy]
 ---
 
 > [!NOTE]
@@ -86,8 +86,11 @@ select-all is coming, and can drop the objects it shouldn't take from the select
 ## Superweapon cameos: one click, no cursor
 
 **The click handler.** A left click on a sidebar cameo runs `0x73E950` (a right click runs `0x73EDF0`). It reads
-the launcher's own copy of the sidebar entry: `+0x18` is the entry's `BuildableType`, `+0x1C` its `BuildableID` and
-`+0x20` its `Type` (`DllObjectTypeEnum`). At `0x73EA39` it tests the type:
+the launcher's own copy of the sidebar entry: `+0x18` is the entry's `BuildableType`, `+0x1C` its `BuildableID`,
+`+0x20` its `Type` (`DllObjectTypeEnum`) and `+0x24` its `SuperWeaponType`. The four state flags are bytes:
+`+0x44` `Completed`, `+0x45` `Constructing`, `+0x46` `ConstructionOnHold` and `+0x47` `Busy`. The copy follows the
+order of EA's `CNCSidebarEntryStruct`, with the name held as a 24-byte `std::string` at `+0x00` and the placement
+list as a 12-byte vector at `+0x38`. At `0x73EA39` it tests the type:
 
 ```
 0x73EA39  8B 4E 20            mov ecx, [esi+20h]      ; Type
@@ -95,11 +98,12 @@ the launcher's own copy of the sidebar entry: `+0x18` is the entry's `BuildableT
           0F 85 92 01 00 00   jne 0x73EBD7
 ```
 
-- **A superweapon, ready:** the launcher plays "select target" and opens its targeting cursor. Nothing reaches the
-  DLL until the map click (`SUPERWEAPON_REQUEST_PLACE_SUPER_WEAPON`) or the cancel (`SIDEBAR_CANCEL_PLACE` at
-  -1, -1).
+- **A superweapon, ready** (`Completed` set): the launcher plays "select target" and opens its targeting cursor.
+  Nothing reaches the DLL until the map click (`SUPERWEAPON_REQUEST_PLACE_SUPER_WEAPON`) or the cancel
+  (`SIDEBAR_CANCEL_PLACE` at -1, -1).
 - **A superweapon, not ready:** a sound at most. Nothing reaches the DLL.
 - **Anything else:** the build path, which sends `START_CONSTRUCTION` with the entry's type and ID at `0x73ECE9`.
+  It goes there at once when the entry is neither busy nor constructing, and also when it's on hold.
 
 **The patch.** Replace the 12 bytes at `0x73EA39` with a jump to the cave. There, redo the original test, and for
 each superweapon that should act on one click (`BuildableType` the special type, `BuildableID` its number), jump to
@@ -108,7 +112,10 @@ each superweapon that should act on one click (`BuildableType` the special type,
 "Ready" label.
 
 **The launcher's input mode** is a global at `0x20F1C90`: 0 idle, 4 aiming a superweapon, 5 placing a building.
-The function that opens the cursor (`0x1689200`) sets it, and so does its twin `0x1689130`. Aiming never reaches
+The function that opens the cursor (`0x1689200`) sets it, after storing the entry's type, ID, name and superweapon
+type for the map click to send. Its twin `0x1689130` sets it too: that one runs when the DLL asks for a target with
+`CALLBACK_EVENT_SPECIAL_WEAPON_TARGETTING`, which EA's Red Alert sends for the Chronosphere's second step (picking
+where the unit goes) and the Chrono Tank's jump. Aiming never reaches
 the simulation (observed): with every DLL export logged, the traffic while a player aimed matched idle. So
 anything that should show only while a player aims, such as a range ring, has to read this global from inside that
 player's launcher.
@@ -149,6 +156,14 @@ zero first.
   the input events are in EA's `DLLInterface.h`.
 - **The click handler:** the bytes above read from disk; `0x0B` is `SPECIAL` in EA's `DllObjectTypeEnum`; the
   cursor function's writes of 0, 4 and 5 to `0x20F1C90` disassembled for this page.
+- **The entry copy's fields:** the handler's byte tests of `+0x44` to `+0x47` and the cursor function's reads of
+  `+0x18`, `+0x1C` and `+0x24`, disassembled for this page, line up with EA's `CNCSidebarEntryStruct`
+  (`DLLInterface.h`) once the name is a `std::string` (the cursor function checks its capacity at `+0x14`) and the
+  placement list a vector. A working mod's notes give the same offsets.
+- **The twin:** `0x1689130` has one caller, in the launcher's event handling, which passes it the targeting event's
+  four fields (type, ID, name, superweapon type). EA's `On_Special_Weapon_Targetting` sends that event, and its
+  only callers in Red Alert are the Chronosphere's second step (`HOUSE.CPP`, `SPC_CHRONO2`) and the Chrono Tank
+  (`UNIT.CPP`).
 - **In play:** a released mod routes deploy, camera-to-yard and both select-alls this way, and fires two
   superweapons on one click, on Linux under Proton and on the Steam Deck, in skirmish and in a LAN game with a
   joiner. The aiming traffic, the tab rule and the stock keys' name tests are that mod's records (observed).

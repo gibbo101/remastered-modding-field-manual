@@ -86,6 +86,20 @@ TD's terrain tilesets then load in Red Alert, and each one's tiles come straight
 5. **Send TD's tile names on a TD theatre.** For each cell, the DLL exports a template name, which the launcher
    looks up in the theatre's tileset. On a TD theatre, send TD's own name (`SH17`, not whatever your DLL calls
    it). Send any cell the TD tileset can't draw as `CLEAR1`, which every terrain tileset has.
+6. **Add TD's desert objects.** Red Alert has no terrain types for TD's desert trees and rocks: `T04`, `T09`, `T18`
+   and `ROCK1` to `ROCK7` are TD-only (`TERRAIN_TREE4`, `_TREE9`, `_TREE18`, `_ROCK1` to `_ROCK7`, all
+   `THEATERF_DESERT` in TD's `TDATA.CPP`). Add them as Red Alert terrain types with TD's footprints, loaded on the
+   desert theatre from TD's classic shapes.
+
+## TD's own map files
+
+To play TD's maps on these theatres, convert their terrain. A TD map keeps its terrain in a `.BIN` file beside its
+INI: 64 × 64 cells, two bytes each (the template's number, then the icon), with 255 meaning no template
+(`MapClass::Read_Binary` in TD's `MAP.CPP`). Red Alert keeps terrain in the INI's `[MapPack]` section instead, laid
+out on [Bigger maps](../maps-and-lobby/bigger-maps.md#map-files). TD's HD terrain is one DDS per icon in
+`TEXTURES_TD_SRGB.MEG`, named `<NAME>.<SUFFIX>-<icon>.DDS` (`S01.TEM-0000.DDS`). Tiles with water in them (shores,
+rivers, fords, falls and bridges) ship 8 frames per icon instead, `<NAME>.<SUFFIX>-<icon>-<frame>.DDS`, the frame
+numbered 00 to 07 or 0000 to 0007.
 
 ## Traps
 
@@ -110,6 +124,11 @@ Each claim was checked three ways:
   `DLLInterface`, and `Theaters[]`;
 - against a working mod. For each of the six theatres it generated a map with every template placed once. All six
   drew every template and units spawned. It was played under Proton on Linux and on the Steam Deck, LAN included.
+
+The desert objects are missing from EA's Red Alert `DEFINES.H` and present, flagged for desert, in TD's; a working
+mod adds them and its desert maps place them. The `.BIN` layout is EA's TD `MAP.CPP` (`TemplateType` is a byte in
+TD's `DEFINES.H`, the map 64 × 64), and a working mod's converter reads TD's maps with it. The HD names were listed
+from `TEXTURES_TD_SRGB.MEG` for this page.
 
 > [!TIP]
 > **In Tiberian Factions**

@@ -72,6 +72,10 @@ Inside the launcher's own process: `VirtualProtect` the range to `PAGE_EXECUTE_R
 restore the old protection, then `FlushInstructionCache`. To patch from another process, use the same steps with
 `VirtualProtectEx` and `WriteProcessMemory`.
 
+**ClientG's addresses are fixed.** It always loads at its preferred base, `0x400000`: its relocation table is
+stripped and it doesn't opt in to address randomisation (`DYNAMIC_BASE`). So an address on these pages is the same
+on every machine running this client, and a hook can use it as a constant.
+
 ## Three hook shapes
 
 - **Redirect a call.** At a `call rel32` (`E8` + offset), first check that the existing offset points at the stock
@@ -116,6 +120,9 @@ launcher may still be loading at the first.
 
 - **The two processes:** the exports each executable names (above), EA's `CNC_Version` in `DLLInterface.cpp`, and
   the DLL's own load seen inside ClientG.
+- **The fixed base:** `objdump -p ClientG.exe`: `ImageBase 00400000`, "relocations stripped", an empty base
+  relocation directory and `DllCharacteristics 0x8100` (no `DYNAMIC_BASE`). A working mod's hooks use the addresses
+  as constants, on Linux and on the Deck.
 - **The hooks:** each hook shape above runs in a shipped mod's release builds, against the client in the box, on
   Linux under Proton and on the Steam Deck. Both machines' `ClientG.exe` hash the same.
 - **Every LAN player patched:** checked in a LAN game, with a Deck hosting and a desktop joining. Each launcher's

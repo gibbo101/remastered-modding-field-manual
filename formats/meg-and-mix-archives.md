@@ -112,7 +112,8 @@ Red Alert's top-level archives add a 4-byte header and encrypt their index:
    are a Blowfish key.
 3. **The index.** Blowfish-ECB decrypts the index: `u16` count, `u32` data size, then 12-byte entries as in a
    classic MIX. It spans whole 8-byte blocks, `roundup8(6 + 12 × count)` bytes, so decrypt one block first to learn
-   the count.
+   the count. It's standard Blowfish, with each 8-byte block read as two big-endian 32-bit words, so any stock
+   Blowfish library decrypts it with the key from step 2.
 4. **The data** follows the encrypted index, and is not encrypted.
 
 Archives nest. `MAIN.MIX` and `REDALERT.MIX` hold other MIXes as ordinary entries, usually classic and
@@ -124,7 +125,7 @@ In `Data/CNCDATA/RED_ALERT/CD1/`:
 
 | Archive | Holds |
 |---|---|
-| `REDALERT.MIX` | 6 nested MIXes. `LOCAL.MIX` among them holds `rules.ini` (59,867 bytes) and 48 `.lut` colour tables. |
+| `REDALERT.MIX` | 6 nested MIXes, about 25 MB (the archive is 25,046,328 bytes). `LOCAL.MIX` among them holds `rules.ini` (59,867 bytes) and 48 `.lut` colour tables. |
 | `EXPAND2.MIX` | Aftermath's new units' art (the Chrono, Tesla and MAD tanks and others), `aftrmath.ini`, `mplayer.ini`, `mission.ini` and `tutorial.ini`. 32 entries, no nested MIX. |
 | `MAIN.MIX` | 12 nested MIXes, about 454 MB: `MOVIES1.MIX` (369 MB), `SCORES.MIX`, `GENERAL.MIX` (the scenarios), the theatre MIXes (`TEMPERAT`, `SNOW`, `INTERIOR`), `CONQUER.MIX`, `SOUNDS.MIX`, `ALLIES.MIX`, `RUSSIAN.MIX` and the editor's two. |
 
@@ -154,7 +155,9 @@ registered there.
 - **Red Alert's outer MIX:** the flags of every MIX in the install's `CNCDATA/RED_ALERT/` folders, read for this
   page (the table above). The key chain mirrors
   EA's `PK.CPP`, `BLOWFISH.CPP` and `MIXFILE.H`, and a working mod's reader extracts Red Alert's `PALETTE.CPS`
-  with it.
+  with it. The word order is EA's `BLOWFISH.CPP` (its `Int` union puts byte 0 in the most significant place) and
+  Vanilla Conquer's copy; that reader uses a stock Blowfish library, and `REDALERT.MIX`'s index decrypts with it
+  (its six nested MIXes add up to 25,046,164 bytes).
 - **Where Red Alert's files are:** `REDALERT.MIX`, `LOCAL.MIX`, `EXPAND2.MIX` and `MAIN.MIX` listed for this page
   with a working mod's reader (every name resolved), and `rules.ini` extracted and read; the same layout in that
   mod's MIX notes; EA's `INIT.CPP` for the names it loads.

@@ -52,8 +52,9 @@ builds in code: a per-game prefix with the tab's state appended (`..._OFF` and s
 | `UI_Sidebar_TabIcon_Supers_` (`0x1C21750`) | `UI_RA_Sidebar_TabIcon_Supers_` (`0x1C217D0`) |
 
 Red Alert always uses its own prefix, whichever HUD scene is showing. So a faction on TD's scene got TD's sidebar
-with Red Alert's tab icons, squashed into TD's smaller tabs. Rewriting the four Red Alert strings to TD's makes
-every tab state come out with TD's names.
+with Red Alert's tab icons, squashed into TD's smaller tabs: Red Alert's tab icons are 130 × 64 atlas regions, and
+TD's are 60 high and mostly 100 wide (TD's vehicle tab states are 122 and 127). Rewriting the four Red Alert strings
+to TD's makes every tab state come out with TD's names.
 
 ## The method
 
@@ -83,9 +84,9 @@ the bare TD string. That finds TD's genuine prefix a few bytes away, and overwri
 ## Two routes that didn't work
 
 - **Re-pointing the drawn records** (as on [Re-pointing launcher UI art in memory](repointing-atlas-regions.md))
-  works for the moment it runs. But each tab state's record is only created when that state first draws (first
-  hover, first "ready", placement), so each state shows the wrong art until the next heap scan. Scanning often
-  enough to hide that slows the game.
+  works for the moment it runs (twelve records: four tabs, three states each). But each tab state's record is only
+  created when that state first draws (first hover, first "ready", placement), so each state shows the wrong art
+  until the next heap scan. Scanning often enough to hide that slows the game.
 - **Patching the atlas lookup table** fixes records made afterwards, but still misses states created before the
   patch, and needs the same heap scan.
 
@@ -96,10 +97,11 @@ search `ClientG.exe`'s strings for the name family.**
 
 - **The strings and their places:** read from `ClientG.exe` on disk. All eight prefixes are in `.rdata`, a
   read-only section, at the addresses above. Both prefixes' tab regions are in the stock atlas map
-  (`MT_COMMANDBAR_COMMON.MTD`).
+  (`MT_COMMANDBAR_COMMON.MTD`), where every `UI_RA_SIDEBAR_TABICON_*` region is 130 × 64 and the TD ones are
+  100 × 60, 122 × 60 and 127 × 60.
 - **The method:** a shipped mod rewrites the four prefixes at each match start, and was checked both ways in one
   launch: TD's tab art in every state on TD's scene, including placement, and Red Alert's art back again for an
-  Allied player. Its doc records the two failed routes.
+  Allied player. Its doc records the two failed routes, and its history holds the twelve-record route's code.
 - **LAN:** each player's launcher runs the rewrite for itself. See
   [Patching the launcher's code from your DLL](patching-the-launchers-code.md).
 
