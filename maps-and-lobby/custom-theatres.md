@@ -151,7 +151,7 @@ size of the extra tiles, tilesets load whole. If it doesn't rise, only drawn til
   `_Watcom_Ugh_Hack`, the iconset fetch and the `Land_Type` modulo in `CDATA.CPP`, and `Get_Template_Info` in
   `CELL.CPP`. A working mod registered seven new templates at 401 to 407 this way, and they loaded unplaced; its
   converted TD iconsets crashed `Land_Type` until their header was rewritten in Red Alert's layout.
-- **Reskinning existing names:** Reilsss's Desert mod (Workshop 2833233740) ships 8,305 loose `.DDS` frames at
+- **Reskinning existing names:** Reilsss's Desert mod (Workshop 2833233740) ships 8,304 loose `.DDS` frames at
   stock template paths and per-map `TILEPATCHES`, with no DLL. A shipped mod's tileset XML names `.tga` frames that
   ship only as `.DDS`, and they draw. The tile and name counts were read from the stock tilesets for this page.
 - **The tileset index:** the stock `TILESETS.XML` in `CONFIG.MEG`, read for this page.

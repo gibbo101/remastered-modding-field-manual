@@ -63,7 +63,8 @@ extent is about 0.81 of its side-on length), but a hull's height inflates that r
   unit SHPs and most cameos in `CONQUER.MIX` (the rest in the per-side sidebar archives, `SIDEC01.MIX` for GDI and
   `SIDEC02.MIX` for Nod), building SHPs in the theatre MIXes, palettes in `CACHE.MIX`. The Firestorm expansion's
   own files are in `expand01.mix`: its voxels and build-up SHPs at the top level, its other SHPs in the inner
-  `ECACHE01.MIX`, its cameos in `E01SC01.MIX`, and its rules in `FIRESTRM.INI`.
+  `ECACHE01.MIX` (the EMP cannon's cameo `MEMPICON.SHP` among them), the inner `E01SC01.MIX` holds just two entries
+  (the Mobile War Factory's cameo `MWARICON.SHP` is one), and its rules are in `FIRESTRM.INI`.
 - **Theatre letters in building names.** A building whose art changes by theatre (`NewTheater=yes` in `ART.INI`) is
   named for one theatre, and the game swaps the second letter: `ART.INI` names `GADEPT` (the Service Depot), and the
   files are `GTDEPT.SHP` in the temperate archives and `GADEPT.SHP` in the snow ones. The swap applies to names

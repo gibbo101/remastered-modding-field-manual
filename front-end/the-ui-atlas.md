@@ -80,7 +80,7 @@ Most lost time here is spent repainting the wrong region. Several look alike:
 | What you see | Region | Keyed by |
 |---|---|---|
 | The radar crest, in a match | `UI_SIDEBAR_FACTIONLOGO_ALLIES` / `_SOVIET` (794 × 713) in Red Alert's HUD; `_GDI` (718 × 706, at 1, 1875) / `_NOD` (660 × 660, at 3778, 2221) in TD's | side, and the HUD scene |
-| The big side logo in the skirmish lobby | `RA_UI_MULTIPLAYER_ALLIED_LOGO_LARGE_NORMAL` and its `_HOVER` / `_SELECTED` versions | side |
+| The big side logo in the skirmish lobby | `RA_UI_MULTIPLAYER_ALLIED_LOGO_LARGE_NORMAL` and its `_HOVER` / `_SELECTED` versions (the Soviet and Random logos name theirs `_HOVERED`) | side |
 | A country's flag in lobby lists | `RA_UI_FLAG_ICON_<COUNTRY>` (73 × 40) | country |
 | The small logo on waypoint and rally markers | `RA_UI_ALLIED_LOGO_SMALL` (25 × 19) / `RA_UI_SOVIET_LOGO_SMALL` (21 × 18) | side |
 | A faction's emblem in the lobby picker | `UI_MULTIPLAYER_PLAYERSLOT_FACTION_<nn>` with `_ON` / `_OVER`: `_00` and `_01` (66 × 56) are TD's GDI and Nod, `_03` to `_10` (150 × 80) Red Alert's eight countries, and there is no `_02` | the picker row, via `FACTIONS.XML` |

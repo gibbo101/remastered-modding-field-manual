@@ -95,7 +95,7 @@ mission's map (`override_map_name` in `CNC_Start_Instance_Variation`).
    game.
 3. **Cover the lobbies too.** The skirmish screen launches through the send above, but LAN and Steam matchmaking
    lobbies build their own launch message (`IPCLaunchInstanceMessage`, instance name at `+0x30`) and send it
-   straight to the server. Hook those two sends and rename D6 in place.
+   straight to the server. Hook those two sends too: when one names one of your entries, rename it to D6 in place.
 4. **Make every client read D6 as your entry.** The server tells every client to load D6. Hook the instance key
    lookup so that D6 resolves as whichever of your entries the client last showed or launched. A LAN joiner never
    launched anything, so for them it's the entry their lobby last showed. The loading screen then names the right
