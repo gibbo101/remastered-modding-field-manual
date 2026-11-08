@@ -58,6 +58,13 @@ Both columns are zero on the same lands, so the two types can share one movement
    that floods it by the hover speed type, and make `TechnoTypeClass::Read_INI` set `MZone` to it for hover units,
    as it already sets `MZONE_WATER` for ships. With the unit's zone spanning the shore, the pathfinder, move
    orders, target choice and nearby-cell searches all accept cross-shoreline moves without touching each one.
+   Each of them compares zones through the type's own zone (`Zones[Techno_Type_Class()->MZone]`, or
+   `Class->MZone`): in `FOOT.CPP`, `Basic_Path`, `Approach_Target`, both `Active_Click_With`s and
+   `Per_Cell_Process`; in `TECHNO.CPP`, `Evaluate_Object`, `Evaluate_Cell`, `Greatest_Threat`, `Nearby_Location`,
+   `Is_In_Same_Zone`, `Base_Is_Attacked` and `Find_Docking_Bay`; and in `UNIT.CPP`, `Can_Enter_Cell`,
+   `Tiberium_Check` and `Find_Best_Refinery`. Two checks name a zone outright, so a hover zone doesn't reach them:
+   `HouseClass::Where_To_Go` (`MZONE_NORMAL`) and a trigger action's waypoint test in `TACTION.CPP`
+   (`MZONE_CRUSHER`).
 5. **Every zone rebuild:** EA's callers pass explicit masks (`Zone_Reset(MZONEF_NORMAL|MZONEF_CRUSHER)` when a wall
    is built or sold, `MZONEF_NORMAL|MZONEF_CRUSHER|MZONEF_DESTROYER` when terrain crumbles). Add `MZONEF_HOVER` to
    each, or hover zones keep walls that are gone.
@@ -80,6 +87,10 @@ Both columns are zero on the same lands, so the two types can share one movement
   (`Zone_Span` flooding by `SPEED_TRACK` or `SPEED_FLOAT`), `TECHNO.CPP` (`MZone` set for ships only, and
   `Can_Teleport_Here`), `CELL.H` (`Zones[MZONE_COUNT]`), and the explicit masks in `CELL.CPP`, `HOUSE.CPP` and
   `TERRAIN.CPP`. Vanilla Conquer's copies match.
+- **The zone gates:** `grep -a` for `Zones[` over EA's Red Alert source gives the list in step 4, each reading the
+  zone through the type's `MZone`, apart from the fixed `MZONE_NORMAL` in `HOUSE.CPP`'s `Where_To_Go` and
+  `MZONE_CRUSHER` in `TACTION.CPP`; Vanilla Conquer's copies match; the working mod's hover units pass all of them
+  through `MZONE_HOVER` with none of them changed.
 - **TS's model:** TS's `RULES.INI` (`[HVR]` `SpeedType=Hover`, `[APC]` `SpeedType=Amphibious` and
   `MovementZone=AmphibiousCrusher`, and the `Hover=` and `Amphibious=` columns in every land section).
 - **A working mod:** a Hover MLRS and an Amphibious APC built this way, with `MZONE_HOVER` shared by both, the new

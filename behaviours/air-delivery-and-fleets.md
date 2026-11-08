@@ -71,6 +71,11 @@ A new `SpecialWeaponType` falls to `SW_UNKNOWN` there, so add a case:
 - **An aircraft with no `rules.ini` section** gets a speed of zero and never moves.
 - **A null `ImageData`** makes an aircraft invisible, as for any unit.
 - **Opening a stock building to a new owner** leaks its roster and superweapons.
+- **A carrier that sets its load down** (Tiberian Sun's Carryall) has to place it at its own exact coordinate.
+  Snapping to the cell's centre slid the load most of a cell in one frame. Lift the landed carrier off the map
+  (`Mark(MARK_UP)`) while the load is placed, and put it back after (`MARK_DOWN`). Otherwise the carrier occupies
+  the cell, the load's `UnitClass::Can_Enter_Cell` refuses it, and a search for a free cell nearby puts it a cell
+  away.
 - **A short-range aircraft weapon never attacks.** An attacking aircraft that isn't fixed-wing (fixed-wing ones hunt
   instead) picks where to fire from with `AircraftClass::Good_Fire_Location`, whose ring search starts a cell inside
   the weapon's range and stops a cell from the target (`for (r = range-0x0100; r > 0x0100; ...)`). For a weapon of
@@ -91,6 +96,11 @@ A new `SpecialWeaponType` falls to `SW_UNKNOWN` there, so add a case:
   `Good_Fire_Location`'s loop, and `PICK_ATTACK_LOCATION` falling to `RETURN_TO_BASE` when it returns nothing), the
   same in Vanilla Conquer, and the working mod's Orca Bomber, whose 1.5-cell bombs needed the target cell as the
   firing spot.
+- **The set-down:** EA's `UNIT.CPP` (`Can_Enter_Cell` returning a blocked result for a cell another object
+  occupies) and `FOOT.CPP` (`FootClass::Mark`, whose `MARK_UP` takes a grounded object out of its cell with
+  `Map.Pick_Up`), and the working mod's Carryall, whose set-down lifts the carrier with `MARK_UP`, places the load at
+  the carrier's coordinate, and falls back to `Nearby_Location` only when `Can_Enter_Cell` still refuses. The
+  one-frame slide and the push into the next cell were seen in play.
 - **A working mod:** cargo-plane delivery at its Nod airstrip, its GDI and Nod navies and airfield, and its Nod
   paratroops and recon flight, shipped and played under Proton on Linux and on the Steam Deck. The roster leak was hit
   in its first navy and A-10 builds and reverted.

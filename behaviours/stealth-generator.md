@@ -40,7 +40,9 @@ A generator only has to decide **who may cloak**. The machine does the rest.
    It re-cloaks after the threat has gone.
 
 Hidden objects stay hidden from the AI too, since `Is_Cloaked` hides them from every non-ally, players and AI alike.
-And when an object starts to cloak, `Do_Cloak` calls `Detach_All`, so enemies already targeting it lose it.
+And when an object starts to cloak, `Do_Cloak` calls `Detach_All(false)`, so everything already targeting it loses
+it. That reaches friends too: `FootClass::Detach` also clears any unit's destination (`NavCom`) on the object.
+Radio contact survives, since only `Detach_All(true)` breaks it.
 
 ## What the engine gives you
 
@@ -54,6 +56,10 @@ And when an object starts to cloak, `Do_Cloak` calls `Detach_All`, so enemies al
 - **Some reveals are built in.** A cloaked object shimmers when it takes damage (`TechnoClass::Take_Damage`), when
   a vehicle's move is blocked by it (`MOVE_CLOAK` in `DRIVE.CPP` shimmers the cell, so units walking into a hidden
   base seem to detect it), and while it carries a captured flag.
+- **`Visual_Character` tells the viewers apart.** For a settled cloak, `TechnoClass::Visual_Character` returns
+  `VISUAL_SHADOWY` when the player being drawn for owns the object, and `VISUAL_HIDDEN` for everyone else. It picks
+  how `Techno_Draw_Object` draws each shape, so it's the test to use for anything tied to a cloaked object that
+  only some players should see, such as its bib. The object export also carries the raw `Cloak` state.
 - **Both transitions need the flag.** `Do_Cloak` acts only on an object that's `IsCloakable` and uncloaked or
   uncloaking; `Do_Uncloak` only on one that's `IsCloakable` and cloaked or cloaking. Clear `IsCloakable` before the
   uncloak has finished and the object stays as it is.
@@ -81,7 +87,8 @@ And when an object starts to cloak, `Do_Cloak` calls `Detach_All`, so enemies al
   once an object is uncloaked, since `Do_Uncloak` does nothing without it.
 - **A helipad never cloaked.** It's always in radio contact with its parked helicopter, and a "don't cloak while in
   radio contact" rule held it visible. Block cloaking only while the partner is actually moving. Aircraft need their
-  own cover pass too.
+  own cover pass too. The rule is still needed for a partner on its way in: a building that starts to cloak clears
+  the destination of a harvester or aircraft heading to it (above), stranding it.
 - **Footprints with holes.** Finding which building owns a bib has to walk the building's real footprint, holes and
   all, or some bibs float uncovered.
 
@@ -91,6 +98,12 @@ And when an object starts to cloak, `Do_Cloak` calls `Detach_All`, so enemies al
   guards and `Detach_All`, `Cloaking_AI`, the `CloakDelay` wait, the shimmer in `Take_Damage`), the `IsCloakable`
   copy in `UNIT.CPP`, `INFANTRY.CPP` and `VESSEL.CPP` but not `BUILDING.CPP`, and the one-way scanner shimmer in
   `FOOT.CPP`; Vanilla Conquer's copies match.
+- **Viewers and destinations:** EA's `TECHNO.CPP` (`Visual_Character`'s `CLOAKED` branch on `Is_Owned_By_Player`,
+  and `Techno_Draw_Object` switching on it; `Do_Cloak` calling `Detach_All(false)`; `TechnoClass::Detach` sending
+  `RADIO_OVER_OUT` only when `all` is set), `FOOT.CPP` (`FootClass::Detach` clearing a matching `NavCom`),
+  `TRACKER.CPP` (`Detach_This_From_All` walking every house's objects) and `DLLInterface.cpp` (the export copying
+  `Cloak`); the same in Vanilla Conquer; and the working mod, which hides a cloaked building's bib when
+  `Visual_Character` is `VISUAL_HIDDEN`, and holds a building's cloak while its radio partner has a `NavCom`.
 - **Detectors and the delay:** EA's `TECHNO.CPP` (`Sensors=` read into `IsScanner`), `IDATA.CPP` and `VDATA.CPP`
   (`IsScanner = true` for every infantry and vessel type), `RULES.CPP` (`CloakDelay` read from `SubmergeDelay`) and
   `DRIVE.CPP` (`MOVE_CLOAK` shimmering the cell); the stock `rules.ini`'s `SubmergeDelay=.02`. The working mod gives

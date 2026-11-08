@@ -40,6 +40,15 @@ keys its resource pips off that range. A new overlay outside it gets no pips. Tw
 overlay ("In normal game mode, all overlays are not buildable"), so ore, gems and a new resource all block
 placement. A field left to spread can close off every legal cell near a construction yard.
 
+**Growth follows the lobby's Tiberium option.** `CellClass::Can_Tiberium_Grow` and `Can_Tiberium_Spread`
+(`CELL.CPP`) return false outside the campaign (`Session.Type != GAME_NORMAL`) while the lobby's Tiberium option is
+off, so in skirmish and multiplayer nothing grows or spreads with it off. Both tests also name the four ore overlays
+(`OVERLAY_GOLD1`–`OVERLAY_GOLD4`), which is why gems never grow: a new resource that should grow has to be added to
+both. The map scans `MAP_CELL_TOTAL / (Rule.GrowthRate * TICKS_PER_MINUTE)` cells a frame (`MapClass::Logic`,
+`MAP.CPP`), so the whole map once every `GrowthRate` minutes (`[General]` in `rules.ini`). In a Remastered
+multiplayer or skirmish match (`GAME_GLYPHX_MULTIPLAYER`) that count is multiplied by the option's value when it's
+above 1, so a higher lobby setting grows faster.
+
 **Keep the fields apart.** Make sure Tiberium and ore never convert each other where their fields meet, in the
 spread code. Stock spreading always plants ore, whatever the source cell holds (see
 [A new resource on the official skirmish maps](../maps-and-lobby/official-maps-with-tiberium.md)).
@@ -76,6 +85,11 @@ TD turns some infantry killed by Tiberium into Visceroids, hostile to everyone.
 - **Placement:** EA's `CELL.CPP` (`Is_Clear_To_Build` returning false for any overlay unless `Debug_Map`), the same
   in Vanilla Conquer, and a working mod's long test matches, where spreading Tiberium left no legal cell near the
   yard.
+- **Growth and the lobby option:** EA's `CELL.CPP` (`Can_Tiberium_Grow` and `Can_Tiberium_Spread`: the
+  `Session.Options.Tiberium` test outside `GAME_NORMAL`, and the `OVERLAY_GOLD1`–`OVERLAY_GOLD4` list), `MAP.CPP`
+  (`MapClass::Logic`'s scan count and the `GAME_GLYPHX_MULTIPLAYER` multiplier) and `RULES.H` (`GrowthRate`, minutes
+  between growth steps); the same in Vanilla Conquer; and a working mod that adds its Tiberium overlay to both tests
+  and grows it only with the option on.
 - **TD's behaviour:** EA's TD `INFANTRY.CPP` (2 damage on reaching a cell's centre, not for `INFANTRY_E5`), and
   `HOUSE_JP` in Red Alert's `DEFINES.H`.
 - **A working mod:** Tiberium as its own overlay, blossom trees, infantry damage and Visceroids, shipped and played

@@ -4,7 +4,7 @@ description: An EMP that disables vehicles and buildings for a time, ported from
 tags: [behaviours, emp, stun, superweapons, detection, tiberian-sun, dll]
 holds_for: Steam build 21590013
 status: verified
-unproven: []
+unproven: [whether a TS pulse spares an aircraft parked on a helipad, since its aircraft pass has no building test]
 ---
 
 > [!NOTE]
@@ -28,15 +28,25 @@ From OpenTS's `empulse.cpp` (`EMPulseClass::Create`) and TS's `RULES.INI`:
 
 - **The weapon's damage is the duration.** `[EMPulseWeapon]` has `Damage=1200`, commented "Damage is duration for EM
   Pulse". The warhead's `Spread=11` is the radius in cells.
-- **Inside the circle:** grounded aircraft crash; underground units lose power and stop; buildings lose power for
-  the duration; vehicles and aircraft with a locomotor are stunned. Plain infantry are untouched (only cyborgs are
-  stunned), and Visceroids are immune.
+- **Inside the circle:** grounded aircraft crash (by distance, below); underground units lose power and stop;
+  buildings lose power for the duration; vehicles and aircraft with a locomotor are stunned. Plain infantry are
+  untouched (only cyborgs are stunned), and Visceroids are immune.
+- **Aircraft are a separate pass, by distance.** Before the cell walk, every aircraft that's on the map, out of
+  limbo and not in the air (`IsDown && !IsInLimbo && !In_Air()`) crashes if its centre is within `Spread` cells'
+  worth of leptons of the pulse's centre (`Spread * CELL_LEPTON`). That's a distance test, not the cell circle, and
+  it has no building check.
 - **Who's spared:** the object that fired the pulse; a building whose centre cell is outside the circle, even if
-  part of it is inside; and anything in a cell that holds a building, since such a cell affects only the building, so
-  aircraft parked on a pad come through. Limpet mines in the circle are destroyed rather than stunned.
-- **The stun counts down** on each object (`StunDuration`), with TS's `EMPulseSparkles` animation (`EMP_FX01`)
-  attached. While it runs the object can't move, fire or deploy. A stunned factory still produces, since TS's
-  production tests read a flag the pulse leaves set. At zero, a building's power comes back.
+  part of it is inside; and anything else in a cell that holds a building, since the cell walk affects only the
+  building there. Core defenders (`IsCoreDefender`, Firestorm's Core Defender), building or unit, are neither
+  stunned nor powered off. Limpet mines in the circle are destroyed rather than stunned.
+- **The stun counts down** on each object (`StunDuration`). While it runs the object can't move, fire or deploy. A
+  stunned factory still produces, since TS's production tests read a flag the pulse leaves set. At zero, a
+  building's power comes back.
+- **The sparks** are TS's `EMPulseSparkles` animation (`EMP_FX01`), attached to every stunned vehicle, aircraft,
+  cyborg and digger. A building gets them only when `Is_Mobile_Deployer()` is true, that is the deployed form of a
+  mobile unit (the sensor array, tick tank, artillery, mobile stealth, Juggernaut and ICBM launcher), placed a
+  quarter-cell along each map axis from its centre and half a height level up. Each spark anim starts after a random
+  delay of 0 to 25 frames, and `[EMP_FX01]` `LoopCount=-1` in `ART.INI` keeps it looping.
 - **No lingering field.** The pulse marks its cells, but nothing reads the mark: a unit driving in afterwards is
   unaffected. Only each object's own timer matters.
 
@@ -82,12 +92,23 @@ cloaked ones attackable through the copy (the cell carries the attack action), a
   that skips everything else in it, the cyborg-only infantry rule, `StunDuration`, and `IsAffectedByEMP`, which is
   only ever cleared), and TS's `RULES.INI` (`[EMPulseWeapon]` `Damage=1200`, `[EMPuls]` `Spread=11`,
   `[EMPulseSpecial]`, `[AudioVisual]` `EMPulseSparkles=EMP_FX01`).
+- **The aircraft pass, core defenders and sparks:** OpenTS's `empulse.cpp` (the aircraft loop ahead of the cell
+  walk, with its `Spread * CELL_LEPTON` distance test; the two `IsCoreDefender` branches; the sparks on every stunned
+  foot object and on buildings only behind `Is_Mobile_Deployer()`, offset `CELL_LEPTON_W / 4`, `CELL_LEPTON_H / 4`
+  and `LEVEL_LEPTON_H / 2`, each created with `Random_Pick(0, 25)` as the `AnimClass` start delay), `builtype.cpp`
+  (`Is_Mobile_Deployer`'s list) and `anim.cpp` (a `LoopCount` of -1 stored as 255, the count that never runs
+  down); TS's `FIRESTRM.INI` (`IsCoreDefender=yes` on `[DEFENDER]` and `[DDEFD]`, both "Core Defender") and
+  `ART.INI` (`[EMP_FX01]` `LoopCount=-1`); and the working mod's pulse, which uses the same quarter-cell offset and
+  0 to 25 delay for its sparks. The aircraft pass is OpenTS's reading of TS, not tested in TS itself.
 - **What keeps running:** in OpenTS the pulse calls a building's `Power_Off`, which leaves `IsOn` set, and
   `Power_Output` and `Who_Can_Build_Me` (the factory and construction yard test) read `IsOn`, never the stun timer.
 - **The stun gates:** EA's `EVENT.CPP` (the `MEGAMISSION`, `IDLE`, `SCATTER` and `PRIMARY` orders), and the working
   mod's code, which gates exactly those four.
 - **A working mod:** the E.M. Pulse Cannon, a Mobile EMP and the Mobile Sensor Array in its release, played under
   Proton on Linux and on the Steam Deck.
+- **Unproven:** whether a TS pulse spares an aircraft parked on a helipad. The cell walk skips everything else in a
+  building's cell, but the aircraft pass runs first with no building test, so a parked aircraft survives only if
+  `In_Air()` is true on the pad.
 
 > [!TIP]
 > **In Tiberian Factions**

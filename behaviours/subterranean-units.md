@@ -28,7 +28,9 @@ digging units doesn't need this page.
 OpenTS's `tunnel.cpp` reconstructs TS's `TunnelLocomotionClass`, and its `unit.cpp` the drive-or-dig decision:
 
 - **Dig unless a short surface route exists.** TS digs on a move order unless the destination is in the same zone,
-  within 12 cells, and reachable by a short trial walk. It never digs to an adjacent cell.
+  within 12 cells, and reachable by a short trial walk. It never digs to an adjacent cell. The numbers, from
+  `UnitClass::Is_Route_Broken`: the larger of the X and Y distances (the Chebyshev distance) under 12, both ends
+  inside the playable map, and a trial walk (`Test_Cell_Walk`) of 15 cells or fewer.
 - **Underground travel is a straight line** through any terrain, water included, at a fixed 19 leptons a tick,
   whatever the unit's own speed.
 - **Surfacing:** on arrival, a blocked cell is swapped for a nearby legal one. With no legal cell anywhere, the unit
@@ -64,10 +66,10 @@ launcher draws an owner's cloaked unit solid. The owner sees the marker, and ene
 
 ## The dive is made in the engine
 
-Tiberian Sun has no "dive" animation: its art registry has only the dirt mound (`DIG`) and a dirt explosion. The
-units tilt nose-down at run time (`IsTilter`). To reproduce it with sprites, render the unit pitched at a few
-angles (for example 0, -8, -16, -24, -32 and -40 degrees going down, and the reverse coming up) for 8 facings, snap
-the facing at dig start, and play the dirt mound over the top. That's about 112 shapes, which fits under the
+Tiberian Sun has no "dive" animation: its art registry has only the dirt mound (`DIG`) and a dirt explosion
+(`DIRTEXPL`). The units tilt nose-down at run time (`IsTilter`). To reproduce it with sprites, render the unit
+pitched at a few angles (for example 0, -8, -16, -24, -32 and -40 degrees going down, and the reverse coming up) for
+8 facings, snap the facing at dig start, and play the dirt mound over the top. That's about 112 shapes, which fits under the
 128-shape limit on a second draw (see [How the launcher draws sprites](../art/how-the-launcher-draws-sprites.md)).
 
 The order that reads right: tilt first, at ground level and with no dirt; start the dirt mound partway into the
@@ -87,7 +89,14 @@ tilt; hide the hull the moment the last step completes, while the mound is still
 - **TS's model:** OpenTS's `tunnel.cpp` (`Process_Tunneling`'s fixed 19-lepton step, `Stop_Moving`'s
   cell-diagonal test and its same-zone-then-any `Nearby_Location` calls) and `unit.cpp` (`Is_Route_Broken`: no dig
   to an adjacent cell), and TS's `RULES.INI` (`[SAPC]`, `[SUBTANK]`, `[General]`'s `TunnelSpeed`, `DigSound`,
-  `Dig=DIG`) and art registry.
+  `Dig=DIG`).
+- **The dig test's numbers:** OpenTS's `UnitClass::Is_Route_Broken` (`unit.cpp`: same `MZONE_NORMAL` zone, a
+  distance of 1 never broken, `dist >= 12` or an end outside `In_Local_Radar` broken, otherwise broken when
+  `Test_Cell_Walk` returns more than 15). This is OpenTS's reading of TS, not measured in TS itself; the working mod
+  uses its own, shorter threshold.
+- **No dive art:** TS's `RULES.INI` `[Animations]` list, all 282 entries, names `DIG` (320) and `DIRTEXPL` (501)
+  and nothing that dives, and Firestorm's `FIRESTRM.INI` adds 38 more with none either. Both units carry
+  `IsTilter=yes`.
 - **The surfacing search in Red Alert:** EA's `MapClass::Nearby_Location` (`MAP.CPP`) and `Is_Clear_To_Move`
   (`CELL.CPP`, where a zone of `-1` matches any), and the working mod's code, which calls it with the unit's zone
   and then `-1`, and steps 19 leptons a tick underground.
