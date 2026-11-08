@@ -1,6 +1,6 @@
 ---
 title: "Units leaving buildings: exits and rails"
-description: How Red Alert moves a finished unit out of a factory (exit point, radio tether, unload mission, fixed movement tracks, a factory track that drives due south), and the traps of giving a new building an exit path of its own with a straight-line rail; one shared track table, saved track numbers, draw order in the doorway, seat depth, infantry spots, and two-cell curves that skip a drive-on check.
+description: How Red Alert moves a finished unit out of a factory (exit point, radio tether, unload mission, fixed movement tracks, a factory track that drives due south), and the traps of giving a new building an exit path of its own with a straight-line rail; one shared track table, saved track numbers, draw order in the doorway, seat depth, infantry spots, two-cell curves that skip a drive-on check, a new barracks' exit point, Find_Exit_Cell's unguarded argument, and TD's fixed refinery tracks.
 tags: [units, buildings, movement, tracks, dll]
 holds_for: Steam build 21590013
 status: verified
@@ -29,7 +29,9 @@ this page.
   it by radio, and its unload mission drives the unit out. If the factory is still unloading the last unit, it hands
   the new one to another idle war factory of the same owner, or waits.
 - **Barracks and kennel:** the building finds a free exit cell (`Find_Exit_Cell`), places the unit at its exit point
-  facing that cell, and gives it a move order.
+  facing that cell, and gives it a move order. Both are the building type's own: the exit point is the
+  constructor's `XYP_COORD`, in classic pixels from the plot's top-left corner (`Exit_Coord` adds it to the
+  building's `Coord`), and the exit list is cell offsets from the top-left cell, tried in order.
 - **Repair pad:** its footprint is a plus, not a square (`ListFix` in `BDATA.CPP`: the centre cell and its four
   neighbours), so an exit straight out from its centre lands two cells away. A mod that picks where a repaired unit
   leaves to, as CFE Patch Redux's smarter repair bay does (`DoSmarterRunAway`), has to look past the arms, and ask
@@ -38,6 +40,12 @@ this page.
 Vehicles then move along **fixed track tables** in `DRIVE.CPP`: `TrackControl[67]` picks a track for each turn,
 and `RawTracks[13]` holds the tracks, `Track1` to `Track13`, as lists of coordinate offsets. A moving unit stores the
 `TrackNumber` and `TrackIndex` it's on.
+
+**TD's refinery tracks are still there, and fixed.** Red Alert keeps `BACKUP_INTO_REFINERY` (64) and
+`OUT_OF_REFINERY` (65) in `DRIVE.H`, though its own refinery never uses them. Their `TrackControl` entries carry no
+flip flags, so `Smooth_Turn` never mirrors them: every step's offset and facing is fixed, facing south-west. TD turns
+its harvester to south-west before forcing the back-up track (TD's `UNIT.CPP`, `RADIO_BACKUP_NOW`); a harvester at
+any other facing snaps to the track's. A reverse from another side needs a mirrored track of its own.
 
 **The war factory's track drives straight south.** `Track13`, "Drive out of weapon's factory", is the active
 `#if(1)` branch in Red Alert's `DRIVE.CPP`: 35 steps due south. The `#else` branch, left in the file, is the curve to
@@ -80,6 +88,12 @@ pathfinding takes over.
   in `Start_Of_Move` for "is the next cell the drive-on cell?" passes on some approaches and never on others. Also
   test the cell after `dest`, and when that is the target, force a straight step into the cell before it, so the
   next move starts with the target as `dest`.
+- **A new barracks needs its own exit point and exit list.** Red Alert's tent's exit point, `XYP_COORD(24,47)`, is
+  the bottom middle of its 2x2 plot. Copied onto a 2x1 building, it's a cell lower, and infantry appear a cell below
+  the door. Work both out from the new plot.
+- **`Find_Exit_Cell` dereferences its argument.** `BuildingClass::Find_Exit_Cell` calls `techno->Can_Enter_Cell` with
+  no null test. A building state that runs after radio contact has dropped gets `NULL` from `Contact_With_Whom()`,
+  so test it before the call.
 - **Log before changing an exit.** Exits involve the building's seat, the unit's rail and the cell it ends on. When
   units go missing or teleport on the way out, log all three for each delivery before changing any of them.
 
@@ -100,6 +114,15 @@ pathfinding takes over.
   `Start_Of_Move` missed vehicles that curved onto the depot's middle cell, until it also tested the cell after
   `dest` and forced a straight step in. Its TD weapons factory leaves on an
   appended south-west track, forced from `Mission_Unload`, while Red Alert's factory keeps the stock one.
+- **Exit points, exit lists and `Find_Exit_Cell`:** EA's `BUILDING.CPP` (`Exit_Coord` adding `ExitCoordinate` to
+  `Coord`; `Find_Exit_Cell` adding each `ExitList` offset to the top-left cell and calling `techno->Can_Enter_Cell`
+  unguarded) and `BDATA.CPP` (the tent's `XYP_COORD(24,47)` on `BSIZE_22`). The working mod's Tiberian Sun barracks,
+  a 2x1, spawned infantry a cell below its door on the tent's exit point until it got its own point and list, and
+  its war factory tests `Contact_With_Whom()` before `Find_Exit_Cell` in the states that run after contact drops.
+- **The refinery tracks:** EA's `DRIVE.H` (`BACKUP_INTO_REFINERY`, `OUT_OF_REFINERY`), Red Alert's `DRIVE.CPP`
+  (their `TrackControl` entries with `F_`, `Track11`'s south-west facings, `Smooth_Turn`'s flag tests), no other use
+  in Red Alert's `.CPP` files (`grep -a`), and TD's `UNIT.CPP` turning to `DIR_SW` before `Force_Track`. The working
+  mod turns its TD harvester to south-west first too; at other facings it saw the truck snap.
 - **Observed, not traced:** a deployed mobile war factory that sometimes loses units it has built.
 
 > [!TIP]

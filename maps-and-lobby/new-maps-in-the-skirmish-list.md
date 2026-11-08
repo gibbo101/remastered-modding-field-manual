@@ -107,7 +107,7 @@ mission's map (`override_map_name` in `CNC_Start_Instance_Variation`).
 
 | What | Address | Stock bytes or target |
 |---|---|---|
-| Launch send (function) | `0x7F1C40` | called from `0x6284B0`, `0x633A5E`, `0x715E8D`, `0x72003B`, `0x723C16`, `0x72D9B8`, `0x72DED9`, `0x7E8A8D` (skirmish, lobby, load, resume and restart starts) |
+| Launch send (function) | `0x7F1C40`, `SkirmishGameManagerClass::Host_Game` | called from `0x6284B0`, `0x633A5E`, `0x715E8D`, `0x72003B`, `0x723C16`, `0x72D9B8`, `0x72DED9`, `0x7E8A8D` (skirmish, lobby, load, resume and restart starts) |
 | IPC send (function) | `0x5860A0` | lobby launches call it from `0x7943EA` (LAN) and `0x5DCE18` (Steam matchmaking) |
 | Instance key lookup | `0x14FE820` | `55 8B EC 56 8B F1` |
 | GUI set-texture | `0xF604C0` | `55 8B EC 80 3D 68 84 FE 01 00` |
@@ -119,7 +119,10 @@ Each call site is `E8` + an offset to the function shown. All of these were read
 
 The map file itself has to be in Red Alert's format, every cell moved onto the 128-wide grid. A TD map also has to
 play in its own theatre: see [TD theatres in Red Alert](../using-what-the-player-owns/td-theatres-in-red-alert.md).
-Ship it in the mod's `CCDATA/` folder under a name of your own.
+Ship it in the mod's `CCDATA/` folder under a name of your own. That folder sits at the mod's root, beside
+`ccmod.json`, and it's the only one of the mod's folders the DLL's file search is given (see
+[Asset packs](../structuring/asset-packs.md#telling-whether-a-pack-is-on)). A `Data/CNCDATA/` in the mod, laid out
+like the base game's, is never searched: those paths are the base install's.
 
 ## The other route: the player's custom maps
 
@@ -152,9 +155,14 @@ DLL plays it as `GAME_NORMAL`. The map shows under the player's custom maps, not
   Hastings' override map, TD's text IDs and its 64-wide preview data), both games' map widths in EA's source
   (`MAP_CELL_W`), and the base game's thumbnail names in `TEXTURES_SRGB.MEG`.
 - **The DLL side:** EA's `CNC_Start_Instance_Variation` plays `override_map_name` when an instance sets one.
-- **The hooks:** every address and stock byte above was read from `ClientG.exe` on disk. A shipped mod lists and
-  plays all 34 of TD's skirmish maps this way, from the skirmish screen and in LAN games, under Proton on Linux and
-  on the Steam Deck.
+- **Where map files are read from:** EA's `Set_Content_Directory` searches the paths given to `CNC_Add_Mod_Path`
+  first, then the official content directory; `InstanceServerG.exe` carries `\CCDATA` beside the base game's
+  `\DATA\CNCDATA\RED_ALERT\...` folders; and a working mod keeps its 189 scenario and rules INIs in its root
+  `CCDATA/`.
+- **The hooks:** every address and stock byte above was read from `ClientG.exe` on disk. The launch send pushes its
+  own name, `SkirmishGameManagerClass::Host_Game`, for a log line (`push 0x1C32054` at `0x7F1C9A`). A shipped mod
+  lists and plays all 34 of TD's skirmish maps this way, from the skirmish screen and in LAN games, under Proton on
+  Linux and on the Steam Deck.
 - **The server's refusal:** a new instance hitting the server's assert was observed in play, and the assert text
   and its source file are in `InstanceServerG.exe`. The ignored `OverrideMapName` edit was observed once, when a
   hijacked community entry still loaded its stock map.

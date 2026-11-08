@@ -31,9 +31,11 @@ instead, which is proven and draws its art from the base game.
 
 The launcher draws terrain templates only from the base game's own art. Give a template a new name, ship its art
 loose, and register it in a tileset: the tileset loads, but the launcher crashes the moment a placed tile renders
-(`0xC0000005`, its fatal-assert address `0x56A539`; see [Crash triage](../troubleshooting/crash-triage.md)). The
-DDS format, a replacement `CONFIG.MEG` and the file's load path were each ruled out as the cause. Your DLL can't
-fix this: it only hands the launcher each cell's template name, and the art behind the name is the launcher's.
+(`0xC0000005`, at its fatal-assert address, RVA `0x56A539`; see [Crash triage](../troubleshooting/crash-triage.md)).
+The DDS format, the mod's `CONFIG.MEG` and the file's load path were each ruled out as the cause. Your DLL can't
+fix this: it only hands the launcher each cell's template name and icon, and the art behind the name is the
+launcher's. EA's `CellClass::Get_Template_Info` gives the template's `IniName` and icon, and the DLL sends the
+cell as `<name>_i<icon>.tga`, both in the map it exports (`DLLInterface.cpp`) and in a cell update (`MAP.CPP`).
 
 TD's theatres work because every TD template name is already in the base game. New *object* names (units,
 effects, trees with art of their own) are a different system, and they do render.
@@ -48,6 +50,11 @@ ground a map is painted with, hits the crash.
 **A loose file at an existing template's path replaces its art.** For example,
 `Data/ART/TEXTURES/SRGB/RED_ALERT/TERRAIN/TEMPERATE/<NAME>.TEM/<NAME>.TEM-0000.DDS` shadows the base game's frame,
 with no DLL needed. The radar samples the new art too, so the minimap matches.
+
+- **Keep the stock path.** Shadow the frame where the base game has it, and leave the tileset XML alone. In a
+  working mod's test, an existing template (`S02`) whose `<Frame>` was repointed in the tileset XML to a loose file
+  crashed the same way as a new name, even with a DXT5 frame that draws from a stock path in another mod
+  (observed once).
 
 - **It reskins, it doesn't add.** The names, shapes, sizes and land types stay the stock template's. Only the
   pixels change.
@@ -92,6 +99,16 @@ The slot and DLL steps are the same as for a TD theatre, and each is proven by T
 3. **Templates.** Every terrain piece is a DLL template, flagged for the theatres that draw it, with classic data
    giving its size and the land type of each cell. `TemplateType` is an `unsigned short`, so there's room past 255
    templates, but every name has to be one the launcher can draw (above).
+   - **Where new ones go.** Red Alert's last template is `TEMPLATE_HILL01`, 400, with `FIXIT_ANTS` on, so
+     `TEMPLATE_COUNT` is 401 and new templates take 401 and up. The type heap is sized by `TEMPLATE_COUNT`
+     (`INIT.CPP`), so there's no cap to raise. Each template's constructor must run in enum order, since the heap
+     index is the type: `Init_Heap` registers the later half in `_Watcom_Ugh_Hack` (`CDATA.CPP`), which it calls
+     last, so new ones go after `AntHill` there.
+   - **The classic art.** When a theatre loads, each template's iconset is fetched as `<IniName>.<theatre suffix>`
+     (`MFCD::Retrieve`) and its width and height are read from it. A missing iconset doesn't crash: the template
+     becomes 0 by 0. A malformed one can: `Land_Type` takes the icon modulo the iconset's width times height, and
+     divides by zero when they read as 0. Tiberian Dawn's iconset header, for one, is a different layout from Red
+     Alert's, and needs converting.
 4. **Names on the wire.** On your theatre, export each cell's template under its tileset name, and anything the
    tileset can't draw as `CLEAR1`.
 
@@ -123,8 +140,17 @@ size of the extra tiles, tilesets load whole. If it doesn't rise, only drawn til
 - **The wall:** a working mod's investigation, which hit the crash with several new template names and ruled out
   the DDS format, a replacement `CONFIG.MEG` and the load path; the crash address disassembled from `ClientG.exe`
   on disk (a deliberate write after an assert flag test); and no published mod adding new terrain template names.
-- **Templates only:** a shipped Red Alert temperate tileset whose single new name, `TIB01`, draws; and a working
-  mod's Tiberian Dawn asset packs, whose new bib tiles draw from loose folders but not from ZIPs.
+  EMC adds no terrain mechanism: the `CDATA.CPP` and `TDATA.CPP` in its source are byte for byte EA's. The `S02`
+  repoint is from the same mod's investigation, and was run once.
+- **Templates only:** a shipped Red Alert temperate tileset whose single new name, `TIB01`, draws; a working
+  mod's Tiberian Dawn asset packs, whose new bib tiles draw from loose folders but not from ZIPs; and Reilsss's
+  Tiberian Dawn in Red Alert (Workshop 2853520457), whose temperate and snow tilesets add `V20` to `V37` with loose
+  art. Those are civilian buildings (`STRUCT_V20` to `STRUCT_V37` in EA's `DEFINES.H`), objects, not templates.
+- **The DLL's template steps:** EA's source: `TEMPLATE_HILL01` counted to 400 in `DEFINES.H` and listed as
+  template 400 in EA's map editor (`TemplateTypes.cs`), `Set_Heap(TEMPLATE_COUNT)` in `INIT.CPP`, `Init_Heap`,
+  `_Watcom_Ugh_Hack`, the iconset fetch and the `Land_Type` modulo in `CDATA.CPP`, and `Get_Template_Info` in
+  `CELL.CPP`. A working mod registered seven new templates at 401 to 407 this way, and they loaded unplaced; its
+  converted TD iconsets crashed `Land_Type` until their header was rewritten in Red Alert's layout.
 - **Reskinning existing names:** Reilsss's Desert mod (Workshop 2833233740) ships 8,305 loose `.DDS` frames at
   stock template paths and per-map `TILEPATCHES`, with no DLL. A shipped mod's tileset XML names `.tga` frames that
   ship only as `.DDS`, and they draw. The tile and name counts were read from the stock tilesets for this page.

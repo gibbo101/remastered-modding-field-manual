@@ -55,7 +55,11 @@ To show real stats, have the DLL do inside the launcher what a skirmish start do
 
 1. **Build the type heaps,** as `INIT.CPP` does.
 2. **Read your mod's rules from its own `CCDATA` folder:** `rules.ini` through `Rule.Process`, then `aftrmath.ini`
-   and `mplayer.ini` as overrides of the sections a skirmish takes from them.
+   and `mplayer.ini` as overrides of the sections a skirmish takes from them. A skirmish start runs `aftrmath.ini`
+   through `Rule.Process` too (`INIT.CPP`), but applies only nine of `mplayer.ini`'s readers: `General`,
+   `Recharge`, `AI`, `Powerups`, `Land_Types`, `Themes`, `IQ`, `Objects` and `Difficulty` (`SCENARIO.CPP`). A
+   second `Rule.Process` breaks the heaps (see Traps), so apply `aftrmath.ini` through those nine and `MPlayer`,
+   leaving out only `Heap_Maximums`.
 3. **List each faction's entries** from the types it can build: your own faction test, a tech level the skirmish
    allows, and an entry in the sidebar's buildables XML.
 
@@ -99,16 +103,19 @@ Use the copied screen's own list box, with a sample row from a `.BUI` of its own
 | Step | Address |
 |---|---|
 | Clear the list | `0xF6AF60` |
-| Add a row | `0xF6A620` |
-| Clone the sample row into the list's column | `0xF73CB0` |
+| Add a row, then clear its byte at `+0x71` | `0xF6A620` |
+| Clone the sample row into the list's column, by the column's name | `0xF73CB0` |
+| Show the cell it returns, then lay it out | the cell's virtuals `+0x78` (with 0), then `+0x6C` (with 1) |
 | Make the row's button take no input, so the list gets the click | `0xF80BC0` |
 | Show a row as selected | `0xF80920` |
 | Select a row after filling | `0xF74EA0` |
 | Set a quad's texture | `0xF604C0` |
 | Find a texture by name (GUI manager) | `0xF301F0` |
 
-Each of these addresses was read from `ClientG.exe` on disk, and each opens with a normal function prologue. A
-click arrives as an event on the row's cell, with the row as its data.
+Each of these addresses was read from `ClientG.exe` on disk, and each opens with a normal function prologue. The
+steps follow the stock Mission Select list's own fill, which clones into its only column, `MissionColumn`
+(`RA_MISSIONSELECT.BUI`), so a copy of that screen passes the same name. The cloned row's widgets are in the
+cell's own scene, at `+0x1F4`. A click arrives as event 4 on the row's cell, with the row as its data.
 
 ## Traps
 
@@ -127,7 +134,13 @@ click arrives as an event on the row's cell, with the row as its data.
 
 - **The screen and the list calls:** a shipped mod's encyclopedia, opened for every faction on the build before
   release. Every address above was read from `ClientG.exe` on disk and matches the bytes that mod checks before
-  calling, except the no-input call (`0xF80BC0`), which it calls without checking. Check it as well.
+  calling, except the no-input call (`0xF80BC0`), which it calls without checking. Check it as well. The per-row
+  steps were read for this page in the stock fill that names `MissionColumn`: add a row, clear `+0x71`, clone the
+  sample, call the cell's `+0x78` with 0 and `+0x6C` with 1, then reach its scene at `+0x1F4`. Another stock list
+  binds event 4 on its rows; the mod's code does the same.
+- **The INIs:** EA's `INIT.CPP` (`AFTRMATH.INI` through `Rule.Process`), `SCENARIO.CPP` (the nine readers for
+  `MPLAYER.INI`) and `RULES.CPP` (`Heap_Maximums` rebuilding the warhead heap); the mod's code applies them as
+  above.
 - **The rules inside the launcher:** the launcher names only `CNC_Version` among the DLL's exports (see
   [Patching the launcher's code from your DLL](../clientg-ram/patching-the-launchers-code.md)), and the mod's code
   builds the heaps and processes its rules as described.

@@ -71,7 +71,9 @@ own refresh, such as a timer on the UI thread.
    carries on underneath.
 4. **Bind its widgets.** The scene's behaviour object, at `+0x330`, owns its widgets and events. Find each widget
    and bind it as for the menu button. A handler bound with data `n` receives the behaviour object and `n`, so one
-   handler can serve a whole row of buttons or tabs.
+   handler can serve a whole row of buttons or tabs. It's called as a member function: the behaviour object in
+   `ecx`, and `n` as its one stack argument, which the handler pops (stock handlers end `ret 4`). In C++, declare
+   it `__fastcall` with an unused second parameter for `edx`.
 5. **Close it** through the scene's own close (its vtable, `+0x2CC`), then release it.
 
 ### Addresses in this client
@@ -88,6 +90,14 @@ own refresh, such as a timer on the UI thread.
 | Set a widget's text | `0xF1D270` | `55 8B EC 83 EC 1C` |
 | Bind an event | `0x6A9F50` | `55 8B EC 51 53 8B` |
 | Main menu's binding site (hook) | `0x6B185B` | `6A 15 68 F0 7E C1 01` |
+| Skirmish lobby's Back handler | `0x71C790` | `56 8B F1 E8 B8 FB` |
+
+**Leaving the skirmish lobby from your code,** say to send the player to a screen of your own, is the lobby's own
+Back handler, called on the lobby's behaviour object with data 0. The lobby binds it to its `Back_Button` widget
+(kept at `+0x5C` in that object) with the click event, so calling it does just what the button does: the lobby
+closes and the main menu underneath shows again. A working mod first checks the button is usable, and leaves the
+lobby alone when it isn't, and it calls the handler on the UI tick after the click that asked for it, not from
+inside that click.
 
 ## Switching mods on and off from your screen
 
@@ -141,6 +151,10 @@ player's.
   `.BUI` files uses it, and a shipped screen that does draws and works.
 - **The calls:** every address above was read from `ClientG.exe` on disk, and matched the opening bytes a working
   patch checks before installing.
+- **The handlers and the lobby's Back:** the lobby's set-up disassembled for this page finds `Back_Button` by name,
+  keeps it at `+0x5C`, and binds `0x71C790` to it with event `0x21` and data 0, through a binder with the same
+  opening bytes as the one above; `0x71C790` takes the object in `ecx` and returns with `ret 4`. A working mod's
+  handlers are declared that way, and its lobby pop-up leaves the lobby through that handler.
 - **Switching mods:** the toggle at `0x7BB7A0` disassembled for this page (it walks `0xBC`-byte records, compares
   the ID at `+0xA8` and writes the byte at `+0xB9`), the opening bytes above read from disk, and `0x1FE4C28` and
   `0x20E0D88` referenced from the launcher's code. A released mod's add-ons screen switched a downloaded pack on

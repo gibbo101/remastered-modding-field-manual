@@ -4,7 +4,7 @@ description: The launcher's screens, menus and in-match HUD, are .BUI files, a z
 tags: [front-end, ui, bui, screens, config-meg, launcher]
 holds_for: Steam build 21590013
 status: verified
-unproven: [the full per-widget property grammar (only rects, tints, strings, texture sets and cloned subtrees are mapped)]
+unproven: [the full per-widget property grammar (only rects, tints, strings, texture sets and cloned subtrees are mapped), whether menu images draw without mipmaps (banding observed on the Steam Deck)]
 ---
 
 > [!NOTE]
@@ -114,6 +114,10 @@ why per-faction crests come from [re-pointing records in memory](../clientg-ram/
   `TacticalSidebarSellRepairButton`, which repainting showed is also the in-match sidebar's (observed). The text
   style `24 Point Regular Outline Red` appears in 19 stock Red Alert screens. Give your screen its own sets and
   styles rather than repainting shared ones.
+- **Paint menu art at the size it's drawn.** The stock main menu background, `RA_MAINMENUBG_02.DDS`, is a 2878 ×
+  1200 uncompressed 32-bit DDS with no mipmaps. A working mod's menu frame painted larger than its widget banded
+  when scaled down on the Steam Deck's screen. That the launcher draws menu images without mipmaps is unproven:
+  it was observed, not traced.
 - **Animations only play when the launcher starts them by name.** A keyframe animation you add won't run. Effects
   such as sheens loop by themselves.
 
@@ -129,6 +133,8 @@ why per-faction crests come from [re-pointing records in memory](../clientg-ram/
   LAN screens and HUD to TD's.
 - **Cloned widgets:** a shipped mod's main menu carries cloned buttons, and a HUD test with inserted widgets drew
   normally.
+- **Menu art:** the stock `RA_MAINMENUBG_02.DDS` read from `TEXTURES_SRGB.MEG` for this page (no mip count, its
+  size exactly 2878 × 1200 × 4 bytes plus the header). The banding is one mod's observation.
 - **`Faction5`, the colour tag and the row height:** the stock `FACTIONS.XML` (only `Faction5`'s `GUIFileNames`
   holds the lobbies), the stock `FONTLIBRARY.BFD` (`0b 10` and four floats in each style), and the stock combo-box
   screens (`05 04` and 0.0975 or 0.1711), all read for this page; a shipped mod edits all three and they hold in

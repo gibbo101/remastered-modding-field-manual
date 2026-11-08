@@ -95,6 +95,12 @@ launcher happened to read first. See
 - **"Video Card Driver Crash Detected!"** and `DXGI_ERROR_DEVICE_REMOVED` are the launcher's own messages for a
   lost Direct3D device. They don't clear the mod on their own. A large mod uses far more video memory than the
   base game, and running out is one plausible cause (**unproven**).
+- **The game DLL has no graphics imports.** EA's `RedAlert.dll` and `TiberianDawn.dll` import only `WINMM`,
+  `WS2_32`, `KERNEL32`, `USER32`, `OLEAUT32` and (Red Alert) `ole32`; a mingw build's list is on
+  [Building the DLL on Linux](../getting-started/building-the-dll-on-linux.md). None imports `d3d11`, `dxgi` or
+  `gdi32`: the launcher does all the drawing. A DLL reaches Direct3D only through the launcher's own objects, which
+  means patching the launcher. A DLL that doesn't patch the launcher can't cause a device crash through its own
+  calls.
 
 ## How it was verified
 
@@ -108,6 +114,9 @@ launcher happened to read first. See
 - **The fatal-assert address:** the instruction at `0x96A539` disassembled from `ClientG.exe` on disk, and two
   separate crash investigations in a working mod's notes that both stopped there, one of them traced to a wrong-size
   `CONFIG.MEG` member and the assert text read from the stack.
+- **The DLL's imports:** `objdump -p` on the installed `RedAlert.dll` and `TiberianDawn.dll` and on a mingw-built
+  mod DLL, a shipped mod's crash runbook, and that mod's one Direct3D call, made on a texture it reads from the
+  launcher's memory.
 - **Unproven:** whether every launcher assert goes through that one address.
 
 > [!TIP]

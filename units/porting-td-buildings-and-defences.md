@@ -1,6 +1,6 @@
 ---
 title: Porting Tiberian Dawn buildings and defences
-description: The lessons for bringing Tiberian Dawn's buildings and defences into Red Alert's engine as types of their own. Why sharing a Red Alert type fails, reading TD's constructor (which doubles a building's strength) and its per-type code, turret and damaged frames, the SAM site's rise-and-lower cycle, the Obelisk's charge (and the Tesla-only tests it needs) and laser, TD's building Fire_At, muzzle flashes and offsets, crews and where they appear, build-ups, overlays, placement and the bib in its preview, Points=, the prerequisite bitfield and its AND rule, hardcoded factory roles, and the traps.
+description: The lessons for bringing Tiberian Dawn's buildings and defences into Red Alert's engine as types of their own. Why sharing a Red Alert type fails, reading TD's constructor (which doubles a building's strength) and its per-type code, turret and damaged frames, the SAM site's rise-and-lower cycle, the Obelisk's charge (and the Tesla-only tests it needs) and laser, TD's building Fire_At, muzzle flashes and offsets, crews and where they appear, build-ups, overlays, a refinery that takes its harvester inside, placement (size and footprint set apart, the foundation facing that moves the aim) and the bib in its preview, Points=, the prerequisite bitfield and its AND rule, hardcoded factory roles, and the traps.
 tags: [buildings, defences, tiberian-dawn, porting, dll, rules-ini]
 holds_for: Steam build 21590013
 status: verified
@@ -170,6 +170,13 @@ TD's line intercept, and the launcher draws the beam in Red Alert.
   TD's `SILO.ZIP` has 11 frames in the same layout. Add your silo to the test.
 - **A barracks' exit.** `Exit_Object` finds a free exit cell for infantry only for `STRUCT_BARRACKS`, `STRUCT_TENT`
   and `STRUCT_KENNEL`. See [Units leaving buildings](exits-and-rails.md).
+- **A refinery that takes its harvester inside.** TD's refinery answers the harvester's `RADIO_IM_IN` with
+  `RADIO_ATTACH`, the harvester limbos and attaches, and the refinery's `Mission_Harvest` draws the load bail by
+  bail through `Offload_Tiberium_Bail`. Red Alert's refinery sends the harvester to `MISSION_UNLOAD` and is paid the
+  whole load there, so TD's path survives only as stubs: the harvester's `RADIO_ATTACH` case in
+  `UnitClass::Per_Cell_Process` is an empty `break`, and `UnitClass::Offload_Tiberium_Bail` removes a bail and
+  returns 0 credits (its payout sits under `#ifdef TOFIX`, never defined). Port TD's bodies of both, paying each bail
+  at Red Alert's `GemValue` or `GoldValue`.
 - **The crew.** `BuildingClass::Crew_Type` has cases by type: the silo gives a civilian, the construction yard a
   25% chance of an engineer (for a human owner, unless it was captured), the kennel a 50% chance of a dog, and the
   barracks and tent a rifleman. Anything else gets `TechnoClass::Crew_Type`: no one unless the type is crewed, a
@@ -261,6 +268,13 @@ offsets. The Obelisk's sideways shift doesn't: a building's constructor passes n
   the placement grid from it, and `Passes_Proximity_Check` scans the same list (`DLLInterface.cpp`). The legality
   test, `TechnoTypeClass::Legal_Placement` (`TECHNO.CPP`), walks it too: every cell on it must be clear to build on.
   Copy the footprint and size from TD's constructor, so that placement, the art and the footprint agree.
+- **Size and footprint are separate arguments.** The constructor's `BSIZE_*` and its occupy list are set
+  independently. Borrow a donor's constructor and change only the size, and the old list stays: the silo's
+  `StoreList` is one cell, so a 2x1 building on it occupies one cell of its plot. A 2x1 needs `List21`.
+- **The foundation facing moves the aim point.** `BuildingClass::Target_Coord`, where attackers fire and units head
+  when they move onto a building, is its centre moved one cell toward the constructor's foundation facing. Tall
+  stock buildings (the power plant, the Tesla Coil) use `FACING_S`, so it lands on their lower cells. Give a flat
+  building `FACING_NONE`, or attackers aim a cell south of it.
 - **The placement grid includes the bib.** The list exported for placement is `Occupy_List(true)`, which adds the
   bib's cells to the building's own (`BDATA.CPP`, the same in TD). A 2x2 building with a bib previews
   three rows tall. Size the building from its `BSIZE_*` and footprint, not from the preview.
@@ -321,6 +335,13 @@ offsets. The Obelisk's sideways shift doesn't: a building's constructor passes n
   `Allowed_Threats` (`WEAPON.CPP`); `Legal_Placement` walking `Occupy_List(true)` (`TECHNO.CPP`); and in Red Alert's
   `AIRCRAFT.CPP`, `Ammo = Class->MaxAmmo`, `Good_Fire_Location`, `Pip_Count`, the rotor test in `Draw_It` and the
   Hind check under `TOFIX`, with `MaxAmmo` defaulting to -1 (`TECHNO.CPP`).
+- **The refinery stubs, the size and the facing:** EA's TD `BUILDING.CPP` (`RADIO_IM_IN` returning `RADIO_ATTACH`
+  for `STRUCT_REFINERY`, `Mission_Harvest`), TD's `UNIT.CPP` (`RADIO_ATTACH`: `Limbo()` and `Attach`) and
+  `DRIVE.CPP` (`Offload_Tiberium_Bail` paying credits); Red Alert's `BUILDING.CPP` (`MISSION_UNLOAD` for the
+  refinery, `Target_Coord`), `UNIT.CPP` (the empty `RADIO_ATTACH` case, the `TOFIX` payout) and `BDATA.CPP`
+  (`StoreList` and `List21`, `FACING_S` on `POWR`, `APWR` and `TSLA`). The working mod ports TD's attach and a
+  per-bail payout for its TD refinery, and its 2x1 Stealth Generator, built on the silo's constructor, needed
+  `List21` and `FACING_NONE` after attackers aimed a cell south of it.
 - **More of the game's files:** the `<Frame />` shape 0 of each TD `MAKE` tile in `CONFIG.MEG`'s TD tilesets, and
   128 frames in TD's `GUN.ZIP`.
 - **The game's files:** stock `rules.ini`'s `Anim=MINIGUN` and `Anim=SAMFIRE` weapons; the frame counts of TD's

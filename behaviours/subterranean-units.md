@@ -54,8 +54,10 @@ OpenTS's `tunnel.cpp` reconstructs TS's `TunnelLocomotionClass`, and its `unit.c
    `MapClass::Nearby_Location` does TS's two-step search: pass the unit's zone first, then `-1`, which
    `CellClass::Is_Clear_To_Move` reads as any zone.
 
-The owner sees an earth marker. A useful trick: make the marker the unit's own underground frame, because the
-launcher draws an owner's cloaked unit solid. The owner sees the marker, and enemies see nothing.
+The owner sees an earth marker. A useful trick: make the marker the unit's own underground frame. The launcher
+draws an owner's cloaked object see-through (see [A stealth generator](stealth-generator.md)), so with the hull's
+frame the owner would see a ghost of the tank; with the marker frame they see a faint patch of disturbed earth, and
+enemies see nothing.
 
 ## Detection, and the EMP
 
@@ -100,6 +102,10 @@ tilt; hide the hull the moment the last step completes, while the mound is still
 - **The surfacing search in Red Alert:** EA's `MapClass::Nearby_Location` (`MAP.CPP`) and `Is_Clear_To_Move`
   (`CELL.CPP`, where a zone of `-1` matches any), and the working mod's code, which calls it with the unit's zone
   and then `-1`, and steps 19 leptons a tick underground.
+- **What the owner sees:** EA's `TechnoClass::Visual_Character` returns `VISUAL_SHADOWY` to a cloaked object's
+  owner, and `Techno_Draw_Object` draws that with `SHAPE_PREDATOR`; the working mod exports a digger as `CLOAKED`
+  and returns the marker frame while it tunnels; in its screenshots (below, and on the stealth generator page)
+  the owner's cloaked objects show faint.
 - **A working mod:** both TS digging units in its release, with the behaviour above, played under Proton on Linux
   and on the Steam Deck.
 - **Unproven:** saving and loading with a unit underground.

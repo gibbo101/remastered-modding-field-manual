@@ -110,7 +110,9 @@ are never seen in an HD-only mod, but its **frame size** is used. `UnitTypeClass
 selection box to three-quarters of the image's largest frame side, at most 48 classic pixels, and the launcher
 sizes the box from that (see [Building selection boxes](../art/building-selection-boxes.md)). A new bullet with no
 classic shape isn't drawn at all (`BulletClass::Draw_It` returns early), and one given another type's shape as a
-donor draws at the donor's size (see [HD tilesets](../art/hd-tilesets-and-zips.md)).
+donor draws at the donor's size (see [HD tilesets](../art/hd-tilesets-and-zips.md)). Size a unit with this shape, not with a
+draw scale passed to `Techno_Draw_Object`: a scale shears the turret off the hull (see
+[How the launcher draws sprites](../art/how-the-launcher-draws-sprites.md#rules)).
 
 Three ways to supply one, each in use in a shipped mod:
 

@@ -1,10 +1,10 @@
 ---
 title: How the launcher draws sprites
-description: The rules the HD renderer applies to unit, building, effect and beam art (canvas-centre anchoring, the 128-shape limit on second draws, no rotation, an alpha cutoff near half, baked shadows, beam frames 0 to 4), each one learned from a build that drew wrong.
+description: The rules the HD renderer applies to unit, building, effect and beam art (canvas-centre anchoring, height drawn as a shift north, the 128-shape limit on second draws, no rotation, draw scale about each draw's anchor, an alpha cutoff near half, baked shadows, beam frames 0 to 4), each one learned from a build that drew wrong.
 tags: [art, sprites, hd, tilesets, launcher]
 holds_for: Steam build 21590013
 status: verified
-unproven: [the exact alpha cutoff (observed near 128), why second draws drop shapes from 128 up, whether SHAPE_GHOST darkens an effect]
+unproven: [the exact alpha cutoff (observed near 128), why second draws drop shapes from 128 up, whether SHAPE_GHOST darkens an effect, why a draw scale leaves the selection box and health bar unscaled]
 ---
 
 > [!NOTE]
@@ -47,6 +47,18 @@ deploys into, must share a ground line, or the sprite hops north or south when o
 Selection boxes follow the same logic: the launcher centres a unit's box on the unit and a building's on its plot,
 and takes only the size from the DLL. See [Building selection boxes](building-selection-boxes.md).
 
+## Height is a shift north
+
+The DLL draws an object off the ground by moving it up the screen. EA's draw code subtracts the object's height from
+its screen y (`y -= Lepton_To_Pixel(Height)` in `AircraftClass::Draw_It`, `BulletClass::Draw_It` and
+`TechnoClass`), and the position the DLL exports is that shifted point. Screen-up is map-north, so a raised object
+draws exactly where an object on the ground that far north would.
+
+- **Anything drawn at a raised object goes north by its height.** EA's bullet code marks the cells a flying shot
+  covers at `Coord_Move(Coord, DIR_N, Height)`; put a trail puff or a flash at the same point.
+- **Height and north-south movement look the same on screen.** A fall reads as a slanting fall only when the
+  object also moves east or west. One moving north while it drops can hang still on screen.
+
 ## Rules
 
 | Rule | What goes wrong otherwise |
@@ -58,6 +70,7 @@ and takes only the size from the DLL. See [Building selection boxes](building-se
 | **An effect with HD art only still needs `ImageData`.** An animation with no classic image gets a null `ImageData`. | It draws as a green placeholder. Give it another animation's `ImageData` (a donor), and its HD tile is then found by name. |
 | **Write straight (unpremultiplied) alpha.** | Colour pasted through a mask onto a transparent canvas comes out darkened, and the launcher draws it darkened. |
 | **A free animation is always its own object.** The export walks every map layer and starts a new root object for each one (`CurrentDrawCount = 0` before each `Draw_It`, EA's `DLLInterface.cpp`). | An animation placed on a unit never becomes part of that unit's draw, however close it sits. |
+| **A draw scale scales each draw about its own anchor.** The `scale` argument of `Techno_Draw_Object` (`0x0100` is 1:1, `TECHNO.H`) reaches the launcher as `CNCObjectStruct::Scale`, and the launcher honours it: EA draws its atom blast animation at `0x300`. | A scaled unit's turret, a separate draw, slides off its hull, and its selection box and health bar keep the classic shape's size. Size a unit with its classic shape instead (see [HD tilesets and ZIPs](hd-tilesets-and-zips.md#size-comes-from-the-classic-shape)). |
 | **A delayed animation is drawn while it waits.** `AnimClass`'s `timedelay` holds back `Start()` until the delay runs out, but the check that would keep it off screen meanwhile (`if (Delay) return(false);` in `AnimClass::Render`) is compiled out (`#ifdef VIC`). | It shows, unstarted, for the whole delay. Leave the delay at 0 for art that must not show early. |
 
 ## Shadows are baked in
@@ -129,6 +142,13 @@ line's colour. TD's Obelisk never hits this: its `LineMaxFrames` is 5. Lines can
 - **Free and delayed animations:** EA's export loop (`DLLInterface.cpp`, the layer loop around `Draw_It`) and
   `ANIM.CPP` (the `#ifdef VIC` check in `Render`, `Start()` deferred in `AI`); `VIC` is defined nowhere in the
   released source. A working mod saw delayed animations drawn before they started, and stopped using the delay.
+- **Height as a shift north:** EA's `AIRCRAFT.CPP`, `BULLET.CPP` and `TECHNO.CPP` (the `Lepton_To_Pixel(Height)`
+  subtractions, and `BulletClass`'s `Coord_Move(Coord, DIR_N, Height)`), and the export, which sends the drawn
+  position. A working mod draws its missile trails north by the missile's height, and its drop pods fall in from
+  the side because a fall from the south didn't read as one.
+- **The draw scale:** the `scale` default in EA's `TECHNO.H`, the `Scale` field the export fills
+  (`DLLInterface.cpp`) and the atom blast's `0x300` in `ADATA.CPP`. The sheared turret and the unscaled box are
+  observed: a working mod scaled a unit this way and dropped it for a classic shape of the right size.
 - **The ground line:** a working mod's walker and its deployed building drew a hop until their art's lowest pixels
   matched, measured as above.
 - **Each rule:** found in a shipped mod's art, where a build drew wrong and the fix was confirmed in game. The

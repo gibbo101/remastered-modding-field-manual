@@ -4,7 +4,7 @@ description: "Sidebar build icons (cameos): the stock ones are 341x256 regions o
 tags: [art, cameos, sidebar, buildables, dds, hd]
 holds_for: Steam build 21590013
 status: verified
-unproven: [why a loose DDS can't override a stock cameo when a loose TGA can (observed)]
+unproven: [why a loose DDS can't override a stock cameo when a loose TGA can (observed), what, if anything, the launcher does with Busy]
 ---
 
 > [!NOTE]
@@ -79,6 +79,10 @@ carry one: besides the name and the type fields, EA's `CNCSidebarEntryStruct` (`
 `ConstructionOnHold`, `Busy`, `BuildableViaCapture`, `Fake`), each with a fixed meaning. So a badge has to be baked
 into each variant's picture.
 
+**`Busy` draws nothing.** EA sets it on every entry whose factory is in use, or whose object list is full, and the
+cameo looks the same either way. To show that an entry can't be built for now, swap its `AssetName` to a variant
+with a locked picture, as above. (Observed.)
+
 ## How it was verified
 
 - **The lookup:** EA's sidebar export (`AssetName` from `IniName`) and the 16-byte field in `DLLInterface.h`; the
@@ -95,7 +99,11 @@ into each variant's picture.
   sides a multiple of 4 (headers read for this page).
 - **The entry's fields:** EA's `DLLInterface.h`; the launcher's cameo click tests four of the flags (see
   [Launcher key commands and superweapon clicks](../clientg-ram/launcher-key-commands-and-clicks.md)).
-- **Observed only:** that a loose DDS doesn't override a stock region, when a TGA does.
+- **`Busy`:** EA's sidebar export sets it from the factory and the object heap (`isbusy`, `DLLInterface.cpp`). A
+  working mod found that setting `Busy` changes nothing on the cameo, and swaps in locked variants by name
+  instead (its sidebar export).
+- **Observed only:** that a loose DDS doesn't override a stock region, when a TGA does, and that `Busy` draws
+  nothing.
 
 > [!TIP]
 > **In Tiberian Factions**

@@ -57,7 +57,9 @@ spread code. Stock spreading always plants ore, whatever the source cell holds (
 
 - **A blossom tree can be a building** owned by the neutral house, drawn with TD's blossom-tree art. On each growth
   tick it spreads a neighbouring Tiberium cell, or failing that seeds an empty one.
-- **Trees can turn.** An ordinary tree with Tiberium in most of its neighbours becomes a blossom tree.
+- **Trees turning is your own rule, not TD's.** In TD a blossom tree is a terrain object the map places; its
+  random "blossoming" only animates its pod, and no ordinary tree ever becomes one. A mod can add the rule: the
+  working mod turns a tree with Tiberium in six or more of its eight neighbours into a blossom tree.
 - **Make it invulnerable,** as TD's are. A damaged blossom tree asks for damage frames its art doesn't have, and
   those draw as white squares.
 
@@ -92,6 +94,10 @@ TD turns some infantry killed by Tiberium into Visceroids, hostile to everyone.
   and grows it only with the option on.
 - **TD's behaviour:** EA's TD `INFANTRY.CPP` (2 damage on reaching a cell's centre, not for `INFANTRY_E5`), and
   `HOUSE_JP` in Red Alert's `DEFINES.H`.
+- **Blossom trees in TD:** EA's TD `TDATA.CPP` (only the two blossom-tree types spawn Tiberium and transform, and
+  both are immune to damage) and `TERRAIN.CPP` (`IsBlossoming` set at random on an existing blossom tree; nothing creates
+  one in play); the working mod's tree-turning rule is in its own `TerrainClass::AI` (six or more `TIB01`
+  neighbours).
 - **A working mod:** Tiberium as its own overlay, blossom trees, infantry damage and Visceroids, shipped and played
   on official maps where Tiberium and ore fields meet, under Proton on Linux and on the Steam Deck.
 

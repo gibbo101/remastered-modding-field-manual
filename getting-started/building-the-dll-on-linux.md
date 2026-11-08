@@ -1,6 +1,6 @@
 ---
 title: Building the DLL on Linux
-description: Cross-compile a Remastered Collection game DLL on Linux with 32-bit mingw-w64 and Vanilla Conquer's remaster preset, with -fpermissive for the MSVC-only code in dllinterface.h, then strip it before shipping.
+description: Cross-compile a Remastered Collection game DLL on Linux with 32-bit mingw-w64 and Vanilla Conquer's remaster preset, with -fpermissive for the MSVC-only code in dllinterface.h, then strip it before shipping. The build's mod folder is copied only when the DLL relinks and never loses files, so restage it.
 tags: [getting-started, build, dll, linux, mingw, vanilla-conquer]
 holds_for: Steam build 21590013
 status: verified
@@ -85,6 +85,11 @@ A post-build step copies `resources/remaster_mods/Vanilla_RA/` (your `ccmod.json
 - **No runtime DLLs to ship.** Vanilla Conquer links libstdc++ and libgcc statically for mingw
   (`-static-libstdc++ -static-libgcc`), so the DLL imports only Windows system DLLs (`KERNEL32`, `msvcrt`,
   `USER32`, `SHELL32`, `OLEAUT32`, `WINMM`).
+- **The mod folder in `build/` goes stale.** The copy of `resources/remaster_mods/Vanilla_RA/` is a `POST_BUILD`
+  step, so it runs only when the DLL relinks: a data-only change never reaches `build/remaster/Vanilla_RA/`. And
+  `cmake -E copy_directory` only adds and overwrites, so a file you rename or delete in `resources/` stays in the
+  build folder. Before you test or ship, restage that folder from scratch: delete it and copy `resources/` and the
+  DLL in again.
 - **No two builds are byte-identical.** The link time is written into the DLL's PE header, so its hash changes on
   every relink, even from the same source. Give every machine in a LAN test the same copy.
 
@@ -97,6 +102,10 @@ A post-build step copies `resources/remaster_mods/Vanilla_RA/` (your `ccmod.json
 - **`-fpermissive`:** the extra qualification in `dllinterface.h`, reproduced in a three-line file with
   `i686-w64-mingw32-g++` 13: an error without the flag and a warning with it.
 - **The output layout:** the `POST_BUILD` copy in `redalert/CMakeLists.txt`, and a real build tree.
+- **The stale folder:** that `POST_BUILD` step, and a test project (CMake 3.28, Ninja) whose `POST_BUILD` command ran
+  on the first build and after a source change but not on an up-to-date rebuild; `cmake -E copy_directory` run
+  twice, which left a file deleted from the source in the destination; and a shipped mod's deploy script, which
+  restages the folder from scratch for that reason.
 - **The imports, size and timestamp:** `objdump -p` and `strip` on a built DLL, compared with a shipped one.
 - A mod built this way ships on the Workshop, and is played under Proton on Linux and on the Steam Deck.
 

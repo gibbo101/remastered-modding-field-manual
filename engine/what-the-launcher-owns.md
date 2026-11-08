@@ -5,7 +5,7 @@ tags: [engine, launcher, clientg, dll, walls, reference]
 holds_for: Steam build 21590013
 clientg_version: 1.153 (745903)
 status: verified
-unproven: [routes for the superweapon cost line and for build hotkeys on new types, and new widgets on the in-match HUD, none of which has been tried with a code patch]
+unproven: [how the launcher decides to hide a superweapon's cost line, routes for that line and for build hotkeys on new types, and new widgets on the in-match HUD, none of which has been tried with a code patch]
 ---
 
 > [!NOTE]
@@ -55,7 +55,7 @@ cached records in memory, or through a patch to its code. This page lists each o
 | New front-end screens and buttons | **Code-patch lever** + data | A screen of your own as a new `.BUI` on a registered screen class no stock screen uses (`SplashScreen`), with buttons and rows cloned from stock widgets. A launcher patch adds the menu button that opens it, and binds every widget's clicks. Shipped in a released mod. [New screens and buttons](../front-end/new-screens-and-buttons.md) |
 | The launcher's own co-op campaign mode | **Real wall** (a cut feature; finishing it is untried) | Code without content. `ClientG.exe` has a co-op campaign menu class and a hosting path (`CoordinatorMultiplayerManagerClass::Host_Coop_Campaign_Lobby`, with match-settings, ready and launch calls to EA's online coordinator), but every faction's `<CoopCampaignType>` in `FACTIONS.XML` is empty, and the screen its scene list names, `UI_CampaignMenu_CoOp`, has no `.BUI` in `CONFIG.MEG`. Hosting goes through the online service, and mods play over LAN only (see [LAN games](lan-games.md)), so even a working button would start an unmodded match. |
 | New widgets on the in-match HUD | **Open** | The `.BUI` alone can only reshape or hide existing widgets. The front-end route (a new scene and a patch that binds it) hasn't been tried on the in-match HUD. |
-| A new superweapon's sidebar cameo showing "Cost: $0" | **Open** | The launcher hides the cost line only for its own superweapons' asset names (`SW_Nuke`, `SW_Chrono` and others). Not tried since code patching became possible. |
+| A new superweapon's sidebar cameo showing "Cost: $0" | **Open** | Observed: the stock superweapons' cameos show no cost line, and a new one shows "Cost: $0". EA's DLL sends a cost of 0 for every superweapon, so the launcher hides the line by some other test, not yet found. It isn't an asset-name list: `ClientG.exe`'s `SW_` names sit only in its build-command tables, beside command numbers. Not tried with a code patch. |
 | The build hotkeys for new buildings and units | **Open** | Each build command names one stock object. Not tried since code patching became possible. |
 
 "Real wall" means the routes tried so far failed. "Observed" marks a row resting on fewer than three independent
@@ -114,7 +114,9 @@ Each row was checked three ways where possible:
   `INPUTTRANSLATORCONFIGURATIONS.XML` (four mod commands with empty keys marked TBD) and `AUDIO_FACTIONS.XML`
   (EA's comment that its maps aren't used for TD or RA). `ClientG.exe`'s strings: both tab-icon prefixes, the
   launcher's sound and command names, only `ALLIED` and `SOVIET` as faction tokens, and no input `_Mod` overlay.
-  The superweapon click test's bytes, read from the exe on disk.
+  The superweapon click test's bytes, read from the exe on disk. Every reference to its `SW_` asset names is in a
+  data table of command numbers and object names, beside stock unit names such as `FTNK` and `MLRS`; EA's
+  `DLLInterface.cpp` sets a superweapon's sidebar `Cost` to 0, having no type to price it from.
 - **The wire and the tools:** `SERVERCONFIG.XML`'s port base and `InstanceServerG.exe`'s `CLIENT_PORT` setting;
   the CryptoPP, Lua 5.1, receiver-class and `SERVER_TO_CLIENT_EXTERNAL_GAME_PLUGIN_EVENT` strings in `ClientG.exe`;
   its event dispatcher's 14-way type switch, read from disk; every MEG in `Data/` listed for `.lua` files; and each

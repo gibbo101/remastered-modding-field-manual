@@ -1,6 +1,6 @@
 ---
 title: "Porting art from other C&C games"
-description: "Turning Tiberian Sun voxels and SHPs, and Command & Conquer 3 models, into HD Remastered sprites; the target every port must hit (canvas, centring, team-colour green, baked shadow), the 32-degree camera and facing order that match EA's HD vehicles, ships' 16 facings, where each game keeps its art (Firestorm's expand01.mix, one-theatre buildings), and TS's SHP layout (shadow half, damaged frame, Rate= in frames per minute)."
+description: "Turning Tiberian Sun voxels and SHPs, and Command & Conquer 3 models, into HD Remastered sprites; the target every port must hit (canvas, centring, team-colour green, baked shadow), the 32-degree camera and facing order that match EA's HD vehicles, ships' 16 facings, where each game keeps its art (Firestorm's expand01.mix, one-theatre buildings, theatre letters, Image= names), TS's SHP layout (shadow half, damaged frame and loop, Rate= in frames per minute), and where TS keeps its voices and music."
 tags: [art, pipelines, tiberian-sun, cnc3, voxels, hd]
 holds_for: Steam build 21590013
 status: verified
@@ -64,6 +64,12 @@ extent is about 0.81 of its side-on length), but a hull's height inflates that r
   `SIDEC02.MIX` for Nod), building SHPs in the theatre MIXes, palettes in `CACHE.MIX`. The Firestorm expansion's
   own files are in `expand01.mix`: its voxels and build-up SHPs at the top level, its other SHPs in the inner
   `ECACHE01.MIX`, its cameos in `E01SC01.MIX`, and its rules in `FIRESTRM.INI`.
+- **Theatre letters in building names.** A building whose art changes by theatre (`NewTheater=yes` in `ART.INI`) is
+  named for one theatre, and the game swaps the second letter: `ART.INI` names `GADEPT` (the Service Depot), and the
+  files are `GTDEPT.SHP` in the temperate archives and `GADEPT.SHP` in the snow ones. The swap applies to names
+  starting `GA`, `GT`, `NA`, `NT`, `CA` or `CT` (`T` for temperate, `A` for snow).
+- **An animation's file is its `Image=`, not its section name.** The Service Depot's arm animations `[GADEPT_C1]`
+  to `[GADEPT_C3]` all draw `GADEPT_C.SHP`. Search for the `Image=` name, or the file seems to be missing.
 - **One-theatre buildings.** Some building art exists in one theatre only: the E.M. Pulse Cannon (`NAPULS.SHP`,
   with `NAPULSMK.SHP`) is only in the snow archives, `SNOW.MIX` and `ISOSNOW.MIX`. Decode such art with that
   theatre's unit palette (`UNITSNO.PAL` for snow, `UNITTEM.PAL` for temperate; both in `CACHE.MIX`).
@@ -80,8 +86,21 @@ extent is about 0.81 of its side-on length), but a hull's height inflates that r
   frames come out as flat purple silhouettes. Drop them, since a Remastered frame bakes its own shadow.
 - **Frame 1 is the damaged look.** A building below the yellow health threshold draws its next frame, so an idle
   building's base SHP has its healthy art at frame 0 and its damaged art at frame 1.
+- **An animation's damaged loop usually shares its file.** The damaged section plays a later range of the same SHP:
+  `[GADEPT_A]` loops frames 0 to 4 of `GADEPT_A.SHP` and `[GADEPT_AD]` frames 5 to 9, then come the shadows, 10 to 19.
+  Read each section's `LoopStart` and `LoopEnd`, since a few animations run one cycle through the whole file.
 - **Animation speed:** an anim's `Rate=` in TS's `ART.INI` is frames per minute (the delay is ticks per minute ÷
   `Rate`), so a higher `Rate` is faster.
+- **Sound and music.** Unit voices are in `SOUNDS.MIX` (inside `TIBSUN.MIX`), named by voice set and line,
+  `<set>-I<nnn>.AUD`, and a unit's `RULES.INI` section lists its own (`VoiceSelect=15-I000,15-I004,...`). Set 15
+  is shared by both sides' basic infantry (`E1`, `E2`, `E3` and a few others), set 25 by both sides' vehicles.
+  Red Alert asks for two infantry takes and two vehicle takes of each response, so map two lines of each set to
+  every response event: see
+  [TD sounds from the base game](../using-what-the-player-owns/td-sounds-from-the-base-game.md#how-a-sound-gets-from-the-dll-to-the-speakers).
+  The scores are in `SCORES.MIX` and Firestorm's `SCORES01.MIX`, loose in the game folder, and the theme list is
+  `THEME.INI` (in `LOCAL.MIX`) and `THEME01.INI` (in `expand01.mix`). Every AUD here, voices and scores alike, is
+  Westwood IMA ADPCM (AUD compression 99, `SCOMP_SOS`) at 22,050 Hz mono, which ffmpeg reads as `adpcm_ima_ws`.
+  EA's guidelines don't license the music (see [Open questions](../open-questions.md#music-built-from-the-players-own-copy)).
 - **Buildings are isometric.** TS's building sprites are drawn for TS's isometric camera, and no re-render can
   change that, so they look tilted beside Red Alert's near-top-down buildings. Rebuilding them from 3D models in
   Remastered's camera fixes it.
@@ -122,12 +141,25 @@ The step-by-step recipe, written for an AI coding assistant to follow, is Tiberi
   `MWARICON.SHP` in `E01SC01.MIX`; `NAPULS.SHP` in `SNOW.MIX` and not `TEMPERAT.MIX`, `NAPULSMK.SHP` in `ISOSNOW.MIX`
   and not `ISOTEMP.MIX`; both palettes in `CACHE.MIX`), OpenTS's theatre table (`_theater.cpp`: snow's archives and
   its `SNO` suffix), and the working mod's extraction script and EMP Cannon port.
+- **Theatre letters and `Image=`:** OpenTS's `ObjectTypeClass` (the `NewTheater` swap of the second letter, for
+  the six prefixes) and `Read_INI` (`Image=` sets the graphic name); TS's `ART.INI` (`[GADEPT]` `NewTheater=yes`,
+  `[GADEPT_C1]` to `[GADEPT_C3]` each `Image=GADEPT_C`); and every MIX in a Tiberian Sun install searched for this
+  page, nested ones included: `GTDEPT.SHP` and `GADEPT.SHP` sit in different theatre archives, `GTDEPT_C.SHP` and
+  `GADEPT_C.SHP` exist, and no `GADEPT_C1` to `C3` file does. A working mod's extractor takes temperate `GT` names.
 - **SHP layout and timing:** OpenTS's `techno.cpp`, `building.cpp` and `anim.cpp` (shadows drawn at
   `shapenum + Get_Count() / 2` with `SHAPE_DARKEN`), `building.cpp` `Shape_Number` (one frame on below
   `ConditionYellow`), and `animtype.cpp` (`Delay = TICKS_PER_MINUTE / Rate`); TS's `ART.INI` (`[GAFIRE_B]`
   `Rate=500` against `[GAFIRE_C]` `Rate=220`); and a working mod, whose extracted build-ups showed the purple second
   half (frames 20 to 39 of `GTPOWRMK.SHP`'s 40), whose buildings use frame 1 when damaged, and whose Firestorm
   Generator plays `GAFIRE_B` about twice as fast as `GAFIRE_C`.
+- **Damaged animation loops:** `ART.INI`'s `[GADEPT_A]` (`LoopStart=0`, `LoopEnd=4`) and `[GADEPT_AD]`
+  (`LoopStart=5`, `LoopEnd=9`, `Image=GADEPT_A`), against `GTDEPT_A.SHP`'s 20 frames, read for this page; a
+  working mod composes its damaged building runs this way.
+- **Sound and music:** `15-I000.AUD`, `25-I000.AUD` and the other lines found in `SOUNDS.MIX`, `THEME.INI` in
+  `LOCAL.MIX` and `THEME01.INI` in `expand01.mix`, and a score (`DUSKHOUR.AUD`) and two voice lines decoded, all
+  for this page (header: 22,050 Hz, compression 99; ffprobe: `adpcm_ima_ws`, mono); `SCOMP_SOS=99` in EA's
+  `SOUNDINT.H`, used by OpenTS's `dsaudio.cpp`; the voice sets of every unit in TS's `RULES.INI`; and a working
+  mod's voice and music builders, which read the same archives and ship TS voices for its units.
 - **Command & Conquer 3:** `StaticStream.big`'s header read for this page (`BIG4`), and a working mod that ships over
   fifteen C&C3 units built this way.
 

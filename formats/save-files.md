@@ -51,7 +51,9 @@ To reach the DLL's data:
    deflate (window bits -15 in zlib, or zlib's reference inflater `puff.c`).
 
 The DLL's data starts the inflated stream, so a check needs only its first few KB. A mod that writes a marker and
-version first in its save data can find them there.
+version first in its save data can find them there. To grey out Load with a reason, a launcher patch can reuse the
+load screen's own refusal for a missing custom map: see the fix on
+[Save versions](../engine/save-versions.md#every-class-size-is-the-version).
 
 ## Traps
 

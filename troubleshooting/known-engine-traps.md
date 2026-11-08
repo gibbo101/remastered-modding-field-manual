@@ -1,7 +1,7 @@
 ---
 title: Known engine traps
-description: Crashes and misbehaviour in EA's released Red Alert source that any DLL mod built from it inherits. The mod search-path buffer overruns with about four mods enabled; another folder's RULES.INI is read before yours; a sidebar column of exactly 75 entries writes past its array; the name table fills; a crate that destroys the unit driving onto it leaves a call on a dead unit; a misspelt INI key makes Inaccurate=yes do nothing; fixes under switches that are off (FIXIT_HELI_LANDING, TOFIX) never compile. Each with its fix.
-tags: [troubleshooting, crashes, engine, dll, ini, sidebar, crates, projectiles, defines]
+description: Crashes and misbehaviour in EA's released Red Alert source that any DLL mod built from it inherits. The mod search-path buffer overruns with about four mods enabled; another folder's RULES.INI is read before yours; a sidebar column of exactly 75 entries writes past its array; the name table fills; a crate that destroys the unit driving onto it leaves a call on a dead unit; a misspelt INI key makes Inaccurate=yes do nothing; fixes under switches that are off (FIXIT_HELI_LANDING, TOFIX) never compile; a dead target's coordinate is the map's origin. Production contracts new code must keep: orders never ask Can_Build, Get_Quantity counts from production start, an entry with production in flight must stay, a builder must be freed, a cheap refinery gets no harvester, the draw export's name can be NULL. Each with its fix.
+tags: [troubleshooting, crashes, engine, dll, ini, sidebar, crates, projectiles, defines, targets, production]
 holds_for: Steam build 21590013
 status: verified
 unproven: [whether the stock RedAlert.dll shipped with the game behaves exactly as EA's released source on each trap, the order in which the launcher registers enabled mods' folders]
@@ -68,6 +68,9 @@ in a column. A mod with several factions' trees can.
 **Fix:** change the guard to `<`, and raise `MAX_BUILDABLES` to fit your largest column, in both files. CFE Patch
 Redux fixes the same guard (its `Chthon CFE Note` in `SIDEBAR.CPP`).
 
+The GlyphX sidebar also closes the gap after a removed entry with an overlapping `memcpy`: see
+[Porting CFE Patch Redux](../engine/cfe-patch-ports.md).
+
 ## About 25 named types fill the name table
 
 Every unit, building or other type whose INI section sets `Name=` takes a slot in `NameOverride`, a table of 25
@@ -129,6 +132,47 @@ helipad, free or not. A change written into the `#ifdef` half compiles and is ne
 compiles. On Vanilla Conquer, look in its own `redalert/defines.h`: it keeps `FIXIT_HELI_LANDING` and
 `FIXIT_MINE_PASSABLE` off and `TOFIX` undefined, but turns `FIXIT_ENGINEER_CAPTURE` on.
 
+## A dead target's coordinate is the map's origin
+
+`As_Coord` (`TARGET.CPP`) turns a target into a coordinate. When the target isn't legal, which includes an object
+that has been destroyed (`Target_Legal` returns its `IsActive`), it returns `0x00000000`: the top-left corner of
+the map, not an error. Code that measures a distance or aims at `As_Coord(target)` after the target has died works
+with that corner instead. A projectile timed by its distance to the target, for example, then lives as long as a
+flight across the whole map.
+
+**Fix:** test `Target_Legal(target)` before using `As_Coord(target)`, and pick your own fallback. Vanilla Conquer's
+`target.cpp` returns the same zero.
+
+## Production contracts that catch new code out
+
+None of these is a bug in the stock game, which never reaches them. Each catches a mod that adds caps, cooldowns
+or new kinds of building:
+
+- **Ordering never asks `Can_Build`.** `HouseClass::Can_Build` decides what the sidebar offers: `Update_Buildables`
+  adds what it allows, and runs when the house's buildings change. An order goes through
+  `DLLExportClass::Construction_Action`, which only checks the item is in the sidebar's list, and then
+  `HouseClass::Begin_Production`, which doesn't call `Can_Build` either. So a cap or cooldown written into
+  `Can_Build` doesn't stop orders for a cameo already showing. A sidebar entry stays until no factory could build
+  it, even in theory (`StripClass::Recalc` asks `Who_Can_Build_Me`). Refuse capped orders in `Begin_Production`.
+- **`Get_Quantity` counts from the start of production.** `FactoryClass::Set` creates the object as soon as
+  production starts, and its constructor counts it (`Tracking_Add`), so `BQuantity` includes a building still being
+  built. For a cap on standing buildings, count the buildings yourself.
+- **Never drop a sidebar entry with production in flight.** Cancelling and placing find the factory through the
+  sidebar entry (`Construction_Action` reads its `Factory`). If your mod removes entries more eagerly than stock,
+  for example when a prerequisite is lost, skip any entry whose `Factory` isn't `-1`. Otherwise the house's factory
+  is left with no entry to cancel or place it, and that column can't build again.
+- **A building that skips `MISSION_CONSTRUCTION` must free its builder.** When construction ends, that mission
+  sends the yard `RADIO_OVER_OUT` and runs `Grand_Opening` (`BUILDING.CPP`). `Who_Can_Build_Me` skips a builder
+  still in radio contact (`OBJECT.CPP`), so a building that bypasses the mission and doesn't send it leaves the
+  yard unable to place anything again.
+- **A cheap refinery gets no free harvester.** A human player's refinery brings its harvester only if it was free
+  (`PurchasePrice` 0) or cost more than its `Raw_Cost`, which is the refinery's cost minus a harvester's
+  (`BuildingClass::Grand_Opening`, `BDATA.CPP`). A cheat or test lever that charges a token price stops the free
+  harvester. Give credits instead.
+- **The draw export's name can be `NULL`.** Most unit and building draws call `CC_Draw_Shape` without a shape
+  name, and `DLL_Draw_Intercept` then fills the object's `AssetName` from the type's graphic name. Code in the
+  intercept that keys on `shape_file_name` misses them. Key on the final `AssetName`.
+
 ## How it was verified
 
 Each trap three ways:
@@ -144,14 +188,27 @@ Each trap three ways:
   The switches: the commented-out `FIXIT_` lines and their note in `DEFINES.H`, no definition of `TOFIX` anywhere
   in the source tree, its 15 `#ifdef TOFIX` lines counted over the `.CPP` files, and the helicopter branch in
   `HOUSE.CPP` with `Who_Can_Build_Me`'s "in theory" test (`OBJECT.CPP`); Vanilla Conquer's `redalert/defines.h`
-  for its own settings.
+  for its own settings. The dead target: `As_Coord`, `Target_Legal` and its `IsActive` test in `TARGET.CPP`, and
+  the same zero in Vanilla Conquer's `target.cpp`. The production contracts: `Begin_Production` (`HOUSE.CPP`) and
+  `Construction_Action` (`DLLInterface.cpp`) with no `Can_Build` call, `Can_Build`'s callers in
+  `Update_Buildables` (`BUILDING.CPP`) and the house's recalc in `HouseClass::AI`, the `Who_Can_Build_Me` test in
+  `SIDEBARGlyphx.CPP`'s `Recalc`; `Tracking_Add` in the `BuildingClass` constructor and `Create_One_Of` in
+  `FactoryClass::Set`; the entry's `Factory` read in `Construction_Action`; `RADIO_OVER_OUT` and `Grand_Opening`
+  at the end of `Mission_Construction`, and the radio-contact test in `Who_Can_Build_Me`; the `PurchasePrice` test in
+  `Grand_Opening` and `BuildingTypeClass::Raw_Cost` in `BDATA.CPP`; the nameless `CC_Draw_Shape` in `CONQUER.CPP`
+  passing `NULL`, and the `Graphic_Name` fallback in `DLL_Draw_Intercept`.
 - **The game's files:** stock `rules.ini` (from `REDALERT.MIX`) sets `Inaccurate=yes` on five projectiles and
   never the key the code reads.
 - **A working mod hit each one:** the search-path crash, reported by another modder running several mods; another
   rules mod's `RULES.INI` replacing its own; the sidebar overrun and the name table, both found as its roster grew; and the crate crash,
   found from minidumps. The name table's crash was a string built from `NULL` in `InstanceServerG.exe`. Its
   projectile code reads both spellings of the inaccuracy key. A helicopter-placement fix of its own did nothing
-  until it moved from the `FIXIT_HELI_LANDING` half to the `#else`.
+  until it moved from the `FIXIT_HELI_LANDING` half to the `#else`. A flame projectile timed by its distance to a
+  target lived map-wide once the target died, until it tested `Target_Legal` first. Its unit caps refuse orders in
+  `Begin_Production` and count standing buildings; its sidebar skips entries with production in flight; a building
+  that installs without `MISSION_CONSTRUCTION` locked the yard out of placing until it sent `RADIO_OVER_OUT` and ran
+  `Grand_Opening`; a token-price test lever lost the free harvester, so it gives credits instead; and its draw
+  intercept keys its per-unit changes on `AssetName`.
 - **The fixes** are in that mod's code and released, and the crashes stopped.
 - **Unproven:** that the stock `RedAlert.dll` behaves exactly as the released source on each trap (it's built from
   it, but the binary wasn't checked), and the order in which the launcher registers enabled mods' folders, which

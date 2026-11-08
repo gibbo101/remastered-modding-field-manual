@@ -60,8 +60,16 @@ The lobby row itself is the launcher's, and it's data in `CONFIG.MEG` (see
 - **The name** is three strings per country in `MASTERTEXTFILE_<lang>.LOC`: `TEXT_FACTION_NAME_FACTION_<n>`
   (the lobby name), `TEXT_FACTION_BONUS_<COUNTRY>` (the overlay shown on hover and select) and
   `TEXT_FACTION_REDALERT_<COUNTRY>` (the in-match name). Relabel all three.
-- **The emblem** is `SmallIconName` in `FACTIONS.XML`, pointing at a preloaded player-slot icon
-  (`UI_Multiplayer_PlayerSlot_Faction_<nn>`). Repaint those icons in the UI atlas.
+- **The entries:** `FACTIONS.XML` holds eleven `ObjectTypeClass` entries. `Faction1` is TD's GDI and `Faction2`
+  TD's Nod. `Faction3` to `Faction10` are the eight countries in `HousesType` order: Spain, Greece, USSR, England,
+  Ukraine, Germany, France, Turkey. The eleventh, `Faction_Funpark`, is the Jurassic bonus campaign's.
+- **The emblem** is `EncyclopediaComponent` > `DefaultIcons` > `SmallIconName` in each entry, pointing at a
+  preloaded player-slot icon (`UI_Multiplayer_PlayerSlot_Faction_<nn>`). GDI uses `_00` and Nod `_01`, the
+  countries `_03` to `_10` in the same order, and `Faction_Funpark` reuses `_00`. There is no `_02`. Repaint those
+  icons in the UI atlas.
+- **The colours:** each entry's `TeamColorSettings` holds one entry per player colour (team 0 sky blue, team 1 red,
+  and on, then one for outposts), each with its own `UIColor`, `ParticleColor` and `RadarIconColor`. So a
+  faction's UI tint is set per team, not once for the faction.
 - **The HUD scene:** each faction entry in `FACTIONS.XML` names both TD's scene (`Art/GUI/Tactical_UI.bui`, in
   `TopLevelGUIList`) and Red Alert's (`Art/GUI/RA_Tactical_UI.bui`, in `TopLevelGUIListAlt`). Red Alert reads
   the alternate list, so swapping the two in a faction's entry gives that faction TD's whole sidebar.
@@ -99,7 +107,10 @@ need the DLL or a launcher patch:
 - **EA's source:** the `HousesType` enum and both side masks, `CNC_Set_Multiplayer_Data` handing the picked house
   over, `HouseClass::Init_Data` setting `ActLike`, and `HouseClass::AI` switching the player context.
 - **The game's files:** the stock `FACTIONS.XML` (the countries' entries, preloaded icons and both scene lists),
-  and the three name strings per country in `MASTERTEXTFILE_EN-US.LOC`.
+  and the three name strings per country in `MASTERTEXTFILE_EN-US.LOC`. The eleven entries, their icon numbers
+  and their `TeamColorSettings` (ten player colours and an outpost neutral) were read from the stock file; the
+  countries' order matches `HousesType` in EA's `DEFINES.H`, and a working mod's same-size `FACTIONS.XML` edit
+  finds each entry's icon at that path.
 - **A working mod** using both routes: Spain and Greece remapped to `HOUSE_GOOD` and `HOUSE_BAD`, Germany
   decoupled into a side of its own. All of it played in skirmish and LAN, under Proton on Linux and on the Steam
   Deck.

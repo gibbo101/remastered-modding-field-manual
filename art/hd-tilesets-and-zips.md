@@ -1,6 +1,6 @@
 ---
 title: HD tilesets and ZIPs
-description: "Ship HD art for a new unit, building or effect: a ZIP of frames with .meta files, one tile per shape in a patched copy of a listed tileset XML, a buildables entry named RA_ plus the type's INI name, an on-screen size set by the classic shape (HD canvas = classic frame x 5.33 in EA's art), and names that can't clash with stock tiles."
+description: "Ship HD art for a new unit, building or effect: a ZIP of frames with .meta files, one tile per shape in a patched copy of a listed tileset XML, a buildables entry named RA_ plus the type's INI name, an on-screen size set by the classic shape drawn (HD canvas = classic frame x 5.33 in EA's art; build-ups by BuildupData, overlays by their own shape), theatre art in the RA_TERRAIN tilesets, and names that can't clash with stock tiles."
 tags: [art, tilesets, zip, buildables, hd]
 holds_for: Steam build 21590013
 status: verified
@@ -87,6 +87,20 @@ cell against classic's 24):
 A canvas with a different shape from its classic frame is squashed to fit: a square canvas on a 72 × 48 building
 draws flattened. A finer canvas (×8, say) draws at the same size with more detail.
 
+**Every draw sends the size of the shape it draws.** EA's `CC_Draw_Shape` exports the width and height of the
+classic frame it was handed (`Get_Build_Frame_Width` and `Get_Build_Frame_Height`, `CONQUER.CPP`), and the map
+export does the same for each overlay and smudge from its own `ImageData` (`DLLInterface.cpp`). So:
+
+- **A building's build-up is sized by `BuildupData`.** While it's under construction, `BuildingClass::Get_Image_Data`
+  returns the build-up shape, so the build-up's classic frame must match the footprint too, or the build-up draws
+  squashed while the finished building looks right.
+- **A new overlay needs a classic shape of its own**, sized for its art.
+- **A donor sets the size as well.** An HD-only type drawn with another type's shape draws at that shape's size,
+  whatever its own canvas.
+
+A draw scale passed to `Techno_Draw_Object` also resizes a unit, but it shears the turret and leaves the selection
+box alone: see [How the launcher draws sprites](how-the-launcher-draws-sprites.md#rules).
+
 **Converting canvas pixels to leptons.** A cell is 256 leptons and 24 classic pixels (`ICON_LEPTON_W` and
 `ICON_PIXEL_W` in EA's `DISPLAY.H`), so one canvas pixel is 256 / (24 × the canvas's scale) leptons: 2 on EA's ×5.33
 canvases, 4/3 on a ×8 one. Convert fire points and muzzle offsets measured off the art at that rate, for the
@@ -103,6 +117,12 @@ type's `ImageData` as a donor, fixes it. The DLL side is on [Adding a unit](../u
   base game already has (the flame tiles `FLAME-N` to `FLAME-NW`, say) draws the base game's art, not yours.
   Prefix your names. The `TD` prefix for Tiberian Dawn art in Red Alert comes from DontCryJustDie's TD-Assets.
   (Observed; the lookup order isn't traced.)
+- **Theatre art lives in the terrain tilesets.** Theatre-specific art (every smudge, bibs included, and overlays
+  with `IsTheater` set, such as ore) is exported with `IsTheaterShape` set, and its tiles are looked up in
+  `RA_TERRAIN_<THEATRE>.XML`, not in the object tilesets. The stock files agree: `GOLD01` and `BIB1` are only in
+  the terrain tilesets, the sandbag wall `SBAG` (not theatre-specific) only in `RA_STRUCTURES.XML`. Register such
+  art in a patched copy of each theatre's terrain tileset (how the launcher picks one is on
+  [TD theatres in Red Alert](../using-what-the-player-owns/td-theatres-in-red-alert.md#how-the-launcher-picks-a-terrain-tileset)).
 - **Crop the frames, and describe them in `.meta`.** A frame's TGA is cropped to its visible pixels, and its
   `.meta` gives the canvas `size` and the `crop` box. A full-canvas TGA with a smaller `crop` is squeezed into
   the crop box.
@@ -123,6 +143,16 @@ type's `ImageData` as a donor, fixes it. The DLL side is on [Adding a unit](../u
 - **Leptons per canvas pixel:** the constants in EA's `DISPLAY.H` (`PIXEL_LEPTON_W` is their ratio). A working
   mod packs its units at ×8 and derives its muzzle tables at 4/3 leptons a pixel; an earlier fire point built on
   a quarter of the real rate fired shells from near the hull's centre, a cell and a half out at long range.
+- **Sizes sent per draw:** EA's `CC_Draw_Shape` (`CONQUER.CPP`), the overlay and smudge entries in
+  `DLLInterface.cpp`, and `BuildingClass::Get_Image_Data` (`BUILDING.CPP`). A working mod's building whose
+  build-up donor didn't match its footprint drew a squashed build-up, fixed by a donor of the right size; its
+  Disc Thrower's disc, on another bullet's shape, flew at that bullet's size until it got a classic shape of its
+  own; and its build gives every new overlay its own classic shape.
+- **Theatre art:** `IsTheaterShape` set from the type's `IsTheater` in EA's `CELL.CPP`, `BUILDING.CPP` and the
+  overlay export, and always for smudges (`SDATA.CPP`, and the smudge export: "Smudges are always
+  theater-specific"); `GOLD01` (theatre art) and `SBAG` (not) in `ODATA.CPP`; `GOLD01`, `BIB1` and `SBAG` counted in
+  the stock tilesets for this page. A working mod's building aprons, theatre-specific smudges, draw only from
+  the copies of their tiles in each theatre's terrain tileset.
 - **Registration and the white boxes:** a working mod's tileset and buildables files (970 `RA_` entries), its
   port notes, and the base game's tileset index.
 - **Observed only:** the `<Missing>` hover text and the stock-name clash, both from a working mod's early ports.

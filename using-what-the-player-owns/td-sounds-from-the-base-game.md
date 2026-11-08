@@ -41,7 +41,13 @@ So a TD sound in Red Alert is an **alias event**: a Red Alert-prefixed event who
 vehicle responses, such as `REPORT1`), EA's `On_Sound_Effect` appends `.V00` to `.V03` for a house on the Allied
 side and `.R00` to `.R03` for any other, picked by the response's variation. The suffix goes inside the same 16 bytes,
 so the launcher looks up `RAR_SFX_REPORT1.V01` and its kin. The base game's localized sound XML carries those events.
-An `IN_VAR` sound of your own needs the variant events, under both prefixes. Every other sound is sent bare.
+Every other sound (`IN_NOVAR`) is sent bare.
+
+The variation decides which two of the four a unit can get. Infantry pass their ID plus one, so they get `.V01`
+or `.V03` by its parity; vehicles and aircraft pass it negated, and get `.V00` or `.V02`. So a response only
+infantry use needs two recordings per side, one only vehicles use needs the other two, and a shared one needs all
+four. EA's own data follows this: `REPORT1` and `YESSIR1` have all four, `ROGER` and `UGOTIT` only `.V01` and
+`.V03`, `VEHIC1` only `.V00` and `.V02`. An `IN_VAR` sound of your own needs its variant events under both prefixes.
 
 ## The method
 
@@ -150,7 +156,12 @@ taken from two identical crash records (`EXCEPTION_INT_DIVIDE_BY_ZERO` at the sa
 there is a `div esi` in the client named above. Tested under Proton on Linux and on the Steam Deck.
 
 The variant suffix is in EA's `On_Sound_Effect` (`DLLInterface.cpp`), which appends it with `strncat` into the
-16-byte name, and the `.V00` to `.R03` events are in the stock `SFXEVENTSLOCALIZED.XML` (218 of them). The sample
+16-byte name, and the `.V00` to `.R03` events are in the stock `SFXEVENTSLOCALIZED.XML` (218 of them). The
+variation each caller passes is in EA's `INFANTRY.CPP` (`ID+1`), `DRIVE.CPP` and `AIRCRAFT.CPP` (`-(ID+1)`), and
+`AUDIO.CPP`'s own copy of the suffix code says "For infantry, use a variation on the response. For vehicles, always
+use the vehicle response table." The stock events per suffix were counted for this page: 11 response names carry
+`.V01` and `.V03`, 6 carry `.V00` and `.V02`. A shipped mod gives its Tiberian Sun units four recordings per
+response event, two infantry and two vehicle, and they play. The sample
 rates and block sizes were read from the fmt chunk of every TD EVA sample in `SFX2D_EN-US.MEG`. A shipped mod's
 DLL-sent EVA lines are stereo 44,077 Hz with 1024-byte blocks (fmt chunks read for this page), and play in game.
 

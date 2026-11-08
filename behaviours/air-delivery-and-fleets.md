@@ -1,6 +1,6 @@
 ---
 title: Air delivery, fleets and support powers
-description: Delivering vehicles by cargo plane as Tiberian Dawn's airstrip does, which Red Alert has no cargo plane for; giving a new faction its own ships, aircraft and support powers without opening Red Alert's types to it; a new superweapon's launcher type and cameo name; the traps of bringing a TD aircraft into Red Alert's engine, and short-range aircraft weapons that never fire.
+description: Delivering vehicles by cargo plane as Tiberian Dawn's airstrip does, which Red Alert has no cargo plane, aircraft box or fixed-wing landing run for; giving a new faction its own ships, aircraft and support powers without opening Red Alert's types to it; a new superweapon's launcher type and cameo name; the traps of bringing a TD aircraft into Red Alert's engine, and short-range aircraft weapons that never fire.
 tags: [behaviours, aircraft, naval, superweapons, reinforcements, tiberian-dawn, dll]
 holds_for: Steam build 21590013
 status: verified
@@ -33,10 +33,15 @@ the map edge, sets the vehicle down beside the strip, and leaves (TD's `BUILDING
 2. **A classic image,** so `ImageData` isn't null, or `AircraftClass::Draw_It` returns before drawing and the plane is
    invisible. Borrow another aircraft's image; the launcher still finds the plane's own HD tiles by name. See
    [Adding a unit](../units/adding-a-unit.md).
-3. **Its own size.** Red Alert's `Dimensions()` gives an unknown aircraft a small default box. A large plane leaves
-   ghost trails on the map unless it gets its own.
+3. **Its own size.** Red Alert's `AircraftTypeClass::Dimensions()` gives the Badger 56x56 and every other aircraft
+   21x20. A large plane leaves ghost trails on the map unless it gets a branch of its own.
 4. **The airstrip's exit** calling the reinforcement with the cargo plane, as TD's does.
-5. **Several deliveries in a row:** a second plane can arrive while the first is still in radio contact with the
+5. **A landing run.** Red Alert's `AircraftClass::Mission_Unload` hands every fixed-wing aircraft straight to
+   `Mission_Hunt`. TD's has a fixed-wing branch: pick an airstrip, fly to it, set the cargo down, leave. Port it
+   for the cargo plane alone, so Red Alert's own planes keep hunting. TD's `Enter_Idle_Mode` is what starts it: an
+   airborne loaner with cargo and no team gets `MISSION_UNLOAD`. Red Alert's has no such branch, so without one
+   the plane falls back to its idle mission instead of unloading.
+6. **Several deliveries in a row:** a second plane can arrive while the first is still in radio contact with the
    strip. Placement has to retry instead of giving up, planes should come in from a fixed edge with a fallback when
    the strip is busy, and the approach should fly straight in rather than circle.
 
@@ -86,7 +91,12 @@ A new `SpecialWeaponType` falls to `SW_UNKNOWN` there, so add a case:
 
 - **TD's delivery and what Red Alert lacks:** EA's TD `BUILDING.CPP` (the airstrip calling
   `Create_Special_Reinforcement` with `AIRCRAFT_CARGO`) and `REINF.CPP` (`SOURCE_AIR`), and Red Alert's `DEFINES.H`, with
-  no cargo plane in its aircraft list.
+  no cargo plane in its aircraft list. The box and the landing run: Red Alert's `AADATA.CPP` (`Dimensions`, 56x56
+  for `AIRCRAFT_BADGER`, else 21x20) and `AIRCRAFT.CPP` (`Mission_Unload`'s fixed-wing `Mission_Hunt`;
+  `Enter_Idle_Mode` with no cargo branch), against TD's `AIRCRAFT.CPP` (`PICK_AIRSTRIP`, `FLY_TO_AIRSTRIP`,
+  `BUG_OUT`; the airborne `Is_Something_Attached` and `IsALoaner` test giving `MISSION_UNLOAD`). The working mod's
+  cargo plane has its own `Dimensions` branch and TD's unload states, gated to its type, and its notes record the
+  frozen mission before the idle branch was added.
 - **Superweapon types and names:** EA's `DLLInterface.cpp` (`Convert_Special_Weapon_Type`: the `SW_*` names, the
   16-byte `strncpy`, `SW_UNKNOWN` for anything else) and `DLLInterface.h` (`DllSuperweaponTypeEnum`, with
   `SW_ION_CANNON` among TD's values), the stock `RA_SW_*` entries in `RABUILDABLES.XML`, and the working mod's four

@@ -1,10 +1,10 @@
 ---
 title: Testing under Proton and on the Steam Deck
-description: Run a Remastered mod build under Proton on Linux or a Steam Deck by copying the mod folder into the game's Proton prefix, synced by checksum rather than by size and time, with the game closed.
+description: Run a Remastered mod build under Proton on Linux or a Steam Deck by copying the mod folder into the game's Proton prefix, synced by checksum rather than by size and time, with the game closed. A DLL's logs go under USERPROFILE; with no one at the screen, the placement grid follows only relative pointer motion and sound is checked by matched filter.
 tags: [getting-started, testing, proton, steam-deck, linux, rsync]
 holds_for: Steam build 21590013
 status: verified
-unproven: [where the game saves screenshots on every setup (observed on the Steam Deck only)]
+unproven: [where the game saves screenshots on every setup (observed on the Steam Deck only), the headless pointer and sound findings on other setups (one run)]
 ---
 
 > [!NOTE]
@@ -72,6 +72,26 @@ The game writes `log/CrashLog.txt` in its install folder, a line per crash namin
 Each line also gives the client version and the faulting address (`EIP`). The same `log/` folder holds the
 launcher's other logs.
 
+## Your DLL's own logs
+
+Build a log file's path from `getenv("USERPROFILE")`, never a written-out `C:/users/steamuser/...`. Under Proton
+`USERPROFILE` is `C:\users\steamuser`, so a hard-coded path works there and nowhere else: on Windows or another
+Wine prefix the `fopen` fails silently and the log never appears. Add `\Documents\CnCRemastered\`, the game's own
+documents folder, which exists wherever the game has run. A log opened at `USERPROFILE` itself lands one folder
+up, in the prefix's `users/steamuser/`, so look there too.
+
+## Testing with no one at the screen
+
+A game can be driven with no monitor, under Xvfb with `xdotool` and screenshots. Two things were found that way,
+in one setup (**unproven** elsewhere):
+
+- **The building-placement grid follows only relative pointer motion.** `xdotool mousemove` works for the HUD and
+  for orders, but doesn't move the placement grid. Steer it with `xdotool mousemove_relative`, and take a
+  screenshot to check the grid before clicking.
+- **Sound can be checked without listening.** Record the audio sink's monitor (`pw-record`), and correlate the
+  recording against the sound files you expect (a matched filter). Lines that played scored 0.5 to 0.9 normalised;
+  lines that never played stayed at 0.24 or below.
+
 ## How it was verified
 
 - **The prefix path:** a Proton prefix on a Linux desktop, the target a working deploy script writes to on both
@@ -83,6 +103,12 @@ launcher's other logs.
   atlas edit that showed only after a relaunch.
 - **Crash records:** a shipped mod's runbook, and `log/CrashLog.txt` in an install, whose lines name the crashing
   process.
+- **Log paths:** the prefix's `user.reg`, whose documents folder is `%USERPROFILE%\Documents` and
+  `C:\users\steamuser\Documents`; a working mod's logging code, which opens its files under `getenv("USERPROFILE")`
+  plus `/Documents/CnCRemastered/`, and its porting notes; and that mod's logs in a prefix, under
+  `Documents/CnCRemastered/`, with the one log opened at `USERPROFILE` itself in `users/steamuser/`.
+- **Testing with no one at the screen:** one headless run of a working mod, recorded in its design notes and its
+  session notes. **Unproven:** whether the pointer behaviour and the scores hold on other setups.
 
 > [!TIP]
 > **In Tiberian Factions**
