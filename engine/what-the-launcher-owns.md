@@ -53,6 +53,7 @@ cached records in memory, or through a patch to its code. This page lists each o
 | Lobby picker: row order, hiding duplicate countries | **Real wall** (observed) | Tried: reordering `FACTIONS.XML` (no effect), commenting out an entry (a blank row that still selects that country), and changing `CampaignType` (crash at boot). |
 | A lobby picker emblem from an atlas region the launcher doesn't preload | **Real wall** (observed) | It crashes at boot. Repaint the preloaded slot icons in the UI atlas instead. |
 | New front-end screens and buttons | **Code-patch lever** + data | A screen of your own as a new `.BUI` on a registered screen class no stock screen uses (`SplashScreen`), with buttons and rows cloned from stock widgets. A launcher patch adds the menu button that opens it, and binds every widget's clicks. Shipped in a released mod. [New screens and buttons](../front-end/new-screens-and-buttons.md) |
+| The launcher's own co-op campaign mode | **Real wall** (a cut feature; finishing it is untried) | Code without content. `ClientG.exe` has a co-op campaign menu class and a hosting path (`CoordinatorMultiplayerManagerClass::Host_Coop_Campaign_Lobby`, with match-settings, ready and launch calls to EA's online coordinator), but every faction's `<CoopCampaignType>` in `FACTIONS.XML` is empty, and the screen its scene list names, `UI_CampaignMenu_CoOp`, has no `.BUI` in `CONFIG.MEG`. Hosting goes through the online service, and mods play over LAN only (see [LAN games](lan-games.md)), so even a working button would start an unmodded match. |
 | New widgets on the in-match HUD | **Open** | The `.BUI` alone can only reshape or hide existing widgets. The front-end route (a new scene and a patch that binds it) hasn't been tried on the in-match HUD. |
 | A new superweapon's sidebar cameo showing "Cost: $0" | **Open** | The launcher hides the cost line only for its own superweapons' asset names (`SW_Nuke`, `SW_Chrono` and others). Not tried since code patching became possible. |
 | The build hotkeys for new buildings and units | **Open** | Each build command names one stock object. Not tried since code patching became possible. |
@@ -118,6 +119,10 @@ Each row was checked three ways where possible:
   the CryptoPP, Lua 5.1, receiver-class and `SERVER_TO_CLIENT_EXTERNAL_GAME_PLUGIN_EVENT` strings in `ClientG.exe`;
   its event dispatcher's 14-way type switch, read from disk; every MEG in `Data/` listed for `.lua` files; and each
   executable's PE header.
+- **The co-op campaign mode:** `ClientG.exe`'s strings (`CoopCampaignMenuImplementationClass`,
+  `Host_Coop_Campaign_Lobby` and its coordinator messages, `Button_CoopCampaign`); `CONFIG.MEG` read for this page
+  (11 empty `<CoopCampaignType>` elements, `UI_CampaignMenu_CoOp` only as a scene-list key, no such member among its
+  207 `.BUI` files); and a working mod's design notes, which reached the same verdict.
 - **EA's source:** the DLL interface (exports, the one callback, `CNCPlayerInfoStruct`'s house, the input handler
   that answers only Ctrl, Shift and Alt) and the 128×128 export buffer.
 - **A working mod**, which ships every data, RAM and code-patch route above, tested under Proton on Linux and on

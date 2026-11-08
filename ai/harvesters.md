@@ -50,6 +50,10 @@ changes:
 | `GoldValue`, `GemValue` | `[General]` | 25, 50 | Credits per bail of ore and of gems. The ore search also weighs gem cells at four times `GemValue`. |
 | `OreTruckRate` | `[General]` | 1 | How slowly the harvester loads and dumps; larger is slower. |
 
+The stock column is the base game's `rules.ini`. A `rules.ini` of your own that leaves a key out gets the code's
+default instead (`RulesClass`'s constructor, `RULES.CPP`), and five of those differ: `OreFarScan` 32 cells
+(`0x2000` leptons), `GoldValue` 35, `GemValue` 110, `Harvester` 3 and `OreTruckRate` 2.
+
 ## What one mod ships
 
 Each is a DLL change, behind one "harvesters" switch on a settings page that restores EA's code when it's off (see
@@ -98,7 +102,9 @@ Each is a DLL change, behind one "harvesters" switch on a settings page that res
 - **The rules.ini knobs:** each key read in EA's `RULES.CPP` (`OreNearScan` and `OreFarScan` into `TiberiumShortScan`
   and `TiberiumLongScan`), used in `UNIT.CPP` (`Goto_Tiberium`, `Tiberium_Check`'s `GemValue*4`, the bail count) and
   `HOUSE.CPP` (`RefineryRatio`, `RefineryLimit`), and the stock values in the base game's `rules.ini`. A working
-  mod's harvester notes list the same keys.
+  mod's harvester notes list the same keys. The code defaults are `RulesClass`'s constructor initialisers
+  (`TiberiumLongScan(0x2000)`, `GoldValue(35)`, `GemValue(110)`, `IQHarvester(3)`, `OreDumpRate(2)`), checked
+  against the `rules.ini` extracted from `REDALERT.MIX`; the mod's notes give the same 110 fallback for `GemValue`.
 - **The fixes:** a working mod's design notes and code: the no-progress detector, field blacklist, retreat, zone
   gate, watchdog and field pick, shipped and tested in play. The refinery spreading is a CFE Patch Redux port.
 - **The zone trap:** EA's `Zone_Span` and `Is_Clear_To_Move` (the cleared building bit), and a working mod's failed

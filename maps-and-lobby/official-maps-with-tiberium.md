@@ -83,8 +83,10 @@ official map's thumbnail is a pre-rendered texture in `TEXTURES_SRGB.MEG`,
 - **Find the key from the preview data.** `CNCMAPPREVIEWDATA.XML` in `CONFIG.MEG` has one
   `<INIData Name="MOBIUS_RED_ALERT_MULTIPLAYER_<N>_MAP">` per map, holding its bounds, theatre and start waypoints,
   and naming no file. Match a map's `[Map]` bounds and its starts against those entries to find its `<N>`. Keep
-  off the Grass, `SCM05EA.INI`, is `_5_`: bounds 39, 35, 48 × 48 and starts 5295 and 9678 in both. The entries'
-  format is on [New maps in the skirmish Official list](new-maps-in-the-skirmish-list.md).
+  off the Grass, `SCM05EA.INI`, is `_5_`: bounds 39, 35, 48 × 48 and starts 5295 and 9678 in both. An entry
+  lists each start once, in the order the map first names it, so drop a map's repeated starts before comparing:
+  `SCMD2EA.INI`'s seven starts are the four of `MOBIUS_RED_ALERT_MULTIPLAYER_D2_MAP` (4773, 11846, 6234, 11558). The
+  entries' format is on [New maps in the skirmish Official list](new-maps-in-the-skirmish-list.md).
 - **The map is letterboxed.** The playable area is scaled by its longer side and centred. Docklands
   (`_111_`, 126 × 64 cells) fills rows 126 to 385 of the 512, with black above and below.
 - **Repaint only the converted cells.** Map each converted cell to its pixels with that rule, recolour the ore there,
@@ -129,11 +131,12 @@ resource's tiles to the tileset of every theatre your converted maps use: for sn
   `From_Name`, and the digest check (`CCINI.CPP`, `SCENARIO.CPP`).
 - **The game's files, measured for this page:** 230 `SCM…EA.INI` names found by CRC in `general.mix`, which also
   holds ten `SCM…EQ.INI` files; the theatre, `[STRUCTURES]` and `[Digest]` of all 230; `MAIN.MIX`'s header flags
-  (0); `SCM05EA.INI`'s sections, its three mines and its
-  bounds and starts, matching its preview entry; the repeated starts in `SCMD2EA.INI`; the stock thumbnails' size,
-  format and mip count, and that size worked out from the DDS layout (a 16-byte block per 4 × 4 pixels, at least
-  one block a mip); the Keep off the Grass thumbnail beside its map's `[TERRAIN]` trees; Docklands' thumbnail rows; and no `TIB01` tile in Red Alert's stock snow and temperate
-  tilesets.
+  (0); `SCM05EA.INI`'s sections, its three mines and its bounds and starts, matching its preview entry; the
+  repeated starts in `SCMD2EA.INI`, and its preview entry's four in first-seen order (a working mod's key lookup
+  drops the repeats the same way); the stock thumbnails' size, format and mip count, and that size worked out from
+  the DDS layout (a 16-byte block per 4 × 4 pixels, at least one block a mip); the Keep off the Grass thumbnail
+  beside its map's `[TERRAIN]` trees; Docklands' thumbnail rows; and no `TIB01` tile in Red Alert's stock snow and
+  temperate tilesets.
 - **A working mod:** 151 official maps rebuilt this way, each with its repainted thumbnail, shipped as data. Keep off
   the Grass was played on the Steam Deck with its East field as Tiberium and its blossom tree standing in it, and the
   repainted thumbnail showed in the lobby. Middle Mayhem, a snow map, drew winter Tiberium with no missing art on

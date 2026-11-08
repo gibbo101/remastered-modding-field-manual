@@ -3,6 +3,8 @@ title: Save versions
 description: Red Alert's save version is the sum of its saved classes' sizes, so growing a class breaks old saves, and EA's Load_Game reads the DLL's save data before the version check; lead the DLL's save data with your own marker and version. Loading re-constructs each object in place, so a field with a default in its declaration is reset on every load.
 tags: [engine, saves, dll]
 holds_for: Steam build 21590013
+clientg_version: 1.153 (745903)
+clientg_sha256: d405ed389548be51c67740bb6309de10a5f02bdfc86324a10c9ad3b663c08897
 status: verified
 unproven: [the exact crash an old save causes when loaded into a build with different class sizes; observed, not traced]
 ---
@@ -43,6 +45,13 @@ first in `DLLExportClass::Load`, and make `Load_Game` stop when `DLLLoad` return
 is then refused before anything else is read. The same leading bytes also let a launcher-side check grey out the
 Load button before the player tries: [Save files](../formats/save-files.md) shows how to reach them in a `.sav`.
 
+The load screen already has a refusal of its own to reuse: a save whose custom map is missing gets Load greyed
+out and a reason, the `TEXT_LOAD_MISSING_CUSTOM_MAP` text. A launcher patch can send a save your DLL would refuse
+down that same path with a reason of its own. In `ClientG.exe` 1.153 (745903), the map check's result is tested
+just after `0x64E4D6`, and the reason is pushed at `0x64E540` (`6A 1C 68 1C 20 C1 01`: the text's length, 28, and
+its address). This is a launcher code patch, with all the rules and fragility of
+[Patching the launcher's code from your DLL](../clientg-ram/patching-the-launchers-code.md).
+
 ## Loading re-runs a constructor: no default values in declarations
 
 Red Alert doesn't load objects field by field. For each saved object, the heap's `Load` (`HEAP.CPP`) reads its bytes
@@ -59,6 +68,9 @@ them out of the `NoInitClass` one. Vanilla Conquer loads the same way.
 - **Saves:** `SAVEGAME_VERSION` and the order of `DLLLoad` and the version check in EA's `SAVELOAD.CPP`, with
   `DLLExportClass::Load` reading without checking. A working mod writes its own marker and version first, and
   refuses any other save. The crash on an old save is observed, not traced.
+- **The load screen's refusal:** the code round `0x64E4D6` and the push at `0x64E540`, read from `ClientG.exe` on
+  disk, with `TEXT_LOAD_MISSING_CUSTOM_MAP` (28 characters) at the pushed address; a shipped mod that hooks both
+  sites, checking those stock bytes first, and greys Load with its own reason; and that mod's notes.
 - **The constructor on load:** EA's `TFixedIHeapClass::Load` (`HEAP.CPP`: `file.Get(ptr, sizeof(T))` then
   `new(ptr) T(NoInitClass())`), the same two lines in Vanilla Conquer's `heap.cpp`, and CFE Patch Redux, which hit
   it: its 1.8 changelog fixes "veterancy and other mod variables being reset to 0 when loading a saved game in RA",

@@ -50,9 +50,12 @@ Each house has an `IQ`, and `rules.ini`'s `[IQ]` section sets the level at which
 **In a stock skirmish every AI gets `IQ = MaxIQ`** (`GlyphX_Assign_Houses`, `DLLInterface.cpp`), so all of the
 above is on whatever the difficulty. IQ is a lever the stock skirmish never uses.
 
-`[IQ]` also has `SellBack`, but despite its section it isn't an IQ check: a damaged building sells itself when the
-house's **tech level** is at least `SellBack` (`BuildingClass::Repair_AI`, which `BuildingClass::AI` calls,
-`BUILDING.CPP`), not its IQ.
+`[IQ]` also has `SellBack`, but despite its section it isn't an IQ check: it's compared with the house's **tech
+level** (`BuildingClass::Repair_AI`, which `BuildingClass::AI` calls, `BUILDING.CPP`), not its IQ. A computer's
+damaged building sells itself only when all of these hold: the house has `RepairSell` IQ, the building could be
+repaired but the house has less money than `[AI]` `CreditReserve` (stock 100), an enemy has hit it, the tech level
+is at least `SellBack` and beats a `Random_Pick(0, 50)` roll, it's below `ConditionRed` (25%), it isn't the
+construction yard and has no trigger, and, in a campaign, the scenario allows selling.
 
 > [!WARNING]
 > **Lowering IQ can stop an AI building at all.** A computer house only starts base building if
@@ -74,9 +77,15 @@ each AI's pick itself: see [Per-AI lobby difficulty](../maps-and-lobby/per-ai-lo
 
 ## How it chooses what to build
 
-`Expert_AI` (`HOUSE.CPP`) runs a list of checks, each returning an **urgency** (none, low, medium, high, critical):
-build power, build defence, build income, fire sale, build offence, raise money, raise power, lower power, attack.
-`AI_Building`, `AI_Unit`, `AI_Infantry` and `AI_Aircraft` then pick one item per category, kept in the house as
+`Expert_AI` (`HOUSE.CPP`) runs ten strategies (`STRATEGY_*` in `DEFINES.H`), each a check returning an
+**urgency** (none, low, medium, high, critical) and an action: build power, build defence, build income, fire sale,
+build engineer, build offence, raise money, raise power, lower power, attack. It then runs the action of every
+strategy rated low or above, the most urgent first. EA's comment says it stops after the first urgency level that
+acts, but the code never checks its `acted` flag, so every rated strategy acts. A base-building house runs it again
+every `TICKS_PER_SECOND*5 + Random_Pick(1, TICKS_PER_SECOND/2)` game ticks: 76 to 82 at 15 ticks a game second, so
+about every 5 to 5.5 game seconds.
+
+`AI_Building`, `AI_Unit`, `AI_Infantry` and `AI_Aircraft` pick one item per category, kept in the house as
 `BuildUnit`, `BuildInfantry` and so on. Each factory asks the house what to build next (`Suggest_New_Object`), and
 the choice is cleared only when one is delivered, so with several factories of a kind the AI can build in parallel
 in a way a human player doesn't.
@@ -109,14 +118,14 @@ Each confirmed in EA's released source:
 |---|---|---|
 | **The skirmish AI never builds ships.** All of `AI_Vessel`'s logic sits inside `if (Session.Type == GAME_NORMAL)`. | `HOUSE.CPP` | No navy at all, on any map. |
 | **Its building list stops short.** `AI_Building`'s skirmish list has no shipyard, sub pen, missile silo, Iron Curtain or Chronosphere, and its repair bay entry is compiled out (`#ifdef OLD`). | `HOUSE.CPP` | No naval yards, no missile silo, Iron Curtain or Chronosphere, and damaged vehicles never repair. |
-| **The radar dome is only built against an air threat.** In skirmish, `AI_Building` queues `STRUCT_RADAR` only inside its air-defence block, which runs when an enemy owns aircraft. | `HOUSE.CPP` | No radar, so no tech centre and nothing that needs one, unless the player builds aircraft first. |
-| **In practice it uses three powers, all from buildings it does build.** Its airfield brings the spy plane and paratroopers, which `Super_Weapon_Handler` fires through `Special_Weapon_AI`, and the Allied tech centre's GPS satellite launches itself for any house. `Special_Weapon_AI` also handles the nuke, but the building list never includes a missile silo. Parabombs are enabled only in `GAME_NORMAL`, for every house. Nothing fires the Iron Curtain, Chronosphere or sonar pulse for a computer player, and it never builds the first two. | `HOUSE.CPP` | No nukes, Iron Curtain or Chronosphere from a stock skirmish AI. A mod that adds those buildings to its list still has to fire the Iron Curtain and Chronosphere itself. Nobody, human or computer, gets parabombs in a skirmish. |
+| **The radar dome is only built against an air threat.** In skirmish, `AI_Building` queues `STRUCT_RADAR` only inside its air-defence block, at `URGENCY_HIGH`, when `Can_Build(b, ActLike)` passes and it can pay (`Cost_Of() < money \|\| hasincome`). That block runs only while the base has fewer SAM sites and AA guns than `AARatio` and `AALimit` allow, and only against an air threat: its chosen enemy, or any house it isn't allied with, has a non-zero `AScan` (it owns aircraft). | `HOUSE.CPP` | In stock `rules.ini` the dome is the prerequisite of the SAM site, the AA gun, the helipad, the airfield and both tech centres. Without it the AI gets no air defence and no aircraft (so no spy plane or paratroopers), no GPS, gap generator, V2 launcher, radar jammer or spy, and nothing that needs a tech centre (Tanya, the flamethrower, the Mammoth tank, Aftermath's tech units). A computer player can't own aircraft without a dome either, so in practice only a human player's aircraft start the chain. |
+| **In practice it uses three powers, all from buildings it builds once it has a radar dome.** Its airfield brings the spy plane and paratroopers, which `Super_Weapon_Handler` fires through `Special_Weapon_AI`, and the Allied tech centre's GPS satellite launches itself for any house. `Special_Weapon_AI` also handles the nuke, but the building list never includes a missile silo. Parabombs are enabled only in `GAME_NORMAL`, for every house. Nothing fires the Iron Curtain, Chronosphere or sonar pulse for a computer player, and it never builds the first two. | `HOUSE.CPP` | No nukes, Iron Curtain or Chronosphere from a stock skirmish AI. A mod that adds those buildings to its list still has to fire the Iron Curtain and Chronosphere itself. Nobody, human or computer, gets parabombs in a skirmish. |
 | **Superweapon aim can't serve the Iron Curtain or Chronosphere.** `Special_Weapon_AI` aims at the enemy building of highest `Value` (each candidate has a 90% chance of being considered). Fired there, the Iron Curtain would shield the enemy's building, and the Chronosphere moves only allied units. `Place_Special_Blast` also picks the object in the target cell by the last mouse position (`Keyboard->MouseQX`). | `HOUSE.CPP`, `CELL.CPP` (`Cell_Techno`) | Adding the missing calls alone isn't enough: those two need their own target choice. |
 | **Target picks ignore the shroud outside a campaign.** `Evaluate_Object`'s "not visible, bail" test runs only in `GAME_NORMAL`, and `Special_Weapon_AI` looks at every enemy building on the map. | `TECHNO.CPP`, `HOUSE.CPP` | A computer player picks targets, and aims nukes, at things it has never seen. |
 | **Deploy abilities are never used.** Chrono tank teleports, MAD tank quakes and minelayer mines all run from `MISSION_UNLOAD`, and outside a campaign's team scripts nothing gives a computer unit that mission (the MCV is the one exception, in `Mission_Guard`). | `UNIT.CPP`, `TEAM.CPP` | Those units drive and shoot like tanks, or wander unarmed. |
 | **Four urgency checks and five build actions are stubs.** `Check_Build_Defense`, `Check_Build_Engineer`, `Check_Build_Income` and `Check_Build_Offense` always return `URGENCY_NONE`; `AI_Build_Defense`, `AI_Build_Engineer`, `AI_Build_Income`, `AI_Build_Offense` and `AI_Build_Power` always return `false`. | `HOUSE.CPP` | Those strategies never drive a decision. Power is the one rated but not acted on. |
 | **The power check's `|`.** "Under attack, so power is urgent" tests `BScan \| STRUCTF_CHRONOSPHERE`, which is always true. | `HOUSE.CPP`, `Check_Build_Power` | Any threatened house rates power as high urgency. |
-| **Target choice keeps the last candidate, not the best.** In `Greatest_Threat`'s ring scan, a candidate sets `bestobject` but never updates `bestval`, which stays at its starting -1 (or the best aircraft's score). | `TECHNO.CPP` (extended ASCII: use `grep -a`) | Every valid target replaces the last, so a unit attacks the last one the scan reaches, not the most valuable. |
+| **Target choice keeps the last candidate, not the best.** In `Greatest_Threat`'s ring scan, a candidate sets `bestobject` but never updates `bestval`, which stays at its starting -1 (or the best aircraft's score). All four edges of each ring (top, bottom, left and right) have the same `if (bestval < value)` with no update. The aircraft pass and the whole-map scan do set `bestval`, so only scans limited to a range or area (`THREAT_RANGE`, `THREAT_AREA`) go wrong. Guard and area guard use them (through `Target_Something_Nearby`), and so does every armed building, whose `Greatest_Threat` always adds `THREAT_RANGE`. Hunt scans the whole map. | `TECHNO.CPP` (extended ASCII: use `grep -a`), `FOOT.CPP`, `BUILDING.CPP` | Every valid target replaces the last, so a guarding unit or a base defence attacks the last one the scan reaches, not the most valuable. |
 | **Harvester bugs:** the "ore is short" latch that never resets, an idle harvester's overwritten order, and, in the campaign only, no replacement harvesters for a computer on a Hard handicap. See [Harvesters](harvesters.md). | `UNIT.CPP`, `HOUSE.CPP` | The AI's economy can stop for good. |
 | **The factory pool is small.** `[Maximums]` `Factory=` defaults to 20 in code (stock `rules.ini` raises it to 32), and every factory in production takes one. | `RULES.CPP`, `INIT.CPP` | Late in a big game, production silently stops. See [Raising the limits](../units/raising-the-limits.md). |
 
@@ -139,13 +148,30 @@ These are methods one mod uses, each a DLL change:
 - **IQ and difficulty:** EA's `RulesClass::IQ`, every use of each IQ value (`HOUSE.CPP`, `BUILDING.CPP`,
   `UNIT.CPP`, `INFANTRY.CPP`, `VESSEL.CPP`, `TECHNO.CPP`), the skirmish house set-up in `GlyphX_Assign_Houses`
   (`DLLInterface.cpp`: `IQ = Rule.MaxIQ`, `Assign_Handicap(Scen.Difficulty)`), `Scen.Difficulty`'s Normal default
-  (`ScenarioClass`'s constructor), `Set_Scenario_Difficulty`'s `GAME_NORMAL` gate and `CNC_Set_Difficulty`, the
-  unused `Assign_Houses` that reads `IsCompEasyBonus` (`SCENARIO.CPP`), `SellBack`'s tech-level test, a working mod's
+  (`ScenarioClass`'s constructor, and the reset in `INIT.CPP`'s scenario set-up), `Set_Scenario_Difficulty`'s
+  `GAME_NORMAL` gate and `CNC_Set_Difficulty`, the unused `Assign_Houses` that reads `IsCompEasyBonus`
+  (`SCENARIO.CPP`), `SellBack`'s whole test in `Repair_AI` (the same in Vanilla Conquer's `building.cpp`), where
+  `IsTickedOff` is set (`TECHNO.CPP`, damage from a non-ally) and `CreditReserve` read into `RepairThreshhold`
+  (`RULES.CPP`), a working mod's
   DLL, which keeps the same `Assign_Handicap(Scen.Difficulty)` call, and the stock `rules.ini` read from `REDALERT.MIX`
   (`[IQ]`, `[Easy]`, `[Normal]`, `[Difficult]`, `[AI]`).
 - **The build picks and attacks:** `AI_Unit`'s and `AI_Infantry`'s skirmish weights, `Check_Attack`, `AI_Attack` and
   the `Attack` timer's two resets, each in EA's `HOUSE.CPP`; `AttackInterval` and `AttackDelay` in `RULES.CPP` and the
   stock `rules.ini`.
+- **The strategies:** the ten `STRATEGY_*` values in EA's `DEFINES.H`; `Expert_AI`'s two loops and its return value,
+  and `HouseClass::AI` setting `AITimer` from it for a base-building house (`HOUSE.CPP`); `TICKS_PER_SECOND` 15
+  (`DEFINES.H`). Vanilla Conquer's `house.cpp` and a working mod's fork have the same loops, with `acted` never
+  read. A working mod's problem inventory counts the same ten pairs.
+- **The radar dome:** the air-defence block in EA's `AI_Building` (`HOUSE.CPP`: the `AARatio`/`AALimit` test, the
+  `AScan` threat test, `STRUCT_RADAR` at `URGENCY_HIGH`), the only `STRUCT_RADAR` choice in that function; the same
+  block in Vanilla Conquer; and the prerequisites in the base game's own `rules.ini`, `aftrmath.ini` and
+  `mplayer.ini`, read from `REDALERT.MIX` and the expansion MIXes for this page (`DOME` for `SAM`, `AGUN`, `HPAD`,
+  `AFLD`, `ATEK`, `STEK`, `GAP`'s `atek`, and so on). A working mod's problem inventory found the gap, and its fix
+  unlocked the tech tree.
+- **The ring scan:** the four `if (bestval < value)` blocks and the two passes that set `bestval` in EA's
+  `TechnoClass::Greatest_Threat`, the same four in Vanilla Conquer's `techno.cpp`; `Target_Something_Nearby`
+  keeping only `THREAT_RANGE | THREAT_AREA`, the guard missions' calls in `FOOT.CPP`, and
+  `BuildingClass::Greatest_Threat` adding `THREAT_RANGE`. A working mod found it and fixed it.
 - **The bugs:** each line in EA's source, as listed (`AI_Vessel`'s `GAME_NORMAL` gate, `AI_Building`'s full list,
   the four `Special_Weapon_AI` calls, the parabomb gate, `Evaluate_Object`'s visibility test, every
   `MISSION_UNLOAD` assignment). A working mod's problem inventory found them, and its code fixes most of them (the

@@ -34,7 +34,8 @@ its own can still take the zoom levels, which are data only. If you don't want C
   player who enables both gets one or the other, not both.
 - **The licence:** GPL v3, like EA's source and Vanilla Conquer. CFE's README invites reuse on the GPL's terms: your
   mod is GPL, and you publish its source. It also says plainly that it will act against reuse that doesn't follow
-  them. Credit the authors (see Credits below).
+  them: a mod using its code without publishing source gets a brief chance to fix that, then a DMCA complaint.
+  Credit the authors (see Credits below).
 
 ## Already in Vanilla Conquer
 
@@ -48,8 +49,13 @@ Check here before porting anything:
   reveal crate refused after a darkness crate, and the single-player AI failing to rebuild on normal-sized maps.
 - **Two fixes disagree.** CFE's own commits say Vanilla Conquer's versions are wrong: `Base_Is_Attacked`
   choosing defenders by strength ("Vanilla-Conquer commit c608b48 has this totally wrong"), and `MISSION_NONE`
-  used as an array index ("I think they have the logic wrong in places"). Compare both versions before trusting
-  either.
+  used as an array index. CFE's commit for that one (`b4f13a7`) says it was "inspired by vanilla-conquer's commit
+  624e391, but I think they have the logic wrong in places". Compare both versions before trusting either.
+- **One overlapping copy is still a `memcpy`.** The same CFE commit turns the `memcpy` that closes the gap in a
+  sidebar strip's list (`StripClass::Recalc`, removing an entry from `Buildables`) into a `memmove`, since the two
+  ranges overlap and C leaves an overlapping `memcpy` undefined. Vanilla Conquer's `sidebar.cpp` already has the
+  `memmove`. Neither changes the same line in `SIDEBARGlyphx.CPP` (`sidebarglyphx.cpp`), the sidebar the Remastered
+  DLL actually runs, so port the fix there yourself.
 
 ## How to port a change
 
@@ -91,7 +97,8 @@ Check here before porting anything:
 Stock Red Alert has eight zoom factors, 1.0 to 2.0, in the `CNCZoomFactors` list of `GameConstants.xml`. CFE
 replaces them with eleven, from 0.246875 to 1.975, which zoom out further. The odd steps are meant to be
 pixel-perfect at 1080p and 4K, the even ones on 2K monitors. The values are bleid's "Pixel-Perfect Zoom Levels",
-with extra steps CFE added between 1x and 2x. CFE ships a whole copy of `GAMECONSTANTS.XML` loose. The overlay
+with extra steps CFE added between 1x and 2x (its commit `ea2dde5`). CFE ships a whole copy of
+`GAMECONSTANTS.XML` loose. The overlay
 file carries only the list (see [Overriding the launcher's data](../launcher-data/overriding-launcher-data.md)):
 
 ```xml
@@ -136,8 +143,11 @@ offered on smaller maps (not tested here).
   boats (except the plain submarine) attack briefly and move on, and surface boats don't chase; minelayers lay all
   their mines near the destination and return to the repair bay. Each is code in that unit kind's class. A boat's
   "briefly" is a 180-frame clock set when it engages, and for the last 90 frames it's forced back to moving.
-- **The minelayer sees hidden mines.** `MinelayerFindSpot` skips any cell holding a building, and mines are
-  buildings, so it steers round enemy mines its owner can't see. CFE's own comment calls it a small cheat.
+- **The minelayer sees hidden mines.** `MinelayerFindSpot` looks at the 5 × 5 cells round the minelayer and takes a
+  cell that `Can_Enter_Cell` rates `MOVE_MOVING_BLOCK` or better, with no building (`Cell_Building()`) and no bib,
+  then picks the one with the shortest A\* path, plus a small random amount. Mines are buildings, so it steers round
+  enemy mines its owner can't see. CFE's own comment calls it a small cheat. It calls CFE's A\* (`Find_Path_AStar`),
+  so port that first.
 - **Aircraft flags are private.** EA's `AircraftClass` keeps `IsLanding` and `IsTakingOff` private, and attack-move
   reads them from `TechnoClass`. CFE comments out the `private:`; on a Vanilla Conquer base, make the two public.
 
@@ -192,13 +202,18 @@ superweapons, instant capture) are design choices, not fixes.
   two disputed fixes, the padding correction, the 1.9 rally-line fix, the zoom commit), and its source: the
   `MISSION_ATTACKMOVE` comment, the `Missions[]` names, `DLL_Export_Get_Input_Key_State` in `AIRCRAFT.CPP`, the
   owner-only rally drawing, the Smarter SAMs code in TD's `BUILDING.CPP`, `AttackMoveBoatClock` (`TECHNO.CPP`),
-  `MinelayerFindSpot` and its comment (`UNIT.CPP`), the commented-out `private:` in `AIRCRAFT.H`, and
+  `MinelayerFindSpot`, its cell test and its comment (`UNIT.CPP`), the `b4f13a7` diff (its one `memmove`, in
+  `SIDEBAR.CPP`, with `SIDEBARGlyphx.CPP` left as `memcpy`), the README's DMCA sentence, the commented-out
+  `private:` in `AIRCRAFT.H`, and
   `Find_Best_Refinery` taking the optimised choice whenever `HARVY_OPTIMIZE` is on (its README says the same), and
   the inaccuracy fix's two changes in `BBDATA.CPP` and `BULLET.CPP`, each gated on `INACCURACY_BUGFIX`. Its
   Workshop item (2268301299) ships
   `Data/RedAlert.dll` and a whole `GAMECONSTANTS.XML`.
-- **Vanilla Conquer:** ChthonVII's four commits on its `vanilla` branch, and its commit removing `SaveLoadPadding`
-  from every class.
+- **Vanilla Conquer:** ChthonVII's four commits on its `vanilla` branch, its commit removing `SaveLoadPadding`
+  from every class, commit `624e391` on GitHub ("[RA] Fix potential buffer over- and underflows"), and the
+  `memmove` in `sidebar.cpp` beside the `memcpy` still in `sidebarglyphx.cpp`. EA's `SIDEBAR.CPP` and
+  `SIDEBARGlyphx.CPP` both have the `memcpy`, and the DLL's sidebars are `SidebarGlyphxClass`
+  (`DLLInterface.cpp`).
 - **EA's source and the base game:** `IsLanding` and `IsTakingOff` under `private:` in `AIRCRAFT.H` (and in Vanilla
   Conquer's); mines as buildings (`STRUCT_AVMINE`, `STRUCT_APMINE`); `SaveLoadPadding` in the saved classes'
   headers; `Missions[]` and
@@ -207,8 +222,9 @@ superweapons, instant capture) are design choices, not fixes.
   in `TechnoClass::AI`. Each was read with `grep -a`. The stock zoom list is in `CONFIG.MEG`'s `GameConstants.xml`,
   and `[HARV]` with `SelfHealing=yes` is in the base game's `rules.ini`.
 - **A working mod** ported each feature in the table into a Vanilla Conquer DLL and played it in skirmish under
-  Proton on Linux. Its port notes record the boat clock, the minelayer leak and the build fix for the aircraft
-  flags. LAN play of the ported features rests on CFE's own statement, not a test here.
+  Proton on Linux. Its port notes record the boat clock, the minelayer leak (with its `Can_Enter_Cell` test, the
+  same in its ported `MinelayerFindSpot`), the build fix for the aircraft flags and the `624e391` dispute. LAN play
+  of the ported features rests on CFE's own statement, not a test here.
 
 **Credits:** cfehunter (the original CFE Patch, and its A\*), Root-Core (the first Red Alert port), ChthonVII (CFE
 Patch Redux: attack-move, harvester optimisation, Tiberium aversion, smarter repair bays, LAN play and most of the

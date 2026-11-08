@@ -35,6 +35,7 @@ Two sets of data drive Mission Select, and they do different jobs:
 | Whether it's **unlocked from the start** | `INSTANCES.XML`, `<IsUnlockedAtStart>` | `true` always shows it; otherwise the player's progress decides |
 | **Which game's** Mission Select lists it | `INSTANCES.XML`, `<ExternalGameID>` | `RedAlert` or `TiberianDawn`. A TD instance never lists in Red Alert. |
 | Its **name and briefing** | `INSTANCES.XML`, `<LocationNameTextID>`, `<MissionBriefingTextID>` | Text IDs, looked up in the game's text |
+| Its **movies and map picture** | `INSTANCES.XML`, `<IntroMovieName>`, `<BriefMovieName>`, `<ActionMovieName>`, `<WinMovieName>`, `<MissionSelectMapTexture>` | Movie names, and the texture Mission Select shows for the mission (`UI_NOD01_MapState.tga` and the like) |
 | Whether it **launches**, and what comes next | the campaign files (`RA_ALLIES.XML`, `RA_ALLIES_MISSIONS.XML` and the like, in `CONFIG.MEG`'s `DATA\XML\CAMPAIGNS\`) | A mission whose definition is removed still lists, but its Start does nothing. `MapStageUnlock` chains to the next stage. |
 
 So **the roster shown comes from `INSTANCES.XML`**, not from the campaign files. Cutting a campaign file down to two
@@ -81,7 +82,9 @@ A stock mission slot plays whatever scenario INI of the right name it finds firs
 2. **Write your scenario** in Red Alert's format. Starting from the stock file is easiest.
 3. **Remove the `[Digest]` section.** Red Alert checks a scenario's digest at load. A wrong digest aborts the
    load (only multiplayer scenarios numbered below 25 are exempt), but a *missing* digest skips the check. Any edit makes the old
-   digest wrong, so delete it.
+   digest wrong, so delete it. The abort is compiled in only because `DEFINES.H` defines `RELEASE_VERSION`, which
+   EA's build and Vanilla Conquer's both do. Maps saved by EA's map editor rely on the missing-digest
+   skip too: the editor never writes a `[Digest]`.
 4. **Ship it** as `CCDATA/SCG43EA.INI` in the mod. No `CONFIG.MEG` change is needed. The file is read when the mission loads, so a
    changed copy takes effect at the next Start, with no restart of the game (observed on a Steam Deck).
 
@@ -130,6 +133,15 @@ missions in Red Alert's Mission Select therefore takes a launcher code patch on 
 | Soviet-side test (faction 7 to 8: USSR, Ukraine) | `0x118E840` | `8B 81 88 04 00 00 83 C0 F9 83 F8 01 0F 96 C0 C3` |
 | Expansion tabs' calls to them | `0x63382F`, `0x633878` | `E8` to the two tests |
 
+Other Mission Select sites a patch can hook, in the same build:
+
+| Site | Address | What's there |
+|---|---|---|
+| Row style | `0x632FFA` | Picks a row's crest style from the mission's house: GDI (`0x64E740`) and Nod (`0x64E770`) styles first, then this branch calls the Allied-side test and takes the Allied (`0x64E710`) or Soviet (`0x64E7A0`) style |
+| Row select | `0x64E680` | A function: gives a row's buttons their selected look |
+| Mission label | `0x118D710` | A function: builds the label a mission's row shows |
+| Tab switch | `0x633E60` | A function: switches Mission Select to another tab |
+
 The mission's faction is read from the instance at `+0x488`. GDI is 0 and Nod 1, which is why neither passes. The
 calls sit in the tab sort, `0x633520`, which files each mission under a numbered tab: Allies 6, Soviets 7, Allied
 expansions 8, Soviet expansions 9, Ant 10 (the `mov [ebp-0Ch], n` after each test).
@@ -141,8 +153,11 @@ expansions 8, Soviet expansions 9, Ant 10 (the `mov [ebp-0Ch], n` after each tes
 > section records what the stock files show, and where the trail goes cold.
 
 Between missions, Red Alert's campaigns show a map of territories, and the player picks the next mission on it.
-`RA_CAMPAIGNMAPS.XML` (in `CONFIG.MEG`'s `DATA\XML\CAMPAIGNS\`) defines it, one `CampaignMapSelectMapClass` per
-tab:
+`RA_CAMPAIGNMAPS.XML` (in `CONFIG.MEG`'s `DATA\XML\CAMPAIGNS\`) defines it for the Allied and Soviet campaigns,
+one `CampaignMapSelectMapClass` each, with `GuiLayer` `RA_ALLIES` and `RA_USSR`. `CAMPAIGNMAPS.XML` beside it holds
+the other eight: Tiberian Dawn's (`TD_GDI`, `TD_NOD` and others), and Red Alert's expansion and Ant campaigns,
+whose layers are named `TD_Aftermath_Allied`, `TD_Aftermath_USSR` and `TD_Funpark`. A `GuiLayer` belongs to the
+campaign map; the Mission Select tabs come from the tab sort above.
 
 ```xml
 <CampaignMapSelectStageClass>
@@ -186,19 +201,33 @@ tab:
   Linux desktop and a Steam Deck: hiding completed missions, cutting a campaign file down, adding `<Stages>` that
   didn't appear, a removed definition that wouldn't start, and a new instance that appeared. The flags and values
   are in the stock `INSTANCES.XML` (`ShowOnMissionSelect`, `IsUnlockedAtStart`, `ExternalGameID` with
-  `RedAlert` and `TiberianDawn`).
+  `RedAlert` and `TiberianDawn`). The tests: Allied 5A, 5B and 5C set `false` made "Tanya's Tale" vanish though it
+  was completed; removing `RA_ALLIES_14`'s definition left its Start doing nothing while mission 1 still launched; and
+  a new `Mobius_Allied_Campaign_99_Map` on the Allied variant listed as "Allies 99" on the Allied tab, its
+  deliberately Tiberian Dawn name ID showing a placeholder.
+- **The movie and picture fields:** counted in the stock `INSTANCES.XML` (about 395 KB), in `CONFIG.MEG`
+  itself, and written by EA's own instance export in `DLLInterfaceEditor.cpp` (TD), which prints
+  `<BriefMovieName>`, `<ActionMovieName>` and `<WinMovieName>` from each scenario's movies.
 - **The scenario shadow:** `SCG43EA.INI` with every enemy removed and `[Digest]` deleted, shipped in a mod's
-  `CCDATA/`, won itself in about 30 seconds from the Aftermath tab, on both machines. EA's source gives the file
-  name (`Set_Scenario_Name`), the digest check (`CCINIClass::Load` skips a missing digest, returns 2 for a wrong
-  one) and the abort on 2 (`SCENARIO.CPP`).
+  `CCDATA/`, won itself in about 30 seconds from the Aftermath tab, on both machines. The mission is "ITALY: Harbor
+  Reclamation"; all 90 enemy entries (USSR and BadGuy, across its units, ships, infantry and structures) were removed
+  and the rest renumbered. On the win the DPTHCHRG movie played, the campaign advanced to "In the Nick of Time", and
+  the roster showed the completion shield. A stock run can't be won unattended in seconds, so the game read the
+  mod's file. EA's source gives the file name (`Set_Scenario_Name`), the digest check (`CCINIClass::Load` skips a
+  missing digest, returns 2 for a wrong one) and the abort on 2 inside `#ifdef RELEASE_VERSION` (`SCENARIO.CPP`),
+  with `RELEASE_VERSION` defined in `DEFINES.H`; Vanilla Conquer's `scenario.cpp` and `defines.h` have the same.
+  EA's map editor source has no digest code at all.
 - **Variant order:** observed as instances that listed nowhere until moved after their base. The stock file defines
   every one of its 456 instances' variants before use, and a shipped mod's build appends its instances at the end.
 - **The campaign map:** the stock `RA_CAMPAIGNMAPS.XML` and `RA_ALLIES_MISSIONS.XML` read for this page (stages,
-  movies, entries, `MapStageUnlock`, `RestoreAllUnits`), the movies listed in `MOVIES_RA.MEG`, and a working
+  movies, entries, `MapStageUnlock`, `RestoreAllUnits`), every `CampaignMapSelectMapClass` and its `GuiLayer` in
+  both campaign map files, found through `CONFIG.MEG`'s index, the movies listed in `MOVIES_RA.MEG`, and a working
   mod that couldn't make a map of its own or a lasting branch.
 - **Tab sort:** the two side tests and their calls, and the tab numbers stored after each test in the tab sort,
   were read from `ClientG.exe` on disk. A shipped mod's patch on them lists its GDI and Nod missions, and its notes
-  give the same tab numbers.
+  give the same tab numbers. The other sites: the row-style branch and the four style calls round it, and the
+  three function starts, read from the exe on disk; a shipped mod hooks all four, and its notes and code name
+  them.
 - **The campaign files:** the stock manifests, campaign and mission files extracted from `CONFIG.MEG` for this page
   (every `ProgressiveCampaignTypeClass`, every `MapStageUnlock`), checked against a working mod's campaign notes
   and the loose copies its CAMPAIGNS page ships. The stock `INSTANCES.XML` has 456 instances: 22 on the Allied base,

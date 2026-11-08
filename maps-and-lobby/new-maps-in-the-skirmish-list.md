@@ -121,6 +121,21 @@ The map file itself has to be in Red Alert's format, every cell moved onto the 1
 play in its own theatre: see [TD theatres in Red Alert](../using-what-the-player-owns/td-theatres-in-red-alert.md).
 Ship it in the mod's `CCDATA/` folder under a name of your own.
 
+## The other route: the player's custom maps
+
+A map can also go where the player's own maps live, with no launcher patch. The launcher lists Red Alert custom
+maps from `Documents\CnCRemastered\Local_Custom_Maps\Red_Alert\` (EA's map editor saves there). Each map is three
+files of the same name:
+
+- `<name>.mpr`: the whole scenario, in Red Alert's INI format;
+- `<name>.tga`: its preview picture;
+- `<name>.json`: what the lobby lists it by, `MapTileX`, `MapTileY`, `MapTileWidth`, `MapTileHeight`, `Theater` and
+  `Waypoints` (the starts).
+
+Starting one, the launcher calls the DLL's `CNC_Start_Custom_Instance` with the folder and the map's name, and the
+DLL loads `<folder><name>.mpr` as an INI (`[Basic]` `Name`, `[Digest]`). With its `multiplayer` flag false, EA's
+DLL plays it as `GAME_NORMAL`. The map shows under the player's custom maps, not in the Official list.
+
 ## Traps
 
 - **D6 must always resolve.** A client told to load D6 that finds no entry for it stalls the whole match. If your
@@ -143,6 +158,10 @@ Ship it in the mod's `CCDATA/` folder under a name of your own.
 - **The server's refusal:** a new instance hitting the server's assert was observed in play, and the assert text
   and its source file are in `InstanceServerG.exe`. The ignored `OverrideMapName` edit was observed once, when a
   hijacked community entry still loaded its stock map.
+- **Custom maps:** EA's map editor source (its save folder, `Local_Custom_Maps`, and the `.mpr`, `.tga` and `.json`
+  it writes, with the JSON's fields), `CNC_Start_Custom_Instance` in EA's `DLLInterface.cpp`, a Proton prefix's
+  `Local_Custom_Maps\Red_Alert\` holding such triplets, and a working mod's notes, which found the same folder on a
+  Steam Deck.
 - Observed, not re-tested for this page: that an unresolved D6 stalls a match.
 
 > [!TIP]

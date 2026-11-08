@@ -45,12 +45,13 @@ already offers it, in the same lobby, every match, with no file to find and edit
 ## Why memory is the only source
 
 - **`CNC_Set_Difficulty`** takes one int for the whole game, and in skirmish the launcher sends the same value
-  whatever the picks are. EA's DLL ignores it outside a campaign anyway, and gives every skirmish house the Normal
-  handicap (see [The skirmish AI and its IQ levels](../ai/skirmish-ai-and-iq.md)).
+  whatever the picks are: 1 in every skirmish lobby measured (mixed, all Easy, all Hard), and -1 in a LAN game. EA's
+  DLL ignores it outside a campaign anyway, and gives every skirmish house the Normal handicap (see
+  [The skirmish AI and its IQ levels](../ai/skirmish-ai-and-iq.md)).
 - **The per-player struct** the DLL receives (`CNCPlayerInfoStruct`) carries a name, house, colour, team and an
   AI flag, but no difficulty.
-- **No file holds it.** The launcher's saved settings keep the map, faction and mode, but not difficulty, and after
-  a full restart the lobby resets to one Medium AI.
+- **No file holds it.** The launcher's saved settings keep the map, faction and mode, but not the AIs' difficulty,
+  and after a full restart the lobby resets to one Medium AI.
 
 The picks live only in `ClientG.exe`'s memory, where they last from the lobby into the match. In a LAN game only the
 host runs the simulation (see [LAN games](../engine/lan-games.md)), and the host's launcher holds the whole
@@ -58,8 +59,8 @@ lobby, so one read on the host covers every AI.
 
 ## The method
 
-1. **Find ClientG** with `CreateToolhelp32Snapshot` and open it with `PROCESS_VM_READ |
-   PROCESS_QUERY_INFORMATION`. Nothing more, since you never write.
+1. **Find ClientG** by its executable name, `ClientG.exe`, with `CreateToolhelp32Snapshot`, and open it with
+   `PROCESS_VM_READ | PROCESS_QUERY_INFORMATION`. Nothing more, since you never write.
 2. **Walk its private, committed, read-write regions** (`VirtualQueryEx`) and read them in chunks.
 3. **Search for the AI names** the lobby gave you. Each AI's record starts with its slot name, `AIPLAYER1`,
    `AIPLAYER2` and so on, null-terminated, and the records are 168 (`0xA8`) bytes apart. The name numbering
@@ -71,16 +72,22 @@ lobby, so one read on the host covers every AI.
    candidate must cover the whole AI roster. Other `AIPLAYER` strings turn up in memory (logs, render copies, a
    message block), and validation discards them.
 5. **Map each record to its AI**, by the `AIPLAYERn` name, and set that AI's difficulty: 1 Easy, 2 Medium, 3 Hard.
+   Capture which house each name went to while the houses are set up: by the time `CNC_Set_Difficulty` runs, the
+   name is gone from the house. EA's `GlyphX_Assign_Houses` (`DLLInterface.cpp`) copies each player's name into
+   its house's `IniName`, then overwrites a computer house's with the "Computer" text, and the copy it keeps in
+   `InitialName` is compiled out (`#ifdef WOLAPI_INTEGRATION`, which the build never defines). Record the slot in
+   that loop, before the overwrite.
 
 Read early in the match, and again a few times if the first read fails. The launcher rebuilds its records as a
-match launches, and a scan inside that window can find a half-written array. Require two reads that agree before
-trusting a late one.
+match launches, and a scan inside that window can find nothing, or a half-written array: one read of an Easy,
+Medium, Hard, Medium lobby came back Easy, Medium, Medium, Medium. Solo skirmish hits this too, from the second
+match of a session. Require two reads that agree before trusting a late one.
 
 ## The record
 
 | Offset | Field | Values |
 |---|---|---|
-| `0x00` | Slot name | `AIPLAYERn`, null-terminated. Human players' records come first, with an empty name. |
+| `0x00` | Slot name | `AIPLAYERn`, null-terminated. Human players' records come first, with an empty name and a difficulty of 0, so anchoring the search on `AIPLAYERn` skips them. |
 | `0x50` | Team | 0 to 7, or 8 for a random team. Zero-based, so check its range only, never treat it as a slot number. |
 | `0x54` | Country (`ActLike`) | Red Alert's `HousesType` + 2, so 2 to 9, or 42 for a random pick |
 | `0x64` | **Difficulty** | 1 Easy, 2 Medium, 3 Hard |
@@ -118,17 +125,44 @@ Require the survivors of each step to agree before taking a value. That way the 
 stale pick. The pointer signals exist only around match start, so run this on the first read. Searching for
 pointers sweeps the whole address space per candidate, so do it only when candidates disagree.
 
+**What doesn't work:**
+
+- **Reading at another call.** A scan in `CNC_Set_Multiplayer_Data` and one in `CNC_Set_Difficulty` found the same
+  candidates every time.
+- **Comparing the records' bytes.** A stale and a live record differ at about 55 offsets, all heap pointers or
+  uninitialised bytes. There is no counter or other field to key on.
+- **Preferring the copy that differs from the last match's picks.** It inverts when the player changes a pick and
+  changes it back: launch on Hard, set Easy, set Hard again, and the stale copy is the one reading Easy.
+- **More fields from the roster.** Team, colour and country are all the lobby gives the DLL, and the stale copy
+  matches on all three.
+
+Changing the difficulty with no match played in between doesn't make a stale copy: the launcher overwrites the
+array in place.
+
 ## How it was verified
 
 - **That nothing passes the difficulty:** EA's `DLLInterface.h` (`CNC_Set_Difficulty(int)`, and no difficulty in
-  `CNCPlayerInfoStruct`); the values the launcher sent across five lobbies; DontCryJustDie's own finding that the
-  per-AI setting exists only on the launcher's side.
+  `CNCPlayerInfoStruct`); the values the launcher sent, logged by a mod's DLL across five skirmish lobbies (mixed,
+  all Easy twice, all Hard, and Hard in the campaign difficulty option) and in LAN games; DontCryJustDie's own
+  finding that the per-AI setting exists only on the launcher's side.
+- **The name trap:** EA's `GlyphX_Assign_Houses` (the `IniName` copy, the `TXT_COMPUTER` overwrite for computer
+  houses, `InitialName` under `#ifdef WOLAPI_INTEGRATION`), no `WOLAPI_INTEGRATION` define in `DEFINES.H` or the
+  project file, the same loop in Vanilla Conquer's `dllinterface.cpp`, and a shipped mod that hit it and now records
+  each house's slot inside the loop.
 - **The record:** a shipped mod's reader and its field constants; live reads with colours, teams and countries
   shuffled, random picks included; and DontCryJustDie's independent identification of the colour, team and country
-  fields, and of the start-position field.
+  fields, and of the start-position field. The first reads, of a Hard, Medium, Easy, Hard lobby, gave 3, 2, 1, 3 at
+  `+0x64`, and human records read 0. Countries decode through EA's `HousesType` order: an all-Soviet lobby read
+  `4, 4, 4` (`HOUSE_USSR` + 2), and a mixed lobby `2, 9, 3` (Spain, Turkey, Greece). Teams read the lobby's team
+  number minus 1, and a three-AI lobby with two AIs sharing a team read `0, 1, 1`.
+- **The rebuild window:** a mid-launch read caught returning a half-written array, and the shipped reader's retry,
+  which needs two agreeing reads; the mod's release notes record the fix for solo skirmish from the second match
+  of a session on.
 - **Stale copies and the resolver:** 28 ambiguous reproductions resolved with none wrong, and the compiled
   resolver run offline over 46 recorded cycles with none wrong. DontCryJustDie independently found the
-  array-base target and the vector triple on Windows, about 30 samples with no failure.
+  array-base target and the vector triple on Windows, about 30 samples with no failure. The routes that don't work
+  come from the same measurements: about 13 change-only cycles with no stale copy, identical candidate sets at
+  both scan sites, and full 168-byte dumps of stale and live records.
 - **Not yet seen:** the vector-triple step deciding a live ambiguous read. Every recorded case was settled by
   the later steps.
 
