@@ -14,18 +14,20 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [The mod folder and ccmod.json](getting-started/the-mod-folder-and-ccmod-json.md): a mod is ccmod.json plus a
   Data/ tree; local mods in Documents\CnCRemastered\Mods\Red_Alert (or Tiberian_Dawn); Workshop items need a named
   subfolder; the version is two integers shown as high.low.
-- [Building the DLL on Linux](getting-started/building-the-dll-on-linux.md): cross-compile the game DLL with
-  32-bit mingw (i686 toolchain, Vanilla Conquer's remaster preset, VC_CXX_FLAGS="-w;-fpermissive"); strip it
-  before shipping.
-- [Testing under Proton and on the Steam Deck](getting-started/testing-under-proton.md): copy the mod into the
-  game's Proton prefix (compatdata/1213210) with rsync -ac --delete, with the game closed; crashes are logged in
-  log/CrashLog.txt.
+- [Building the DLL on Linux](getting-started/building-the-dll-on-linux.md): cross-compile the game DLL with 32-bit
+  mingw (i686 toolchain, Vanilla Conquer's remaster preset, VC_CXX_FLAGS="-w;-fpermissive"); strip it before
+  shipping; the build's mod folder is copied only on relink and never loses files, so restage it.
+- [Testing under Proton and on the Steam Deck](getting-started/testing-under-proton.md): copy the mod into the game's
+  Proton prefix (compatdata/1213210) with rsync -ac --delete, with the game closed; crashes are logged in
+  log/CrashLog.txt; build DLL log paths from USERPROFILE; headless, the placement grid follows only relative pointer
+  motion (one run).
 - [Publishing to the Workshop from Linux](getting-started/publishing-to-the-workshop-from-linux.md): a SteamUGC
   uploader using EA's .workshop.json fields; restart Steam first, description at most 8000 characters, upload real
   folders in a named subfolder; EA's Uploader.exe hangs the same way.
 
-- [HD-only mods](getting-started/hd-only-mods.md): the manual assumes HD graphics mode; switch off the classic
-  option with CNCDisableLegacyGraphicsOption in GameConstants_Mod.xml when new art exists only in HD.
+- [HD-only mods](getting-started/hd-only-mods.md): the manual assumes HD graphics mode; switch off the classic option
+  with CNCDisableLegacyGraphicsOption in GameConstants_Mod.xml when new art exists only in HD; TD's classic art: the
+  palette remap rule and the Obelisk beam's RA indices.
 
 ## File formats
 
@@ -57,10 +59,12 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
   hide, retint, retexture, clone widgets; FACTIONS.XML GUIFileNames picks the screen. Loose any size.
 - [New screens and buttons](front-end/new-screens-and-buttons.md): clone a stock button in a loose RA_MAIN_MENU.BUI
   and bind its click from a hook; a new screen is a loose .BUI on ClientG's unused SplashScreen class, opened with
-  GUIManager/Create_Scene_Instance. Fragile: one ClientG build.
+  GUIManager/Create_Scene_Instance. Fragile: one ClientG build; handlers are member calls (object in ecx, data on the
+  stack); leave the skirmish lobby through its Back handler.
 - [A faction encyclopedia screen](front-end/faction-encyclopedia.md): a new SplashScreen-class screen listing each
   faction's units with picture, description and live stats; the DLL processes the mod's rules inside ClientG, draws
-  pictures into a canvas texture shipped at start-up, and fills a stock list box. Fragile: one ClientG build.
+  pictures into a canvas texture shipped at start-up, and fills a stock list box. Fragile: one ClientG build; rows
+  filled as the stock Mission Select list does (MissionColumn, event 4); mplayer.ini's nine rule readers.
 
 ## Using what the player already owns
 
@@ -72,22 +76,24 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [TD sounds from the base game](using-what-the-player-owns/td-sounds-from-the-base-game.md): play Tiberian Dawn's
   sound effects and EVA lines in a Red Alert mod from the base game's sound MEGs, by naming each sound in the DLL and
   adding RAC_/RAR_ alias events; your own samples must be MS-ADPCM; IN_VAR responses get a .V00-.R03 suffix; DLL-sent
-  lines take ffmpeg's default block.
+  lines take ffmpeg's default block; infantry get .V01/.V03, vehicles .V00/.V02.
 
 ## Maps and the lobby
 
 - [New maps in the skirmish Official list](maps-and-lobby/new-maps-in-the-skirmish-list.md): list maps with
   INSTANCES.XML and CNCMAPPREVIEWDATA.XML (RA's 128-wide grid); start them under Hastings' D6 entry, whose
   OverrideMapName the DLL honours, by hooking ClientG's launch sends and key lookup. Fragile: one ClientG build; or
-  ship a player custom map (.mpr/.tga/.json, CNC_Start_Custom_Instance).
+  ship a player custom map (.mpr/.tga/.json, CNC_Start_Custom_Instance); a map ships in the mod's root CCDATA/; a
+  mod's Data/CNCDATA/ is never searched.
 - [Bigger maps](maps-and-lobby/bigger-maps.md): maps up to 255 cells a side (253x253 playable): widen CELL to 32 bits
   with 8-bit X/Y, patch InstanceServerG's two export copies (0x59235A, 0x5982A4) to read bigger arrays, re-encode
   offsets on the launcher's 128-wide grid, skip the legacy render. Byte cell fields cap it at 255; the engine survey:
   negative cell IDs, zone wrap, HIGH_COORD_MASK, the MapPack layout.
 
-- [Adding a theatre of your own](maps-and-lobby/custom-theatres.md): slot and DLL steps are proven by TD's
-  theatres, but a new terrain template name with loose art crashes the launcher; custom terrain reskins existing
-  template names (loose DDS at the stock path).
+- [Adding a theatre of your own](maps-and-lobby/custom-theatres.md): slot and DLL steps are proven by TD's theatres,
+  but a new terrain template name with loose art crashes the launcher; custom terrain reskins existing template names
+  (loose DDS at the stock path); new templates go at 401 and up, after HILL01; a missing classic iconset makes a 0x0
+  template, a malformed one divides by zero.
 - [Custom campaigns: replacing the official ones](maps-and-lobby/custom-campaigns.md): INSTANCES.XML decides what
   Mission Select shows (ShowOnMissionSelect, IsUnlockedAtStart, ExternalGameID), the campaign files what launches;
   replace a stock mission by shipping its scenario (SC<house><nn><dir><var>.INI) in CCDATA/ without [Digest]; the
@@ -116,8 +122,9 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [What the launcher owns: the modding walls](engine/what-the-launcher-owns.md): each behaviour ClientG owns, with
   its route (data, cached-record RAM, launcher code patch) or the evidence it's a real wall. Search data first, then
   the DLL interface, then ClientG memory, then code; the cut co-op campaign mode.
-- [Adding a faction](engine/adding-a-faction.md): houses are a fixed enum, so a new side rides one of the
-  lobby's eight country rows, either remapped to HOUSE_GOOD/HOUSE_BAD or decoupled from its side mask.
+- [Adding a faction](engine/adding-a-faction.md): houses are a fixed enum, so a new side rides one of the lobby's
+  eight country rows, either remapped to HOUSE_GOOD/HOUSE_BAD or decoupled from its side mask; FACTIONS.XML's eleven
+  entries (Faction1 GDI _00, Faction2 Nod _01, Faction3-10 the countries _03-_10, no _02) and per-team UIColor.
 - [LAN games](engine/lan-games.md): only the host runs the simulation and the DLL; PlayerPtr switches per player,
   sounds are addressed per house, DLL keyboard reads see the host only, and every player needs the same mods.
 - [Save versions](engine/save-versions.md): SAVEGAME_VERSION is the sum of class sizes and DLLLoad runs before the
@@ -142,7 +149,8 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [Units leaving buildings: exits and rails](units/exits-and-rails.md): Exit_Object places a war factory's unit at
   Exit_Coord facing south and drives it out by radio tether; vehicles follow fixed DRIVE.CPP tracks (TrackNumber is
   saved); a new exit path is a per-unit straight-line rail, never a shared static table; sort under the doorway;
-  two-cell curves skip a drive-on check.
+  two-cell curves skip a drive-on check; a new barracks needs its own exit point and list; Find_Exit_Cell's argument
+  is unguarded; TD's refinery tracks are fixed to south-west.
 - [Porting Tiberian Dawn units](units/porting-td-units.md): Speed = round(MPH x 100 / 256); Tracked= for SPEED_TRACK;
   fill RA-only geometry; ANIM_FRAG2 loads "FRAG3"; TD text IDs don't exist in RA; cloak/scanner is one system;
   Speed=100 is light speed and a visible shot never moves; impact animation from the warhead's Explosion= 1-6; TD's
@@ -151,7 +159,8 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
   (hardcoded STRUCT_ checks, INI-name namespace, 32-bit prerequisite bitfield, From_Name below STRUCT_COUNT); TD's
   SAM rise/lower cycle, Obelisk charge and laser lines, muzzle offsets, MAKE build-ups, the WEAP2 overlay, Points=
   for AI targeting; TD doubles building strength; turret frames +32 recoil, +64 damaged, SAM +35; crews at centre
-  minus 12 px; prerequisites are an AND list.
+  minus 12 px; prerequisites are an AND list; a refinery that takes its harvester inside (RA keeps only stubs); size
+  and footprint are separate arguments; flat buildings need FACING_NONE.
 
 ## AI and pathfinding
 
@@ -188,7 +197,8 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
   with the lobby's Tiberium option on, faster at higher settings.
 - [Air delivery, fleets and support powers](behaviours/air-delivery-and-fleets.md): RA has no cargo plane; TD's
   airstrip calls Create_Special_Reinforcement; aircraft need a rules.ini section and non-null ImageData; a carrier's
-  set-down needs MARK_UP and the exact coordinate.
+  set-down needs MARK_UP and the exact coordinate; RA's aircraft box is 21x20 (Badger 56x56); port TD's fixed-wing
+  landing run and its idle branch.
 - [Jumpjets, deployers, mines and bouncing discs](behaviours/jumpjets-deployers-and-more.md): MissionClass::AI skips
   non-aircraft with Height > 0; deploy where the build-up starts; drone mines as buildings; Distance() runs long.
 - [Hover and amphibious units](behaviours/hover-and-amphibious-units.md): RA dropped TD's SPEED_HOVER; restore it
@@ -201,19 +211,23 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [How the launcher draws sprites](art/how-the-launcher-draws-sprites.md): an HD frame's .meta is a canvas size plus
   a crop box, anchored by canvas centre; second draws use shapes 0-127; no rotation; alpha below ~128 discarded;
   ground shadows are baked (black, alpha 191); beam line frames 0-4 only, 3 lines per object; only TD's DLL exports
-  beam lines; delayed animations draw before they start.
+  beam lines; delayed animations draw before they start; height draws as a shift north; a draw scale scales each draw
+  about its anchor (the turret shears).
 
-- [HD tilesets and ZIPs](art/hd-tilesets-and-zips.md): a unit's art is a ZIP of <name>-NNNN.tga + .meta frames,
-  one tile per shape in a patched copy of RA_UNITS/RA_STRUCTURES/RA_VFX.XML, a buildables entry named
-  RA_<IniName>; TypeName = IniName, AssetName = graphic name.
+- [HD tilesets and ZIPs](art/hd-tilesets-and-zips.md): a unit's art is a ZIP of <name>-NNNN.tga + .meta frames, one
+  tile per shape in a patched copy of RA_UNITS/RA_STRUCTURES/RA_VFX.XML, a buildables entry named RA_<IniName>;
+  TypeName = IniName, AssetName = graphic name; build-ups sized by BuildupData, overlays by their own shape; theatre
+  art (smudges, ore) in RA_TERRAIN_<theatre>.
 - [Sprite memory and DDS](art/sprite-memory-and-dds.md): the launcher uploads every enabled mod's textures at
   start-up; ZIP frames cost 4 bytes a pixel of their crop; loose DDS frames about a quarter but need the whole
   canvas, and DXT shifts greys toward team-colour green.
-- [Sidebar cameos](art/sidebar-cameos.md): stock cameos are 341x256 BUILDICON_* atlas regions; new ones are loose
-  TGA or DDS; the DLL's sidebar AssetName picks the entry, so per-player suffixes swap cameos at runtime.
-- [Porting art from other C&C games](art/porting-art-from-other-games.md): Tiberian Sun voxels/SHPs, Red Alert 2 voxels
-  and C&C3 models into HD sprites: a 32-degree camera, 32 counter-clockwise facings from north, pure-green team colour,
-  a baked shadow.
+- [Sidebar cameos](art/sidebar-cameos.md): stock cameos are 341x256 BUILDICON_* atlas regions; new ones are loose TGA
+  or DDS; the DLL's sidebar AssetName picks the entry, so per-player suffixes swap cameos at runtime; Busy draws
+  nothing.
+- [Porting art from other C&C games](art/porting-art-from-other-games.md): Tiberian Sun voxels/SHPs, Red Alert 2
+  voxels and C&C3 models into HD sprites: a 32-degree camera, 32 counter-clockwise facings from north, pure-green
+  team colour, a baked shadow; TS theatre letters (GT/GA) and Image= file names; voices in SOUNDS.MIX by voice set,
+  scores in SCORES.MIX.
 - [Building selection boxes](art/building-selection-boxes.md): the launcher centres a building's selection box on
   its plot and takes only the size from the DLL; a misplaced box means the art is seated off the plot's centre.
 
@@ -229,14 +243,17 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 
 ## Troubleshooting
 
-- [Crash triage](troubleshooting/crash-triage.md): log/CrashLog.txt names the crashing process (ClientG =
-  launcher, InstanceServerG = your DLL) and EIP; minidumps give the DLL's base and stack; addr2line on the
-  unstripped DLL gives the line; ClientG RVA 0x56A539 is a deliberate assert write, so read the assert text.
+- [Crash triage](troubleshooting/crash-triage.md): log/CrashLog.txt names the crashing process (ClientG = launcher,
+  InstanceServerG = your DLL) and EIP; minidumps give the DLL's base and stack; addr2line on the unstripped DLL gives
+  the line; ClientG RVA 0x56A539 is a deliberate assert write, so read the assert text; the game DLL imports no
+  graphics library.
 - [Known engine traps](troubleshooting/known-engine-traps.md): bugs in EA's released RA source every DLL mod
   inherits: the 512-byte mod search-path buffer overruns at about four mods; RULES/AFTRMATH/MPLAYER.INI resolve the
   current directory first; a sidebar column of 75 writes past its array; the 25-slot NameOverride table fills (no
   dedup, last slot unreachable); a crate that kills its driver; fixes under switches that are off
-  (FIXIT_HELI_LANDING, TOFIX) never compile.
+  (FIXIT_HELI_LANDING, TOFIX) never compile; a dead target's As_Coord is the map origin; production contracts (orders
+  never ask Can_Build, Get_Quantity counts from production start, keep sidebar entries with production in flight, a
+  cheap refinery gets no harvester, the draw export's shape name can be NULL).
 
 ## Patching the launcher in memory (advanced)
 
