@@ -54,7 +54,9 @@ the arrays breaks the struct layout the other side expects, and a bigger map ove
 Neither is the limit it looks like:
 
 - **The launcher has no 128 limit of its own.** It draws, scrolls and shows on the radar whatever size the static
-  map export gives it, and clamps the camera to `OriginalMapCellX/Y/Width/Height`.
+  map export gives it, and clamps the camera to `OriginalMapCellX/Y/Width/Height`. Below 128 the size was always
+  free: the export sends the scenario's own window plus a one-cell border where it fits inside
+  `MAP_MAX_CELL_WIDTH/HEIGHT`. That's how Red Alert ships maps of different sizes.
 - **The arrays are copied by the instance server**, the process that calls your DLL and serializes its exports
   for the launcher. Both copies take their length from the export itself (width × height, and
   `ActionWithSelectedCount`), and neither caps at 16,384 entries. Only the source pointer is fixed inside the
@@ -73,13 +75,15 @@ make them.
   after the array.
 - **Raise only the map size.** Leave the arrays at 16,384 entries and make the map bigger. The loop that fills
   `ActionWithSelected` never checks its index against `MAX_EXPORT_CELLS`, so a big map writes far past the end of
-  the array every time units are selected, and the server crashes.
+  the array every time units are selected, and the server crashes. Each entry is a byte, so a 256 × 256 map
+  writes 48 KB past the end. The static map's fill loop has the same unchecked index.
 - **Change the shape, not the area.** With `X:7, Y:8` bitfields, a 128 × 255 map fits the 16-bit `CELL` exactly:
   the last cell is 32767. It doesn't help, because the export limit is on total cells, and 128 × 255 is still twice
-  16,384.
+  16,384. Its last cell would also equal `REFRESH_EOL`, the end marker of the offset lists.
 - **Ask the launcher for a bigger buffer.** There's no channel for it. `CNC_Get_Game_State` returns a bare `bool`,
   and the launcher's only other contact with the DLL is the `CNC_Version` check. Bumping the version just fails
-  that check.
+  that check. The exports whose length varies (shroud, occupier, placement, dynamic map) do check their buffer,
+  but only to return `false`.
 - **Conclude it's the launcher's wall.** For a long time this was the verdict: the 128 × 128 arrays looked like the
   launcher's own buffer, and growing a struct in `DLLInterface.h` looked like the end of it. The mistake was the
   process. The fixed arrays are copied by the *instance server*, which copies whatever length the export declares.
@@ -101,12 +105,22 @@ byte runs above were read from the server file on disk.
 ## The engine side
 
 Red Alert's cell type is the bigger job. It is a 16-bit `signed short` with 7-bit X and Y bitfields, so 128 × 128 is
-built into it.
+built into it. Vanilla Conquer's Tiberian Dawn has made a smaller jump already: its `MEGAMAPS` build takes TD's
+64 × 64 grid to 128 × 128 (6 bits a side to 7), which still fits the 16-bit cell.
 
 - **Widen the cell.** `MAP_CELL_W/H` to 256, `CELL` to 32 bits, bitfields to `X:8, Y:8`. Make `CELL` a `long`,
-  not an `int`, because `TARGET` is an `int` and the engine overloads functions on the two.
-- **Widen what holds cell numbers.** `CellClass::ID` becomes a `CELL`. Zone IDs become 16-bit too, because a big map
-  with ponds and rocks passes 255 zones, and aliased zones make unrelated landmasses look connected.
+  not an `int`, because `TARGET` is an `int` and the engine overloads functions on the two. On a big-endian
+  build the union pads ahead of the bitfields with a `sluff` field; make it 16 bits, or the fields shift.
+- **Change the shift twice in `DLLInterface.cpp`.** Two exports build cell numbers with their own
+  `static const int _map_width_shift_bits = 7`. Both become 8.
+- **Widen what holds cell numbers.** `CellClass::ID` is a `short`, so on a 256 grid every cell past 32767 reads
+  negative, and every lookup built from it lands outside the array. Make it a `CELL`. Zone IDs are a byte each,
+  and `Zone_Reset` numbers zones with no overflow check: a big map with ponds and rocks passes 255 zones, and the
+  wrapped numbers make unrelated landmasses look connected. Make them 16-bit.
+- **Replace the off-world mask.** EA catches a coordinate that runs off the world with `HIGH_COORD_MASK`
+  (`0x80008000`, the top bit of each axis), and `DisplayClass::In_View` rejects cells with `cell & 0xC000`. At 256
+  cells no bit is spare: set the mask to 0, test `In_View` against the cell range, and catch running off the world
+  as a wrap, by comparing the old coordinate with the new one (bullets, `Coord_Scatter`, scrolling).
 - **Keep offset lists `short`.** `Occupy_List`, `Overlap_List` and the exit lists hold small deltas and end in
   `REFRESH_EOL` (32767). Retyped as `CELL`, the terminator collides with a real cell.
 - **Re-encode offsets for the launcher.** The launcher decodes cell offset lists (`OccupyList`, the sidebar's
@@ -120,7 +134,16 @@ built into it.
   wraps row 256 to cell 0 and never ends. Then a map that fits 128×128 does the same work as before.
 - **No recursion for flood fills.** EA's `Zone_Span` recurses, and a maze-like 250×250 map exhausts the server's
   stack. Use an explicit stack.
-- **Grow the staging buffer** used to pack the map to 256 KB, enough for a 256×256 MapPack.
+- **Grow the staging buffer.** EA's `_staging_buffer` (`GLOBALS.CPP`) is 32,000 bytes, and it's the only buffer
+  for reading and writing the MapPack and OverlayPack. 256 KB holds a 256×256 MapPack.
+- **Events grow with the cell.** `EventClass` carries `CELL` fields (selling a wall, placing a building, special
+  events), so every event gets bigger. EA builds the event lengths and the network packet size from `sizeof`, so
+  they follow, but LAN with a joiner hasn't been tested on the wider events.
+- **The DLL's own radar can't show a whole big map.** `RadarClass::Zoom_Mode` gives each cell at least a pixel
+  and shows at most 146 × 130 cells, the size of its image. That radar draws only in classic mode, which big maps
+  lock out; the launcher's radar shows the whole map.
+- **A typo to fix while you're there:** `MAP_REGION_HEIGHT` (`DEFINES.H`) rounds with `REGION_WIDTH`. It's
+  harmless while regions are square.
 
 ## Map files
 
@@ -128,11 +151,21 @@ A scenario numbers its cells `y * width + x`: in the MapPack and OverlayPack, an
 (`[Waypoints]`, `[CellTriggers]`, `[TERRAIN]`, `[SMUDGE]`, `[Overlay]`, the unit, infantry, structure, ship and
 aircraft sections, `[Base]`, and team move-to-cell missions).
 
+- **The MapPack carries no size.** EA's `MapClass::Write_Binary` packs every cell of the grid: 16,384 template
+  types of 2 bytes, then 16,384 icons of 1 byte, 49,152 bytes, LCW-compressed in 8 KB blocks and base64'd into
+  70-character INI lines. The reader takes exactly as many cells as the grid has, and the OverlayPack works the
+  same way. A grid change therefore needs a new format number.
 - **Write a new format.** Use a new `NewINIFormat` (4) for files on the 256-wide grid, packing 65,536 cells.
 - **Read old maps at their real position.** A format 3 or older file uses width 128, and a cell number in it is a
   different x and y on the 256 grid. Convert every cell number as you read it, and never rewrite the files.
   Every existing map then loads unchanged, official maps included.
-- **Saves change layout.** Saves from a 128-grid build won't load. See [Save versions](../engine/save-versions.md).
+- **Clamp `[Map]` yourself.** EA reads `X`, `Y`, `Width` and `Height` as plain ints; the old size check is
+  compiled out (`FIXIT_VERSION_3`, "Map size no longer restricted"). End the map and its border by cell 255.
+- **Saves change layout.** `MouseClass::Save` writes the whole map object as raw bytes, and the scenario, with its
+  `CELL` waypoints, goes in as one block. Saves from a 128-grid build won't load. See
+  [Save versions](../engine/save-versions.md).
+- **Two interfaces keep the old stride.** `CarryoverObjectStruct::Cell` and EA's editor call
+  `CNC_Editor_Get_Cell_Data_By_Index` still pass cell numbers on the 128-wide grid.
 
 ## The other limit: no editor makes them yet
 
@@ -223,6 +256,10 @@ At its worst the server spends about 8 ms of each 17 ms tick, and the match ran 
 - **The patch:** both instructions and their stock bytes read from `InstanceServerG.exe` on disk, matching the
   working patch's expected bytes. The fixed arrays, the byte cell fields and the lepton positions are in EA's
   `DLLInterface.h`, and the 12-bit `TARGET` packing is in EA's `TARGET.CPP`.
+- **The engine side:** each EA starting point (the unchecked fill loops, the bounds-checked exports, `CellClass::ID`,
+  the zone bytes, `HIGH_COORD_MASK` and `In_View`, the two shift constants, `_staging_buffer`, the MapPack writer,
+  `[Map]`'s compiled-out check, the save writers, `EventClass`, the radar's zoom) read in EA's released source, and
+  each change read in the working build's code.
 - **Play:** a 200×200 skirmish against the AI, and a 25-minute eight-player match at 253×253 with timing logs, on
   the Steam Deck. An official Red Alert map and a converted TD map play unchanged on the 256 grid.
 - **The router:** checked natively against brute-force shortest paths on 253×253 open, maze and random grids,
