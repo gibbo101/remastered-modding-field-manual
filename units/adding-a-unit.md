@@ -131,7 +131,13 @@ if (CCFileClass("MYMOD.MIX").Is_Available()) {
 ```
 
 Animations differ: one with a null `ImageData` draws as a green placeholder instead of nothing. Give it another
-animation's `ImageData`, and its HD tile is then still found by name.
+animation's `ImageData`, and its HD tile is then still found by name. EA does this itself for an animation that
+exists only in HD: `AnimTypeClass::Init` (`ADATA.CPP`) gives `ANIM_BEACON_VIRTUAL` the classic beacon's
+`ImageData`.
+
+**A smoke trail doesn't prove the projectile draws.** A projectile with `Animates=yes` leaves its trail of smoke
+puffs from `BulletClass::AI`, whatever its `ImageData`. So a missile with no classic shape shows its trail, makes
+its sound and does its damage with no body in front. Check the body and the trail separately.
 
 ## 5. Weapons and sounds
 
@@ -148,12 +154,16 @@ A sound plays by name: add it to the DLL's sound table, and route it in the laun
 - **EA's source:** the `UnitTypeClass` constructor and a stock tank's values (`UDATA.CPP`); `Init_Heap`, and
   `As_Reference` reading `UnitTypes.Ptr(type)`; the same pair for animations in `ADATA.CPP`, with its ordering
   comment; `UnitTypes.Set_Heap(UNIT_COUNT)` and `AnimTypes.Set_Heap(ANIM_COUNT)` (`INIT.CPP`); `One_Time` loading
-  `ImageData` with `MFCD::Retrieve`; the null check in `Techno_Draw_Object_Virtual` (`TECHNO.CPP`); `Image=`
+  `ImageData` with `MFCD::Retrieve`; the null check in `Techno_Draw_Object_Virtual` (`TECHNO.CPP`); the beacon's
+  donor in `AnimTypeClass::Init` (`ADATA.CPP`); the smoke puffs in `BulletClass::AI` (`BULLET.CPP`); `Image=`
   (`TECHNO.CPP`), `Tracked=` (`UDATA.CPP`) and `Burst=` (`WEAPON.CPP`); and `new MFCD(...)` for EA's own MIXes.
 - **The game's files:** stock `rules.ini`'s land speeds, from `REDALERT.MIX`.
 - **A working mod:** dozens of added vehicles, each with a classic shape in its own MIX: TD's real shapes for TD
   units, transparent generated stubs sized to each unit for the rest, and donor images for some infantry. Also the
-  heap-order bug and its fix, and the invisible unit and green placeholder seen before the shapes went in.
+  heap-order bug and its fix, and the invisible unit and green placeholder seen before the shapes went in. The
+  heap-order bug was hit for animations too: with a new animation out of order, an infantry death that asked for
+  a corpse played the crate's red missile (`ANIM_CRATE_DEVIATOR`), the type in that heap slot. And a missile with
+  no classic shape showed only its smoke trail.
 - **The box size:** `UnitTypeClass::Dimensions` and `One_Time`'s largest-frame measure in EA's `UDATA.CPP`.
 
 **Credit:** DontCryJustDie suggested sharing one set of shapes between types through `Image=` to save video

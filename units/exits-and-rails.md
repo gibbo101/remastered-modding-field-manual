@@ -1,6 +1,6 @@
 ---
 title: "Units leaving buildings: exits and rails"
-description: How Red Alert moves a finished unit out of a factory (exit point, radio tether, unload mission, fixed movement tracks, a factory track that drives due south), and the traps of giving a new building an exit path of its own with a straight-line rail; one shared track table, saved track numbers, draw order in the doorway, seat depth, and infantry spots.
+description: How Red Alert moves a finished unit out of a factory (exit point, radio tether, unload mission, fixed movement tracks, a factory track that drives due south), and the traps of giving a new building an exit path of its own with a straight-line rail; one shared track table, saved track numbers, draw order in the doorway, seat depth, infantry spots, and two-cell curves that skip a drive-on check.
 tags: [units, buildings, movement, tracks, dll]
 holds_for: Steam build 21590013
 status: verified
@@ -74,6 +74,12 @@ pathfinding takes over.
 - **Infantry snap to spots.** A cell holds infantry at fixed spots, and an infantryman placed in a cell moves to the
   nearest free one (`CellClass::Closest_Free_Spot`). So infantry leaving a building can appear beside the door rather
   than in it. Measure where they appear before moving the exit point.
+- **A curve can skip the cell you check.** Some tracks in `TrackControl` cover two cells at once (the `F_D` flag,
+  "two cell consumption"). When `DriveClass::Start_Of_Move` picks one at a bend in the path, it moves `dest` on to
+  the second cell (`dest = Adjacent_Cell(dest, nextface)`), after a crate check on the cell in between. So a test
+  in `Start_Of_Move` for "is the next cell the drive-on cell?" passes on some approaches and never on others. Also
+  test the cell after `dest`, and when that is the target, force a straight step into the cell before it, so the
+  next move starts with the target as `dest`.
 - **Log before changing an exit.** Exits involve the building's seat, the unit's rail and the cell it ends on. When
   units go missing or teleport on the way out, log all three for each delivery before changing any of them.
 
@@ -85,10 +91,14 @@ pathfinding takes over.
   (`TrackControl[67]`, `RawTracks[13]`, `Track1`–`Track13`, `TrackNumber`, `TrackIndex`) and `CELL.CPP`
   (`Closest_Free_Spot`). The south `Track13` under `#if(1)`, the south-west one under `#else` and its `DIR_SW`
   control entry are in Red Alert's `DRIVE.CPP`; TD's `DRIVE.CPP` has only the south-west curve. That track numbers
-  are saved: `TFixedIHeapClass::Save` (`HEAP.CPP`) writes each object whole.
+  are saved: `TFixedIHeapClass::Save` (`HEAP.CPP`) writes each object whole. The two-cell tracks: `F_D` in
+  `DRIVE.H`, its entries in `TrackControl` and the `dest` step in `Start_Of_Move` (`DRIVE.CPP`, the same in
+  Vanilla Conquer's `drive.cpp`).
 - **The rail and its traps:** a working mod's code (a per-unit `Rail_To` in its `DriveClass`), and its history: the
   harvester that drove out of the back of the factory and its fix, the removed tracks left as empty slots because
-  saves store their numbers, the doorway sort, and the deeper walker seats. Its TD weapons factory leaves on an
+  saves store their numbers, the doorway sort, and the deeper walker seats. Its service depot's drive-on check in
+  `Start_Of_Move` missed vehicles that curved onto the depot's middle cell, until it also tested the cell after
+  `dest` and forced a straight step in. Its TD weapons factory leaves on an
   appended south-west track, forced from `Mission_Unload`, while Red Alert's factory keeps the stock one.
 - **Observed, not traced:** a deployed mobile war factory that sometimes loses units it has built.
 

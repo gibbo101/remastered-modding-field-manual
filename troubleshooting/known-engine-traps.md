@@ -1,7 +1,7 @@
 ---
 title: Known engine traps
-description: Crashes and misbehaviour in EA's released Red Alert source that any DLL mod built from it inherits. The mod search-path buffer overruns with about four mods enabled; another folder's RULES.INI is read before yours; a sidebar column of exactly 75 entries writes past its array; the name table fills; a crate that destroys the unit driving onto it leaves a call on a dead unit; a misspelt INI key makes Inaccurate=yes do nothing. Each with its fix.
-tags: [troubleshooting, crashes, engine, dll, ini, sidebar, crates, projectiles]
+description: Crashes and misbehaviour in EA's released Red Alert source that any DLL mod built from it inherits. The mod search-path buffer overruns with about four mods enabled; another folder's RULES.INI is read before yours; a sidebar column of exactly 75 entries writes past its array; the name table fills; a crate that destroys the unit driving onto it leaves a call on a dead unit; a misspelt INI key makes Inaccurate=yes do nothing; fixes under switches that are off (FIXIT_HELI_LANDING, TOFIX) never compile. Each with its fix.
+tags: [troubleshooting, crashes, engine, dll, ini, sidebar, crates, projectiles, defines]
 holds_for: Steam build 21590013
 status: verified
 unproven: [whether the stock RedAlert.dll shipped with the game behaves exactly as EA's released source on each trap, the order in which the launcher registers enabled mods' folders]
@@ -113,6 +113,22 @@ own `Inaccurate=yes` is ignored the same way.
 `Inaccuate=yes`, which the stock DLL reads. Mind the balance: turning it on for the stock projectiles changes every
 stock weapon that uses them. Vanilla Conquer keeps EA's spelling.
 
+## A fix in an `#ifdef` that never compiles
+
+Some of EA's code sits under switches that are off, and a change made there does nothing. `DEFINES.H` turns on
+most of the `FIXIT_` switches, and comments out three of them under the note "These fixes will cause the game to go
+out of sync": `FIXIT_ENGINEER_CAPTURE`, `FIXIT_HELI_LANDING` ("Fixes so new helicopters land at free helipad") and
+`FIXIT_MINE_PASSABLE`. `TOFIX` is never defined at all, and guards code in 15 places in Red Alert's `.CPP` files,
+such as the Hind's fast-flight frames and the credits a harvester's per-bail unload returns.
+
+So the live branch is often the `#else`. In `HouseClass::Place_Object`, a finished helicopter's exit is the
+`#else` of `FIXIT_HELI_LANDING`: it asks `Who_Can_Build_Me` for a builder "in theory", so it can leave from any
+helipad, free or not. A change written into the `#ifdef` half compiles and is never run.
+
+**Fix:** before patching code under an `#ifdef`, look the switch up in `DEFINES.H`, and patch the branch that
+compiles. On Vanilla Conquer, look in its own `redalert/defines.h`: it keeps `FIXIT_HELI_LANDING` and
+`FIXIT_MINE_PASSABLE` off and `TOFIX` undefined, but turns `FIXIT_ENGINEER_CAPTURE` on.
+
 ## How it was verified
 
 Each trap three ways:
@@ -125,12 +141,17 @@ Each trap three ways:
   `FOOT.H`; `NameOverride[25]` in `GLOBALS.CPP`, its fill loop in `TECHNO.CPP` and the `<` test in `INLINE.H`; the
   `"Inaccuate"` key in `BBDATA.CPP`, in the Remastered source, in EA's original Red Alert source and in Vanilla
   Conquer's `bbdata.cpp`, and its use in `BULLET.CPP`. Vanilla Conquer inherits the search-path code unchanged.
+  The switches: the commented-out `FIXIT_` lines and their note in `DEFINES.H`, no definition of `TOFIX` anywhere
+  in the source tree, its 15 `#ifdef TOFIX` lines counted over the `.CPP` files, and the helicopter branch in
+  `HOUSE.CPP` with `Who_Can_Build_Me`'s "in theory" test (`OBJECT.CPP`); Vanilla Conquer's `redalert/defines.h`
+  for its own settings.
 - **The game's files:** stock `rules.ini` (from `REDALERT.MIX`) sets `Inaccurate=yes` on five projectiles and
   never the key the code reads.
 - **A working mod hit each one:** the search-path crash, reported by another modder running several mods; another
   rules mod's `RULES.INI` replacing its own; the sidebar overrun and the name table, both found as its roster grew; and the crate crash,
   found from minidumps. The name table's crash was a string built from `NULL` in `InstanceServerG.exe`. Its
-  projectile code reads both spellings of the inaccuracy key.
+  projectile code reads both spellings of the inaccuracy key. A helicopter-placement fix of its own did nothing
+  until it moved from the `FIXIT_HELI_LANDING` half to the `#else`.
 - **The fixes** are in that mod's code and released, and the crashes stopped.
 - **Unproven:** that the stock `RedAlert.dll` behaves exactly as the released source on each trap (it's built from
   it, but the binary wasn't checked), and the order in which the launcher registers enabled mods' folders, which
