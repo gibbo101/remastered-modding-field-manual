@@ -1,10 +1,10 @@
 ---
 title: BUI screens
-description: The launcher's screens, menus and in-match HUD, are .BUI files, a zlib-compressed ChunkFile scene graph. A mod reshapes, hides, retints and retextures existing widgets, clones widgets, and swaps whole screens through FACTIONS.XML; the format, the tags, and the size rule inside a CONFIG.MEG.
+description: The launcher's screens, menus and in-match HUD, are .BUI files, a zlib-compressed ChunkFile scene graph. A mod reshapes, hides, retints and retextures existing widgets, clones widgets, and swaps whole screens through FACTIONS.XML; the format and its fixed header bytes, the tags, how names are stored, the stock effects in GUIEFFECTS.CFX, the loading spinner's sheet, and the size rule inside a CONFIG.MEG.
 tags: [front-end, ui, bui, screens, config-meg, launcher]
 holds_for: Steam build 21590013
 status: verified
-unproven: [the full per-widget property grammar (only rects, tints, strings, texture sets and cloned subtrees are mapped), whether menu images draw without mipmaps (banding observed on the Steam Deck)]
+unproven: [the full per-widget property grammar (only rects, tints, strings, texture sets and cloned subtrees are mapped), whether menu images draw without mipmaps (banding observed on the Steam Deck), the loading spinner's frame rate (about 24 a second, observed)]
 ---
 
 > [!NOTE]
@@ -47,8 +47,11 @@ offset  size  field
 0x00    2     magic 'CH' (ChunkFile)                       keep
 0x02    2     version 02 01 (2.1)                          keep
 0x04    1     flags: low nibble 1 = zlib                   keep
+0x05    3     ff ff ff                                     keep
 0x08    4     a hash                                       not checked: leave it as it was
+0x0C    4     the dword 8                                  keep
 0x10    4     compressed length = file length - 0x24       set it after an edit
+0x14    16    zero                                         keep
 0x24    ...   the zlib stream: the scene graph
 ```
 
@@ -69,6 +72,17 @@ so far:
   widget. Editing the tint after a name changes the wrong widget.
 - Texture-set names are strings inside a widget's header leaf, and can be swapped for any set the launcher knows.
 
+**Names are length-prefixed ASCII**, with no terminator, stored three ways (integers little-endian):
+
+- **A name leaf:** `[u32 id][u32 len+2][u16 len][name]`. The id depends on the field: the stock main menu's
+  textures (`ui_ra_mainlogo`) sit under id 2, its buttons' text style (`24 Point Regular Outline Red`) under id 3,
+  and some other text styles under id 2. Keep the id you find beside the stock name.
+- **An effect:** `[u32 0x16][u32 len+4]`, then a `0x17` micro-chunk, `[0x17][len+2][u16 len][name]`.
+- **A texture set:** the micro-chunk `[0x0f][len+2][u16 len][name]` inside the widget's header leaf.
+
+A longer or shorter name changes its leaf's size, and the header leaf's for a texture set, so fix the sizes when a
+name's length changes.
+
 Text styles live in `FONTLIBRARY.BFD`, a flat list of named styles, and new ones can be appended. A style's colour
 is its `0b 10` tag, four floats RGBA. Some text widgets
 are recoloured by the launcher itself, so for those a tint won't stick: use a coloured style instead.
@@ -83,7 +97,10 @@ are recoloured by the launcher itself, so for those a tint won't stick: use a co
   parent's child count. The screen then draws it. Drawn is not the same as working: the launcher binds behaviour to
   widgets it looks up by name in its own code, so a clone of a button draws but does nothing until a patch binds
   it. See [New screens and buttons](new-screens-and-buttons.md).
-- **Add text styles** in `FONTLIBRARY.BFD`, and attach effects (sheens, glows) by name.
+- **Add text styles** in `FONTLIBRARY.BFD`, and attach effects (sheens, glows) by name. The stock effects are
+  defined in `DATA\ART\GUI\GUIEFFECTS.CFX`, itself a `CH` 2.1 zlib ChunkFile with the same header: `Sheen`,
+  `Logo_Sheen`, `Logo_Glow`, `Power_Sheen`, `Button_Sheen`, `MouseOver`, `Scanline_Sheen`, `Scanline_Sheen_Red`
+  and `Scanline_Sheen_Blue`.
 
 What a `.BUI` can't do alone is make the launcher *use* a widget it has no code for. In Red Alert's HUD scene, for
 example, every Allied country's crest is the `_Allies` widget, and an added `_GDI` widget is never asked for. That's
@@ -119,14 +136,25 @@ why per-faction crests come from [re-pointing records in memory](../clientg-ram/
   when scaled down on the Steam Deck's screen. That the launcher draws menu images without mipmaps is unproven:
   it was observed, not traced.
 - **Animations only play when the launcher starts them by name.** A keyframe animation you add won't run. Effects
-  such as sheens loop by themselves.
+  such as sheens loop by themselves. The loading screen's spinner is one the launcher runs: it plays
+  `ANIM_LOADTWIDDLE_RA.DDS` (TD's is `ANIM_LOADTWIDDLE.DDS`), a 1360 × 1360 uncompressed sheet holding a 4 × 4 grid
+  of 340-pixel frames. Repaint the frames in place, in the same grid; its speed, about 24 frames a second, is
+  observed, not traced.
 
 ## How it was verified
 
 - **The format:** every one of the 207 stock `.BUI` files in `CONFIG.MEG` has the `CH`, 2.1, zlib header, and
   parses exactly with the node grammar above (measured). A shipped mod's loose main menu keeps the stock hash over an
   edited, larger payload and loads. The header and loader checks were also read from `ClientG.exe`'s ChunkFile
-  reader.
+  reader. The fixed bytes (`ff ff ff` at `0x05`, 8 at `0x0C`, zeros from `0x14`) were measured in all 207 files
+  for this page, and in `GUIEFFECTS.CFX`; a shipped mod's BUI writer keeps them.
+- **Names and effects:** the stock main menu decompressed for this page (`Scanline_Sheen_Red` stored as
+  `16000000 16000000 17 14 1200`, `24 Point Regular Outline Red` as `03000000 1e000000 1c00`, `ui_ra_mainlogo` under
+  id 2, `TacticalSidebarSellRepairButton` as `0f 21 1f00`), and `GUIEFFECTS.CFX` decompressed (its nine effect
+  names); a shipped mod's BUI tools read and rewrite names in these forms, and its menus load.
+- **The spinner:** `ANIM_LOADTWIDDLE_RA.DDS` read from `TEXTURES_SRGB.MEG` and decoded for this page (no mips,
+  1360 × 1360 × 4 bytes, sixteen frames of a turning Soviet crest), the stock `RA_UI_LOADINGSCREEN.BUI` naming it,
+  and a shipped mod that repaints it in the same grid; the frame rate is that mod's observation.
 - **The tags:** read in the stock main menu (`Button_Exit`'s rect `02 10` sits before its name, with values in 0 to
   1), and used by a shipped mod's menu, lobby, dialog, loading-screen and HUD edits.
 - **Screens by `FACTIONS.XML`:** the stock file's `GUIFileNames` entries, and a shipped mod that swaps its lobbies,

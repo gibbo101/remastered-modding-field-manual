@@ -1,6 +1,6 @@
 ---
 title: "Custom campaigns: replacing the official ones"
-description: Replace or add to Red Alert's official campaigns. INSTANCES.XML decides what Mission Select shows, the campaign files (manifests, campaigns, mission definitions) decide what launches, and a stock mission slot plays your own scenario INI shipped in CCDATA with its [Digest] removed; brand-new instances still need a launch route.
+description: Replace or add to Red Alert's official campaigns. INSTANCES.XML decides what Mission Select shows, the campaign files (manifests, campaigns, mission definitions) decide what launches, and a stock mission slot plays your own scenario INI shipped in CCDATA with its [Digest] removed; brand-new instances still need a launch route. Names TD's campaign and mission files and both games' Mission Select screens.
 tags: [maps, campaigns, missions, mission-select, instances, ccdata]
 holds_for: Steam build 21590013
 clientg_version: 1.153 (745903)
@@ -44,6 +44,11 @@ missions still shows all fourteen. Adding missions to a campaign's `<Stages>` do
 Both kinds of file ship loose in the mod, as patched copies of the stock ones. See
 [Overriding the launcher's data](../launcher-data/overriding-launcher-data.md).
 
+The screens themselves are `.BUI` files in `CONFIG.MEG` (see [BUI screens](../front-end/bui-screens.md)). Red
+Alert's campaign select is `DATA\ART\GUI\RA\RA_CAMPAIGN_SELECT.BUI`, its Mission Select `RA_MISSIONSELECT.BUI`
+beside it, each row `RA_MISSIONSELECT_LISTENTRY.BUI`; TD's are `DATA\ART\GUI\CNC\CNC_CAMPAIGN_SELECT.BUI`,
+`UI_MISSIONSELECT.BUI` and `UI_MISSIONSELECT_LISTENTRY.BUI`.
+
 ### How the campaign files fit together
 
 All in `CONFIG.MEG`, under `DATA\XML\`:
@@ -69,7 +74,8 @@ Each Red Alert tab's missions belong to one campaign:
 
 The last Allied and Soviet missions (`RA_ALLIES_14`, `RA_USSR_14`) carry `MapStageUnlock` -1; the last expansion
 and Ant missions carry no `MapStageUnlock` at all. Tiberian Dawn's campaigns live beside them in `GDI.XML`,
-`NOD.XML`, `CONSOLE.XML` and `FUNPARK.XML`.
+`NOD.XML`, `CONSOLE.XML` and `FUNPARK.XML`, with their mission files `GDI_MISSIONS.XML`, `NOD_MISSIONS.XML`,
+`CONSOLE_MISSIONS.XML` and `FUNPARK_MISSIONS.XML`, all listed in the same two manifests.
 
 ## Replacing an official mission: shadow its scenario
 
@@ -241,7 +247,9 @@ campaign map; the Mission Select tabs come from the tab sort above.
   them.
 - **The campaign files:** the stock manifests, campaign and mission files extracted from `CONFIG.MEG` for this page
   (every `ProgressiveCampaignTypeClass`, every `MapStageUnlock`), checked against a working mod's campaign notes
-  and the loose copies its CAMPAIGNS page ships. The stock `INSTANCES.XML` has 456 instances: 22 on the Allied base,
+  and the loose copies its CAMPAIGNS page ships. `PROGRESSIVECAMPAIGNMISSIONFILES.XML` lists TD's four mission
+  files beside Red Alert's, each present in `CONFIG.MEG`'s index, and the same index holds the six Mission Select
+  screens, which the working mod's notes name; it ships Red Alert's Mission Select and its row as loose, restyled copies. The stock `INSTANCES.XML` has 456 instances: 22 on the Allied base,
   20 Soviet, 8 and 9 on the Allied Counterstrike and Aftermath bases, 4 Ant.
 - **No restart:** a working mod copied a changed scenario INI into the mod's `CCDATA/` on a Steam Deck with the game
   running, and the next Start played it.

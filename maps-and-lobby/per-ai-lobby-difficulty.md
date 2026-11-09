@@ -6,7 +6,7 @@ holds_for: Steam build 21590013
 clientg_version: 1.153 (745903)
 clientg_sha256: d405ed389548be51c67740bb6309de10a5f02bdfc86324a10c9ad3b663c08897
 status: verified
-unproven: [the start-position field (reported, not checked here), heap behaviour on native Windows (all of TF's measurements were under Proton; the layout was replicated on Windows by DontCryJustDie), the freshness and majority tie-breaks beyond the cases recorded]
+unproven: [the start-position field (reported, not checked here), heap behaviour on native Windows (all of TF's measurements were under Proton; the layout was replicated on Windows by DontCryJustDie), the freshness and most-common-reading tie-breaks beyond the cases recorded]
 ---
 
 > [!NOTE]
@@ -123,12 +123,14 @@ Nothing inside the record tells them apart. What does is who points at them:
    live copy in every recorded case, and was never on a stale one.
 3. **Freshness.** A stale copy, once the active array, has many leftover pointers into its neighbourhood. A fresh
    live copy has few. Drop the heavily referenced ones.
-4. **A strict majority** of the remaining candidates.
+4. **The most common reading.** Count how many candidates carry each set of difficulties, over all the
+   candidates, and take the commonest if no other set's count reaches it.
 5. **Otherwise fail closed** and use your default.
 
-Require the survivors of each step to agree before taking a value. That way the worst case is the default, never a
-stale pick. The pointer signals exist only around match start, so run this on the first read. Searching for
-pointers sweeps the whole address space per candidate, so do it only when candidates disagree.
+Each step looks at every candidate, and its value is taken only when all the candidates it picks agree. That way
+the worst case is the default, never a stale pick. The pointer signals exist only around match start, so run this
+on the first read. Searching for pointers sweeps the whole address space per candidate, so do it only when
+candidates disagree.
 
 **What doesn't work:**
 
@@ -168,7 +170,8 @@ array in place.
   which needs two agreeing reads; the mod's release notes record the fix for solo skirmish from the second match
   of a session on.
 - **Stale copies and the resolver:** 28 ambiguous reproductions resolved with none wrong, and the compiled
-  resolver run offline over 46 recorded cycles with none wrong. DontCryJustDie independently found the
+  resolver run offline over 46 recorded cycles with none wrong. The steps, and the count over all candidates in
+  step 4, are read from that resolver's code. DontCryJustDie independently found the
   array-base target and the vector triple on Windows, about 30 samples with no failure. The routes that don't work
   come from the same measurements: about 13 change-only cycles with no stale copy, identical candidate sets at
   both scan sites, and full 168-byte dumps of stale and live records.

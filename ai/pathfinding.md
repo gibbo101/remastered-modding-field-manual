@@ -43,8 +43,11 @@ type (`MZONE_NORMAL`, `MZONE_CRUSHER`, `MZONE_DESTROYER`, `MZONE_WATER`; `MapCla
 zones can't reach each other.
 
 - **Zones ignore buildings, by design.** The fill tests each cell with `Is_Clear_To_Move` with vehicles ignored, and
-  that clears the occupancy bit for vehicles *and* buildings (`CELL.CPP`: "Drop the vehicle/building bit"). So a
-  spot walled in by buildings still counts as reachable.
+  that clears the occupancy bit for vehicles *and* buildings (`CELL.CPP`: "Drop the vehicle/building bit"): the mask
+  is `composite &= 0x5F`, which drops the vehicle bit (`0x20`) and the building bit (`0x80`) together, and with
+  infantry ignored too only the `Monolith` bit (`0x40`) is left. So a spot walled in by buildings still counts as
+  reachable. Walls still divide zones: they're overlays, tested apart from the occupancy bits (`overlay->IsWall`),
+  and block every zone but `MZONE_DESTROYER`, and `MZONE_CRUSHER` for a crushable wall.
 - **Building placement never rebuilds zones.** `Zone_Reset` is called for walls being built or destroyed, bridges,
   terrain such as trees, and scenario load, but never for buildings.
 
@@ -158,8 +161,10 @@ Any movement or successful path starts the count again, so a queue that advances
 
 - **The stock pathfinder:** EA's `FINDPATH.CPP` (`Find_Path`, `Follow_Edge`, `Unravel_Loop`, `Optimize_Moves`,
   `MAX_MLIST_SIZE`, `MAX_PATH_EDGE_FOLLOW`), with no A\* anywhere in EA's source (searched with `grep -a`).
-- **Zones:** EA's `MZoneType` (`DEFINES.H`), `Zone_Span` (`MAP.CPP`), `Is_Clear_To_Move` (`CELL.CPP`) and every
-  `Zone_Reset` caller.
+- **Zones:** EA's `MZoneType` (`DEFINES.H`), `Zone_Span` (`MAP.CPP`, calling `Is_Clear_To_Move` with infantry and
+  vehicles ignored), `Is_Clear_To_Move` (`CELL.CPP`: the `0xE0` and `0x5F` masks and the `IsWall` test), the
+  occupancy bits in `CELL.H`, and every `Zone_Reset` caller; Vanilla Conquer's `cell.cpp` and a working mod's fork
+  have the same mask, and the mod's harvester notes trace its dead route to it.
 - **The head-on rule and the give-up gate:** EA's `UNIT.CPP` (`face == techface && Distance <= 0x1FF`, `MOVE_NO`)
   and `INFANTRY.CPP` (the zone-mismatch abort). No such rule in `INFANTRY.CPP`'s own `Can_Enter_Cell`.
 - **Vehicles give up:** EA's `DRIVE.CPP` (`TryTryAgain--`, then `Assign_Destination(TARGET_NONE)`; `IsScanLimited`),

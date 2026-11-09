@@ -1,6 +1,6 @@
 ---
 title: "Porting art from other C&C games"
-description: "Turning Tiberian Sun voxels and SHPs, and Command & Conquer 3 models, into HD Remastered sprites; the target every port must hit (canvas, centring, team-colour green, baked shadow), the 32-degree camera and facing order that match EA's HD vehicles, ships' 16 facings, where each game keeps its art (Firestorm's expand01.mix, one-theatre buildings, theatre letters, Image= names), TS's SHP layout (shadow half, damaged frame and loop, Rate= in frames per minute), its infantry facing order, level barrel pitch and railgun colours, and where TS keeps its voices and music."
+description: "Turning Tiberian Sun voxels and SHPs, and Command & Conquer 3 models, into HD Remastered sprites; the target every port must hit (canvas, centring, team-colour green, baked shadow), the 32-degree camera and facing order that match EA's HD vehicles, ships' 16 facings, where each game keeps its art (Firestorm's expand01.mix and the Firestorm Generator's exception, one-theatre buildings, theatre letters, Image= names), TS's SHP layout (shadow half, damaged frame and loop, the unused frame 2, walker frames, Rate= in frames per minute), barrels and water hulls kept as separate voxels, its infantry facing order, level barrel pitch and railgun colours, and where TS keeps its voices and music."
 tags: [art, pipelines, tiberian-sun, cnc3, voxels, hd]
 holds_for: Steam build 21590013
 status: verified
@@ -65,7 +65,11 @@ extent is about 0.81 of its side-on length), but a hull's height inflates that r
   `SIDEC02.MIX` for Nod), building SHPs in the theatre MIXes, palettes in `CACHE.MIX`. The Firestorm expansion's
   own files are in `expand01.mix`: its voxels and build-up SHPs at the top level, its other SHPs in the inner
   `ECACHE01.MIX` (the EMP cannon's cameo `MEMPICON.SHP` among them), the inner `E01SC01.MIX` holds just two entries
-  (the Mobile War Factory's cameo `MWARICON.SHP` is one), and its rules are in `FIRESTRM.INI`.
+  (the Mobile War Factory's cameo `MWARICON.SHP` is one), and its rules are in `FIRESTRM.INI`. The Firestorm
+  Generator and its wall sections are the exception: they're base-game files in `TIBSUN.MIX`, not `expand01.mix`
+  (`GTFIRE.SHP` and `GTFSDF.SHP` in `TEMPERAT.MIX`, the build-up `GTFIREMK.SHP` in `ISOTEMP.MIX`, the field's
+  `FSIDLE.SHP` and the cameos `FSDICON.SHP` and `FSPICON.SHP` in `CONQUER.MIX`, its crackle `FIRSTRM1.AUD` in
+  `SOUNDS.MIX`).
 - **Theatre letters in building names.** A building whose art changes by theatre (`NewTheater=yes` in `ART.INI`) is
   named for one theatre, and the game swaps the second letter: `ART.INI` names `GADEPT` (the Service Depot), and the
   files are `GTDEPT.SHP` in the temperate archives and `GADEPT.SHP` in the snow ones. The swap applies to names
@@ -80,6 +84,13 @@ extent is about 0.81 of its side-on length), but a hull's height inflates that r
   those normals rather than ones worked out from the shape: on flat decks, worked-out normals come out blotchy.
   The HVA beside it holds a transform per section per frame; a vehicle with no moving parts has one frame (the
   Subterranean APC's `SAPC.HVA` is 88 bytes: one frame, one section).
+- **Some parts are separate voxels, found by name.** A unit with `Turret=yes` looks for `<Image>TUR.VXL` and
+  `<Image>BARL.VXL` (each with its `.HVA`), even when the unit itself is an SHP: the Mammoth Mk. II (`[MMCH]`,
+  `Voxel=no` in `ART.INI`) walks in `MMCH.SHP`, whose 32 turret facings follow its 8 × 15 walk frames, and its
+  cannon is `MMCHBARL.VXL`, drawn under or over the turret by facing at run time. Render the barrel into your
+  sprites, or it's missing. The Amphibious APC changes hull on water: on a water cell, off a bridge and near the
+  ground it draws `APCW.VXL` instead of `APC.VXL`, a case hardcoded on the INI name `APC`. All of these are in
+  `LOCAL.MIX`.
 - **Barrels are level at pitch 64.** TS keeps a voxel barrel's pitch as a facing out of 256, and level is `DIR_E`,
   64: it's the default `StartPitch` (OpenTS `builtype.cpp`), the pitch `Barrel_Pitch` returns for a level shot
   (`building.cpp`), and TS's own `FIRESTRM.INI` notes `StartPitch=2 ; DIR_E = 2 << 5` (the INI key counts in
@@ -96,7 +107,14 @@ extent is about 0.81 of its side-on length), but a hull's height inflates that r
   holds its image frames first, then a shadow for each: frame n's shadow is frame n + count/2, which TS draws darkened under it. Decoded as art, those
   frames come out as flat purple silhouettes. Drop them, since a Remastered frame bakes its own shadow.
 - **Frame 1 is the damaged look.** A building at or below the yellow health threshold draws its next frame, so an idle
-  building's base SHP has its healthy art at frame 0 and its damaged art at frame 1.
+  building's base SHP has its healthy art at frame 0 and its damaged art at frame 1. Base SHPs also hold a third,
+  more wrecked frame 2 (`GTPOWR.SHP`: three images, then their three shadows), which TS never draws: the step is
+  only ever one frame. Port frames 0 and 1.
+- **A walker's frames are laid out by `ART.INI`.** Each of its 8 facings gets `WalkFrames` walking frames, then a
+  standing frame, then `FiringFrames` firing frames, in blocks per facing, all before the shadow half (setting
+  `FiringFrames` makes `StandingFrames` 1). The Wolverine (`[SMECH]`: `WalkFrames=12`, `FiringFrames=4`) walks on
+  frames 0 to 95, stands on 96 to 103 and fires on 104 to 135; its weapon, `[AssaultCannon]`, has no `Anim=`, so
+  its muzzle flash exists only in those firing frames.
 - **An animation's damaged loop usually shares its file.** The damaged section plays a later range of the same SHP:
   `[GADEPT_A]` loops frames 0 to 4 of `GADEPT_A.SHP` and `[GADEPT_AD]` frames 5 to 9, then come the shadows, 10 to 19.
   Read each section's `LoopStart` and `LoopEnd`, since a few animations run one cycle through the whole file.
@@ -162,11 +180,24 @@ The step-by-step recipe, written for an AI coding assistant to follow, is Tiberi
   page, nested ones included: `GTDEPT.SHP` and `GADEPT.SHP` sit in different theatre archives, `GTDEPT_C.SHP` and
   `GADEPT_C.SHP` exist, and no `GADEPT_C1` to `C3` file does. A working mod's extractor takes temperate `GT` names.
 - **SHP layout and timing:** OpenTS's `techno.cpp`, `building.cpp` and `anim.cpp` (shadows drawn at
-  `shapenum + Get_Count() / 2` with `SHAPE_DARKEN`), `building.cpp` `Shape_Number` (one frame on below
-  `ConditionYellow`), and `animtype.cpp` (`Delay = TICKS_PER_MINUTE / Rate`); TS's `ART.INI` (`[GAFIRE_B]`
-  `Rate=500` against `[GAFIRE_C]` `Rate=220`); and a working mod, whose extracted build-ups showed the purple second
+  `shapenum + Get_Count() / 2` with `SHAPE_DARKEN`), `building.cpp` `Shape_Number` (one frame on at or below
+  `ConditionYellow`, and no path to frame 2), and `animtype.cpp` (`Delay = TICKS_PER_MINUTE / Rate`); TS's
+  `ART.INI` (`[GAFIRE_B]` `Rate=500` against `[GAFIRE_C]` `Rate=220`); and a working mod, whose extracted build-ups showed the purple second
   half (frames 20 to 39 of `GTPOWRMK.SHP`'s 40), whose buildings use frame 1 when damaged, and whose Firestorm
-  Generator plays `GAFIRE_B` about twice as fast as `GAFIRE_C`.
+  Generator plays `GAFIRE_B` about twice as fast as `GAFIRE_C`. `GTPOWR.SHP`, `GTWEAP.SHP`, `GTRADR.SHP`,
+  `GTDEPT.SHP` and `GTFIRE.SHP` each have six frames, and `GTPOWR.SHP`'s first three were decoded for this page:
+  healthy, damaged and a more wrecked third; the working mod's notes record the same.
+- **Walker frames, extra voxels and the Firestorm's files:** OpenTS's `unittype.cpp` (`FiringFrames`, the
+  `StandingFrames = 1` it implies, and the start of each block), `unit.cpp` (the walk and firing frame sums, the SHP
+  turret at `8 * WalkFrames`, the barrel voxel drawn under or over it, and `APC`'s water voxel on a water cell) and
+  `objtype.cpp` (`%sTUR` and `%sBARL` fetched for any turret-equipped unit, SHP or voxel; `%sW` for `APC` only);
+  TS's `ART.INI` (`[SMECH]`, `[MMCH]` `Voxel=no`, `WalkFrames=15`, `PBarrelLength=250`) and `RULES.INI`
+  (`[MMCH]` `Turret=yes`, `[AssaultCannon]`); `SMECH.SHP` (272 frames, twice 136) and `MMCH.SHP` (304, twice 152)
+  read, and `SMECH.SHP`'s standing and firing frames decoded, flashes in the firing ones; `MMCHBARL.VXL`,
+  `APCW.VXL` and their `.HVA`s found in `LOCAL.MIX`, and no `MMCHTUR.VXL`. Every Firestorm file named above was
+  probed in `TIBSUN.MIX`'s inner archives and in none of `expand01.mix`'s, and TS's own `ART.INI` and `SOUND.INI`
+  define `[GAFIRE]`, `[GAFSDF]`, `FSIDLE` and `FIRSTRM1`, which Firestorm's `ARTFS.INI` and `FIRESTRM.INI` don't.
+  A working mod's renderer and art extraction script use all of these.
 - **Damaged animation loops:** `ART.INI`'s `[GADEPT_A]` (`LoopStart=0`, `LoopEnd=4`) and `[GADEPT_AD]`
   (`LoopStart=5`, `LoopEnd=9`, `Image=GADEPT_A`), against `GTDEPT_A.SHP`'s 20 frames, read for this page; a
   working mod composes its damaged building runs this way.

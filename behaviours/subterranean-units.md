@@ -69,10 +69,12 @@ enemies see nothing.
 ## The dive is made in the engine
 
 Tiberian Sun has no "dive" animation: its art registry has only the dirt mound (`DIG`) and a dirt explosion
-(`DIRTEXPL`). The units tilt nose-down at run time (`IsTilter`). To reproduce it with sprites, render the unit
-pitched at a few angles (for example 0, -8, -16, -24, -32 and -40 degrees going down, and the reverse coming up) for
-8 facings, snap the facing at dig start, and play the dirt mound over the top. That's about 112 shapes, which fits under the
-128-shape limit on a second draw (see [How the launcher draws sprites](../art/how-the-launcher-draws-sprites.md)).
+(`DIRTEXPL`). The units tilt at run time (`IsTilter`): nose down as they dig in, and nose up as they surface, so a
+unit comes up front first, the opposite tilt to its dive. Only an aborted dig runs the dive backwards. To reproduce
+it with sprites, render the unit pitched at a few angles for 8 facings: for example 0, -8, -16, -24, -32 and -40
+degrees (nose down) for the dive, and +40, +32, +24, +16, +8 and back to 0 (nose up) for surfacing. Snap the
+facing at dig start, and play the dirt mound over the top. That's about 112 shapes, which fits under the 128-shape
+limit on a second draw (see [How the launcher draws sprites](../art/how-the-launcher-draws-sprites.md)).
 
 The order that reads right: tilt first, at ground level and with no dirt; start the dirt mound partway into the
 tilt; hide the hull the moment the last step completes, while the mound is still solid. Surfacing mirrors it.
@@ -99,6 +101,9 @@ tilt; hide the hull the moment the last step completes, while the mound is still
 - **No dive art:** TS's `RULES.INI` `[Animations]` list, all 282 entries, names `DIG` (320) and `DIRTEXPL` (501)
   and nothing that dives, and Firestorm's `FIRESTRM.INI` adds 38 more with none either. Both units carry
   `IsTilter=yes`.
+- **The tilt's direction:** OpenTS's `TunnelLocomotionClass::Draw_Matrix` (`tunnel.cpp`) pitches by
+  `DigTimer.Progress()` × 90° while digging in, from −90° back to 0 while emerging, and from 90° back to 0 while
+  aborting; the working mod's emerge ladder runs nose up, +40 to 0, in its frame packer and its unit code.
 - **The surfacing search in Red Alert:** EA's `MapClass::Nearby_Location` (`MAP.CPP`) and `Is_Clear_To_Move`
   (`CELL.CPP`, where a zone of `-1` matches any), and the working mod's code, which calls it with the unit's zone
   and then `-1`, and steps 19 leptons a tick underground.

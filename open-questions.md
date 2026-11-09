@@ -120,11 +120,20 @@ Team colours are the same kind of data, and published mods do change them (see
 - **Established:** `MOUSEPOINTERS.XML` has 90 entries (texture and hotspot). The lobby lists (`CNCStartingUnits`,
   `CNCStartingCredits` and others) are `<Entry>` lists in `GameConstants.xml`. `CNCRABONUSCONTENT.XML` has 87 gallery
   entries, `SLASHCOMMANDS.XML` 203 commands with permission letters, and `UIHINTS.XML` ships every hint commented out.
-  `CNCRULES.XML` has a per-difficulty table marked `network="server"`.
+  `CNCRULES.XML` has a per-difficulty table for TD and for Red Alert, each marked `network="server"`, with the twelve
+  fields of `rules.ini`'s `[Easy]`, `[Normal]` and `[Difficult]` (`Firepower` to `ContentScan`; the hardest is keyed
+  `Hard`), and a `NameOverrides` list of `Key`/`Value` pairs mapping in-game names to text IDs. EA's DLL exports
+  `CNC_Config`, which takes the same twelve values for each difficulty and writes them into the `Rule.Diff` table
+  that `rules.ini` fills, and `InstanceServerG.exe` holds the path `\XML\CNCRules.xml` and a `RulesTypeClass` type
+  manager.
 - **Untested:** whether a loose or `GameConstants_Mod.xml` change to any of these shows in game; whether ClientG
-  honours slash-command permissions from data; whether UI hints are live; whether `CNCRULES.XML` is read at all.
+  honours slash-command permissions from data; whether UI hints are live; whether the server passes
+  `CNCRULES.XML`'s values to `CNC_Config`, and if so whether before or after the DLL reads `rules.ini`, which
+  decides whose difficulty values hold in play. A mod's copy wouldn't reach the server either way, as it reads none
+  of the launcher overrides.
 - **The test:** one change each (a new cursor texture, a tenth starting-units entry, a relaxed
-  permission letter, one uncommented hint), launched once.
+  permission letter, one uncommented hint), launched once. For `CNCRULES.XML`, log `Rule.Diff` from the DLL after
+  `CNC_Config` and at match start, against a `rules.ini` with distinct difficulty values.
 - **Full context:** TF's [CONFIG.MEG lever audit](https://github.com/gibbo101/cnc-ra-tiberian-factions/blob/main/docs/config-meg-lever-audit.md).
 
 ## Whether a terrain tileset costs video memory whole

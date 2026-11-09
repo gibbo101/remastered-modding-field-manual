@@ -1,10 +1,10 @@
 ---
 title: The skirmish AI and its IQ levels
-description: "How Red Alert's computer player works in a Remastered skirmish (IQ levels from rules.ini's [IQ] section, difficulty as a stat handicap that stock skirmish never varies, the urgency checks and weighted dice that choose what to build, the attack timer) and the stock bugs and gaps every DLL mod inherits, from missing ships and superweapons to targets picked through the shroud, confirmed in EA's source, with what one mod did about them."
+description: "How Red Alert's computer player works in a Remastered skirmish (IQ levels from rules.ini's [IQ] section, difficulty as a stat handicap that stock skirmish never varies, the urgency checks and weighted dice that choose what to build, the attack timer) and the stock bugs and gaps every DLL mod inherits, from missing ships and superweapons to targets picked through the shroud, no gang-up, no threat map, empty teams and an enemy pick that almost never picks, confirmed in EA's source, with what one mod did about them."
 tags: [ai, skirmish, iq, difficulty, rules-ini, dll]
 holds_for: Steam build 21590013
 status: verified
-unproven: [the stock AI's behaviour on native Windows beyond what the source shows; how much each of one mod's changes helps against a human at Hard (measured AI against AI only)]
+unproven: [the stock AI's behaviour on native Windows beyond what the source shows; how much each of one mod's changes helps against a human at Hard (measured AI against AI only); the chosen enemy staying unset in play (read from code and not watched)]
 ---
 
 > [!NOTE]
@@ -99,6 +99,13 @@ The skirmish picks are weighted dice, not plans:
   once it has more than five infantry, and one Tanya. **Every other infantry type is weight 0**, so the skirmish AI
   never trains spies, thieves, dogs or medics.
 
+It builds under the player's rules. `Can_Build`'s "the computer can always build everything" bypass runs only in
+`GAME_NORMAL`, so in skirmish the AI meets the same prerequisites, tech level and ownership tests.
+`FactoryClass::Start` starts a computer's build only if it can pay the first step (`House->IsHuman ||
+Available_Money() >= Cost_Per_Tick()`), where a human's always starts, and every step is paid as it goes. One small
+edge: a computer MCV whose deploy spot is blocked tells its own idle units there to move (`Flush_For_Placement`),
+where a human's only plays the can't-deploy cue (`UnitClass::Try_To_Deploy`).
+
 ## How it attacks
 
 `Check_Attack` rates an attack critical once the house's `Attack` timer reaches zero (never in the first minute).
@@ -109,6 +116,15 @@ minutes (stock `[AI]` `AttackInterval=3`); the first comes after `AttackDelay` Ã
 
 So there is no wave: whatever is armed at that moment goes, each unit hunting on its own, however large or small
 the army. A house with no buildings left always attacks.
+
+**The house's chosen enemy is almost never set.** Whenever the `Attack` timer is at zero, `Expert_AI` re-picks
+`Enemy`. Each candidate house scores `((MAP_CELL_W*2) - Distance(Center, h->Center)) * 2`, plus 5 for each of this
+house's buildings it has destroyed, 1 for each unit, the difference in base size, and 100 if it attacked last, and
+the pick needs a score above 0. `MAP_CELL_W*2` is 256, but `Distance` between two coordinates is in leptons, 256 to a
+cell, so any base more than about a cell away scores far below zero and the pick sets `Enemy` to none. Otherwise
+`Enemy` is set only when a non-ally hits one of the house's buildings (`BuildingClass::Take_Damage`), until the next
+pick clears it. Hunting units choose their own targets, so the attack still happens, but the target bonus for the
+designated enemy (+500, then Ã—3, in `Evaluate_Object`) rarely applies.
 
 ## Stock bugs and gaps
 
@@ -123,6 +139,11 @@ Each confirmed in EA's released source:
 | **Superweapon aim can't serve the Iron Curtain or Chronosphere.** `Special_Weapon_AI` aims at the enemy building of highest `Value` (each candidate has a 90% chance of being considered). Fired there, the Iron Curtain would shield the enemy's building, and the Chronosphere moves only allied units. `Place_Special_Blast` also picks the object in the target cell by the last mouse position (`Keyboard->MouseQX`). | `HOUSE.CPP`, `CELL.CPP` (`Cell_Techno`) | Adding the missing calls alone isn't enough: those two need their own target choice. |
 | **Target picks ignore the shroud outside a campaign.** `Evaluate_Object`'s "not visible, bail" test runs only in `GAME_NORMAL`, and `Special_Weapon_AI` looks at every enemy building on the map. | `TECHNO.CPP`, `HOUSE.CPP` | A computer player picks targets, and aims nukes, at things it has never seen. |
 | **Deploy abilities are never used.** Chrono tank teleports, MAD tank quakes and minelayer mines all run from `MISSION_UNLOAD`, and outside a campaign's team scripts nothing gives a computer unit that mission (the MCV is the one exception, in `Mission_Guard`). | `UNIT.CPP`, `TEAM.CPP` | Those units drive and shoot like tanks, or wander unarmed. |
+| **Computer players never gang up.** `Computer_Paranoid`, which allies every computer house against the humans (called when a human makes an ally, or a top-IQ computer house is defeated, with `[AI]` `Paranoid=yes`), wraps its whole body in `if (Session.Type != GAME_GLYPHX_MULTIPLAYER)`, with EA's comment "Re-enable this for multiplayer if we support classic team/ally mode". | `HOUSE.CPP` | `Paranoid=` does nothing in a skirmish: computer players fight each other as readily as the human. |
+| **The threat map stays empty.** `ObjectClass::Mark` feeds each house's region threat (`Adjust_Threat`) only in `GAME_NORMAL`, so `MapClass::Cell_Threat` returns only whether the cell is visible to the house (1 or 0). | `OBJECT.CPP`, `MAP.CPP` | Nothing has per-cell threat data in a skirmish: a damaged team's regroup choice in `TEAM.CPP` weighs distance alone. The threat-avoiding path test in `FINDPATH.CPP` is itself gated to `GAME_NORMAL`. |
+| **Teams are never filled.** `TeamClass::AI` recruits members only when `Session.Type == GAME_NORMAL`, though `HouseClass::AI` still creates teams from the map's TeamTypes. | `TEAM.CPP`, `HOUSE.CPP` | A skirmish map's TeamTypes produce empty teams: no squads, no team scripts. |
+| **The base-defence planner is compiled out.** `AI_Base_Defense` sits inside `#ifdef NEVER`, is declared nowhere and is never called. | `HOUSE.CPP` | Defences are queued by `AI_Building`'s `[AI]` `DefenseRatio` and `DefenseLimit` alone, with no sense of where attacks come from. |
+| **Friendly-fire caution covers only buildings.** `Area_Modify` halves a target's value for each allied building within `[General]` `FireSupress` cells (stock 1), checking `Cell_Building()` at all four edges of each ring and never units, and only for a weapon with `Supress=yes`, which in stock `rules.ini` is the cruiser's `8Inch` alone. It applies to every house's target scans. | `TECHNO.CPP` (`Evaluate_Object`), `WEAPON.CPP`, `RULES.CPP` | Splash weapons fire on targets beside their own side's infantry and tanks. |
 | **Four urgency checks and five build actions are stubs.** `Check_Build_Defense`, `Check_Build_Engineer`, `Check_Build_Income` and `Check_Build_Offense` always return `URGENCY_NONE`; `AI_Build_Defense`, `AI_Build_Engineer`, `AI_Build_Income`, `AI_Build_Offense` and `AI_Build_Power` always return `false`. | `HOUSE.CPP` | Those strategies never drive a decision. Power is the one rated but not acted on. |
 | **The power check's `|`.** "Under attack, so power is urgent" tests `BScan \| STRUCTF_CHRONOSPHERE`, which is always true. | `HOUSE.CPP`, `Check_Build_Power` | Any threatened house rates power as high urgency. |
 | **Target choice keeps the last candidate, not the best.** In `Greatest_Threat`'s ring scan, a candidate sets `bestobject` but never updates `bestval`, which stays at its starting -1 (or the best aircraft's score). All four edges of each ring (top, bottom, left and right) have the same `if (bestval < value)` with no update. The aircraft pass and the whole-map scan do set `bestval`, so only scans limited to a range or area (`THREAT_RANGE`, `THREAT_AREA`) go wrong. Guard and area guard use them (through `Target_Something_Nearby`), and so does every armed building, whose `Greatest_Threat` always adds `THREAT_RANGE`. Hunt scans the whole map. | `TECHNO.CPP` (extended ASCII: use `grep -a`), `FOOT.CPP`, `BUILDING.CPP` | Every valid target replaces the last, so a guarding unit or a base defence attacks the last one the scan reaches, not the most valuable. |
@@ -178,6 +199,20 @@ These are methods one mod uses, each a DLL change:
   ring scan's `bestval`, the radar dome, ships and shipyards, the repair bay, parabombs, fog in target and
   superweapon picks). **AI Boost**, an independent mod, adds the missing naval yards, superweapon buildings,
   Iron Curtain and Chronosphere calls, and spy, thief, chrono tank and MAD tank use, which agrees with each gap.
+- **The gang-up, threat map, teams, defence planner and friendly fire:** EA's `Computer_Paranoid` and its two
+  callers (`HOUSE.CPP`), the two `GAME_NORMAL` gates on `Adjust_Threat` in `ObjectClass::Mark` (`OBJECT.CPP`),
+  `Cell_Threat` (`MAP.CPP`) and its two users (`TEAM.CPP`, `FINDPATH.CPP`), the recruit gate in `TeamClass::AI`
+  (`TEAM.CPP`) and team creation in `HouseClass::AI`, `AI_Base_Defense` between `#ifdef NEVER` and its `#endif`
+  with no other mention in the source, and `Area_Modify`'s four `Cell_Building()` tests and `IsSupressed` gate
+  (`TECHNO.CPP`); Vanilla Conquer's `house.cpp`, `object.cpp`, `team.cpp` and `techno.cpp` match line for line; a
+  working mod's fork carries the same code and its AI notes list each one; `Paranoid=yes`, `FireSupress=1`,
+  `DefenseRatio` and `[8Inch]`'s `Supress=yes` (the only one) in the stock `rules.ini` from `REDALERT.MIX`.
+- **The enemy pick and the build rules:** EA's `Expert_AI` (`int close = 0`, the score, `Enemy = enemy`),
+  `MAP_CELL_W` 128 (`DEFINES.H`), `Distance` returning leptons (`COORD.CPP`), the `Enemy` set in
+  `BuildingClass::Take_Damage` and read in `Evaluate_Object`; `Can_Build`'s `GAME_NORMAL` bypass (`HOUSE.CPP`),
+  `FactoryClass::Start` and `FactoryClass::AI` (`FACTORY.CPP`), and the MCV's `Flush_For_Placement` call
+  (`UNIT.CPP`, with `BDATA.CPP`'s body scattering allied idle units). Vanilla Conquer's and a working mod's copies
+  have the same lines. The enemy pick's outcome is read from code, not watched in play.
 - **The `Production` trap:** EA's base-building gate in `HouseClass::AI`, stock `Production=5`, and a working mod
   that lowers it to 3 so its easiest AI still builds.
 
@@ -188,6 +223,7 @@ including primary-factory production, the share of the army sent per attack, and
 > **In Tiberian Factions**
 >
 > TF maps lobby difficulty to IQ (Easy 3, Medium 4, Hard 5) and to behaviours. Easy builds and fights but scouts
-> lazily and never fires superweapons. Medium and Hard attack in staged attack-move waves and place defences against
-> the threats they've seen, and Hard scouts actively. It never touches firepower or cost. Its AI also builds navies
+> lazily and never fires superweapons. Every tier gathers its attacks into staged waves, launched on army size and
+> worth; Hard releases its waves on attack-move against a known enemy building, and the others release theirs to
+> hunt. Medium and Hard place defences against the threats they've seen, and Hard scouts actively. It never touches firepower or cost. Its AI also builds navies
 > and ferries armies over water, which the stock skirmish AI never does.

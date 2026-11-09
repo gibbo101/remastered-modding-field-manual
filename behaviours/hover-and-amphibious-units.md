@@ -77,7 +77,8 @@ Both columns are zero on the same lands, so the two types can share one movement
   with it. Old saves won't load (see [Save versions](../engine/save-versions.md)).
 - **Missing a zone-reset caller** shows only later: a wall sold or crushed stays a barrier for hover units alone.
 - **Nothing changes the look on water.** A hover unit draws over water as it does over land. A lift, a wake or a
-  different hull afloat is art and DLL work of your own.
+  different hull afloat is art and DLL work of your own. TS's Amphibious APC has a water hull of its own to port
+  (see [Porting art from other games](../art/porting-art-from-other-games.md#tiberian-sun)).
 
 ## How it was verified
 

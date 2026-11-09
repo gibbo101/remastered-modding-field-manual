@@ -1,11 +1,11 @@
 ---
 title: Overriding the launcher's data
-description: Three ways a mod changes the launcher's own data (loose files under Data/, a replacement CONFIG.MEG held to the same-size rule, and the GameConstants_Mod.xml overlay), what each can and can't reach, and why the instance server never sees any of them.
+description: Three ways a mod changes the launcher's own data (loose files under Data/, a replacement CONFIG.MEG held to the same-size rule, and the GameConstants_Mod.xml overlay), loose members of the other archives such as the startup movie, what each can and can't reach, and why the instance server never sees any of them.
 tags: [launcher, config-meg, xml, game-constants, data]
 holds_for: Steam build 21590013
 clientg_version: 1.153 (745903)
 status: verified
-unproven: [which mod's copy wins when two enabled mods ship the same loose file, whether the launcher reads GameConstants_Mod.xml from a mod's root folder as well as Data/XML]
+unproven: [which mod's copy wins when two enabled mods ship the same loose file, whether the launcher reads GameConstants_Mod.xml from a mod's root folder as well as Data/XML, a startup movie in any format but Bink (a Theora one hung once)]
 ---
 
 > [!NOTE]
@@ -37,6 +37,12 @@ Put the file at its path inside the archive, under your mod's `Data/`. For examp
 `DATA\XML\INSTANCES.XML` in `CONFIG.MEG` becomes `Data/XML/INSTANCES.XML` in the mod. The launcher reads your copy
 instead of the archive's, at any size. Loose copies work for XML (tilesets, sound events, instances, map preview
 data), for `.BUI` screens and for the `MASTERTEXTFILE_*.LOC` string tables.
+
+The same holds for members of the other base archives: the UI atlas from `TEXTURES_SRGB.MEG` (see
+[The UI atlas](../front-end/the-ui-atlas.md)), and the startup movie. A loose `Data/ART/MOVIES/RA/REDINTRO.BK2`
+replaces Red Alert's intro from `MOVIES_RA.MEG`. Make it a Bink file: the game folder ships RAD's Bink 1 and Bink 2
+players (`binkw32.dll`, `bink2w32.dll`), and a Bink 1 movie renamed to `.BK2` plays. **Unproven:** other formats;
+a Theora file in its place hung on a black screen that couldn't be skipped, seen once.
 
 The loose file **replaces** the member whole. Ship a patched copy of the base game's file with your changes in it,
 never a file holding only your additions. The [TD sounds page](../using-what-the-player-owns/td-sounds-from-the-base-game.md)
@@ -139,6 +145,10 @@ Alert's houses, and CFE Patch Redux's Tiberian Dawn copy rearranges TD's multipl
 - **Loose files and the replacement archive:** a byte-identical repack of `CONFIG.MEG` with one string edited
   showed in the lobby when shipped in a mod folder. Loose `INSTANCES.XML`, `CNCMAPPREVIEWDATA.XML`, tileset, sound
   and `.BUI` files all load in a shipped mod. The size-rule crash and its signature were hit, then fixed by padding.
+- **The startup movie:** `DATA\ART\MOVIES\RA\REDINTRO.BK2` listed in the stock `MOVIES_RA.MEG` for this page, both
+  Bink DLLs in the game folder and `bink2w32.dll`'s functions imported by `ClientG.exe`; a shipped mod's intro build
+  encodes Bink 1 and copies it to the `.BK2` name, and its intro plays in place of the stock one. The Theora hang is
+  that mod's record only.
 - **`GameConstants_Mod.xml`:** the path appears in `ClientG.exe`, and it's the only `_Mod` name there. A shipped mod
   uses it to lock out classic graphics, enable the mod hotkeys and add theatre slots, all working in play.
   Vanilla Conquer's TD sample uses the same file and `overwrite="true"`.

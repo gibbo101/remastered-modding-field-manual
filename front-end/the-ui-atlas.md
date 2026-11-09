@@ -1,6 +1,6 @@
 ---
 title: The UI atlas
-description: Almost all of the launcher's 2D UI, menus and HUD alike, is drawn from one texture atlas, MT_COMMANDBAR_COMMON, and a region table (.MTD). A mod ships a repainted copy loose, as TGA or as a much smaller DXT5 DDS; region geometry stays the launcher's, so pick the right region and fit its box.
+description: Almost all of the launcher's 2D UI, menus and HUD alike, is drawn from one texture atlas, MT_COMMANDBAR_COMMON, and a region table (.MTD). A mod ships a repainted copy loose, as TGA or as a much smaller DXT5 DDS; region geometry stays the launcher's, so pick the right region and fit its box, and repaint the title logo in both its places.
 tags: [front-end, ui, atlas, textures, dds, launcher]
 holds_for: Steam build 21590013
 status: verified
@@ -84,6 +84,7 @@ Most lost time here is spent repainting the wrong region. Several look alike:
 | A country's flag in lobby lists | `RA_UI_FLAG_ICON_<COUNTRY>` (73 × 40) | country |
 | The small logo on waypoint and rally markers | `RA_UI_ALLIED_LOGO_SMALL` (25 × 19) / `RA_UI_SOVIET_LOGO_SMALL` (21 × 18) | side |
 | A faction's emblem in the lobby picker | `UI_MULTIPLAYER_PLAYERSLOT_FACTION_<nn>` with `_ON` / `_OVER`: `_00` and `_01` (66 × 56) are TD's GDI and Nod, `_03` to `_10` (150 × 80) Red Alert's eight countries, and there is no `_02` | the picker row, via `FACTIONS.XML` |
+| Red Alert's title logo | Not one region: the main menu draws its own texture, `UI_RA_MAINLOGO.DDS` (1948 × 552, uncompressed, no mips); the campaign select draws the atlas's `UI_RA_MAINMENU_LOGO` (908 × 257, at 4788, 94), the same art scaled down; the loading screen names both. Repaint both | screen |
 | A player's badge on the lobby map's start positions and on the loading screen | `UI_MAPSELECT_FACTION_<nn>` (40 × 40), numbered `_01` to `_10` by faction (`_01` GDI, `_02` Nod, `_03` Spain to `_10` Turkey), so the countries share their picker plates' numbers and only GDI and Nod sit one above | the faction |
 
 **Per side or per country decides what you can do with data.** A repainted crest shows for every faction on that
@@ -111,6 +112,10 @@ grown TGA is about 268 MB, against 184 MB.
 - **The picker, marker, small-logo and big-logo regions:** their boxes read from the `.MTD` for this page, and the stock
   `FACTIONS.XML`, whose `SmallIconName`s run `_00`, `_01`, `_03` to `_10`. A shipped mod repaints all of them and
   each shows where the table says; that the map badges also draw on the loading screen is its record (observed).
+- **The title logo:** `UI_RA_MAINLOGO.DDS` read from `TEXTURES_SRGB.MEG` for this page (1948 × 552, 32-bit, no mip
+  count, its size exactly that plus the header) and `UI_RA_MAINMENU_LOGO`'s box from the `.MTD`; the stock
+  `RA_MAIN_MENU.BUI` names the texture, `RA_CAMPAIGN_SELECT.BUI` the region, and `RA_UI_LOADINGSCREEN.BUI` both; a
+  shipped mod's title build paints both from one image.
 - **Editing in place:** the formula matches the stock file's size (18 + 6871 × 6716 × 4 = 184,582,562 bytes) and
   the scripts a shipped mod paints its crests and emblems with.
 - **Loose TGA:** a shipped mod's repainted copy draws in menus and matches, and another mod's

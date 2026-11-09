@@ -1,6 +1,6 @@
 ---
 title: Harvesters
-description: "Why Red Alert's harvesters get stuck, queue at one refinery or drive into enemy bases (a latch that never resets, an overwritten idle order, zones that ignore buildings, a sticky refinery choice, ore picks with no sense of danger), each confirmed in EA's source, the few rules.ini knobs, and the fixes one mod ships."
+description: "Why Red Alert's harvesters get stuck, queue at one refinery or drive into enemy bases (a latch that never resets, an overwritten idle order, zones that ignore buildings, a sticky refinery choice, ore picks with no sense of danger and, outside a campaign, no shroud), each confirmed in EA's source, the few rules.ini knobs, and the fixes one mod ships."
 tags: [ai, harvesters, economy, pathfinding, dll]
 holds_for: Steam build 21590013
 status: verified
@@ -32,7 +32,7 @@ Each confirmed in EA's released source:
 | **An idle harvester's repair or hunt order is overwritten.** The `GOINGTOIDLE` case assigns repair or hunt, then always `MISSION_GUARD`. | `UNIT.CPP` | It just stops where it is. |
 | **No replacement harvesters for a computer on a Hard handicap: campaign only.** The computer's replacement check requires its house's `Difficulty != DIFF_HARD`. A computer house takes that from `Scen.CDifficulty`, which only the original game's campaign menus set to Hard (on the player's two easiest settings). A skirmish AI gets `Scen.Difficulty`, which the lobby can't change from Normal, and the Remastered DLL never sets `CDifficulty`, so in Remastered the check only bites a mod that gives a computer house a Hard handicap. | `HOUSE.CPP`, `AI_Unit` | A campaign computer on a Hard handicap that loses its harvesters doesn't rebuild them that way. A stock skirmish AI always passes the check. |
 | **The refinery choice is sticky.** `Find_Best_Refinery` returns the last refinery used whenever it's still valid ("Remember our last refinery and prefer that one"). | `UNIT.CPP` | Harvesters queue at one refinery while another stands idle. |
-| **Ore picks ignore danger.** `Tiberium_Check` scores a cell by land type, ore, fog and zone only, and the harvester returns first to the last cell it mined (`ArchiveTarget`). | `UNIT.CPP` | A harvester that once mined in an enemy's base keeps going back. |
+| **Ore picks ignore danger, and outside a campaign the shroud.** `Tiberium_Check` scores a cell by its ore alone, `(OverlayData+1)` × the ore's value, in the harvester's zone and with no unit on it, and the harvester returns first to the last cell it mined (`ArchiveTarget`). Its fog test applies only to the player's own harvester in a campaign (`Session.Type != GAME_NORMAL \|\| !IsOwnedByPlayer \|\| Is_Mapped(PlayerPtr)`). | `UNIT.CPP` | A harvester that once mined in an enemy's base keeps going back, and in a skirmish every harvester, human or computer, picks ore it has never seen. |
 | **Zones ignore buildings.** A field walled off by a turret still counts as reachable. See [Pathfinding](pathfinding.md). | `CELL.CPP`, `MAP.CPP` | A harvester heads for ore it can never reach. Because the edge-following pathfinder nearly always returns *some* path, nothing reports a failure. It just never arrives. |
 
 ## The rules.ini knobs
@@ -95,7 +95,7 @@ Each is a DLL change, behind one "harvesters" switch on a settings page that res
 ## How it was verified
 
 - **The stock problems:** EA's `UNIT.CPP` (the `IsTiberiumShort` set, the `!House->IsHuman` re-queue, the
-  `GOINGTOIDLE` case, `Find_Best_Refinery`'s cache, `Tiberium_Check` and `ArchiveTarget`) and `HOUSE.CPP` (the
+  `GOINGTOIDLE` case, `Find_Best_Refinery`'s cache, `Tiberium_Check`'s score and its `GAME_NORMAL` fog gate, and `ArchiveTarget`; Vanilla Conquer's `unit.cpp` and a working mod's fork have the same `Tiberium_Check` lines) and `HOUSE.CPP` (the
   latch's only initialisation, its use in refinery building and harvester replacement, and the `DIFF_HARD` check),
   each read with `grep -a`. Where a computer's `Difficulty` comes from: `HouseClass`'s constructor (`Scen.CDifficulty`), `CDifficulty`'s only writers in `INIT.CPP` and `NULLDLG.CPP` (the original menus, which the
   DLL never calls), and `GlyphX_Assign_Houses` (`DLLInterface.cpp`, `Assign_Handicap(Scen.Difficulty)`).

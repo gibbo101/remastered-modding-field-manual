@@ -163,8 +163,12 @@ past its four charge frames into its damaged frames. Make the rate, the last sta
 
 Two more tests name only the Tesla Coil. `BuildingClass::Shape_Number` draws the charge stage as the frame only for
 `STRUCT_TESLA` (with the same three cases as TD's Obelisk), and `Animation_AI` leaves a building's stage alone
-only if it has a turret or is `STRUCT_TESLA`.
+only if it has a turret or is `STRUCT_TESLA`, and the mission isn't `MISSION_CONSTRUCTION` or
+`MISSION_DECONSTRUCTION` (TD's has the same test with `STRUCT_OBELISK`).
 Add your type to both, or the charge never shows and the idle animation runs over the charge stage.
+The mission exception cuts the other way too: a turret building that plays its build-up in any other mission (a
+deployer packing up under `MISSION_UNLOAD`, say) never loops it or flags it finished, so its stage counts on past
+the last frame. Add that mission to the test as well.
 
 `Charges=yes` does two more things in `TechnoClass::Fire_At`: it draws the Tesla's lightning to the target, and
 runs the bullet's logic at once. A laser wants the second and not the first, so skip the lightning for it.
@@ -196,11 +200,13 @@ TD's line intercept, and the launcher draws the beam in Red Alert.
   random civilian (`C1` to `C9`) for a house that acts as neutral, and otherwise a rifleman, or for a building with
   no weapon a 15% chance of a civilian, `C1` or `C7` at even odds. A TD building whose survivors should be TD's
   infantry needs a case of its own.
-- **Where the crew appears.** Both games place a survivor at the building's centre moved 12 pixels north
-  (`Center_Coord() + XYP_COORD(0,-12)`), then at the nearest free infantry spot (`Closest_Free_Spot`). A 1x2
-  tower's footprint is only its lower cell (`List12`), so its crew appears in the cell above the footprint.
-  Vanilla Conquer moves it a cell south for Red Alert's Tesla Coil, and for TD's Advanced Guard Tower and Obelisk in
-  its TD code; EA's released source doesn't. A 1x2 port on an EA base needs the same case.
+- **Where the crew appears.** A sold building's crew (`Mission_Deconstruction`) appears, in both games, at the
+  building's centre moved 12 pixels north (`Center_Coord() + XYP_COORD(0,-12)`), then at the nearest free infantry
+  spot (`Closest_Free_Spot`). A 1x2 tower's footprint is only its lower cell (`List12`), so its crew appears in the
+  cell above the footprint. Vanilla Conquer moves it a cell south for Red Alert's Tesla Coil, and for TD's Advanced
+  Guard Tower and Obelisk in its TD code; EA's released source doesn't. A 1x2 port on an EA base needs the same
+  case. A destroyed building's survivors come from `Drop_Debris` instead: one roll per footprint cell, each
+  survivor placed at that cell's centre with no offset and then scattered, so no 1x2 case is needed there.
 - **Power.** TD hardcodes its Advanced Guard Tower to hold fire on low power (`Can_Fire`). Red Alert does the same
   from data: `Powered=yes` in the building's section.
 
@@ -349,8 +355,10 @@ offsets. The Obelisk's sideways shift doesn't: a building's constructor passes n
   Alert (`BDATA.CPP`, `TYPE.H`, and a grep of both EA's and Vanilla Conquer's Red Alert code); TD's `IsCharging` and
   `IsCharged` (`BUILDING.H`), their handling in `BuildingClass::AI`, `Shape_Number` and `Fire_At`, and the
   Obelisk's `_anims` entry (`BDATA.CPP`); TD's whole building `Fire_At`; Red Alert's `GUNFIRE` and `SAMFIRE`
-  entries (`ADATA.CPP`); the survivor's placement in both games' `BUILDING.CPP` and Vanilla Conquer's extra south
+  entries (`ADATA.CPP`); the survivor's placement in both games' `BUILDING.CPP` (the offset in
+  `Mission_Deconstruction`, `Cell_Coord` of each footprint cell in `Drop_Debris`) and Vanilla Conquer's extra south
   step in both of its trees (`tiberiandawn/building.cpp`, `redalert/building.cpp`), with `List12` (`BDATA.CPP`);
+  `Animation_AI`'s turret, Tesla (Obelisk in TD) and mission test in both games, the same in Vanilla Conquer's;
   the civilian picks in Red Alert's `TechnoClass::Crew_Type`; the prerequisite test and its built-in alternatives
   (`HOUSE.CPP`); the "HACK ALERT" in `Who_Can_Build_Me` (`OBJECT.CPP`) and both sidebars' `Recalc`;
   `Allowed_Threats` (`WEAPON.CPP`); `Legal_Placement` walking `Occupy_List(true)` (`TECHNO.CPP`); and in Red Alert's
