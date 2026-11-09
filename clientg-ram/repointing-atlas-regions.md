@@ -160,6 +160,11 @@ Under Proton on Linux, ClientG's memory is readable and writable at `/proc/<pid>
 that lists the records for a region pattern and re-points them lets you test an idea in seconds, with no DLL build:
 write the record, take a screenshot.
 
+This works even with Linux's `ptrace_scope` at its default of 1 because of the Steam Linux Runtime, not Wine: the
+game runs in the runtime container's user namespace, which belongs to your user, and Linux lets a namespace's owner
+read the processes inside it. A same-user process outside such a container, such as the Steam client, refuses the
+same read. Without the container, the loop is untested.
+
 ## How it was verified
 
 Every finding here was made with that loop against the running client, before any DLL code was written. The shipped
@@ -168,7 +173,10 @@ with a joiner.
 `ptrace_scope`: Wine's `server/ptrace.c` (`read_process_memory` and `write_process_memory` try
 `process_vm_readv`/`process_vm_writev`, then `PTRACE_ATTACH` with `/proc/<pid>/mem`) and `dlls/ntdll/unix/server.c`
 (`prctl(PR_SET_PTRACER, server_pid)` in `server_init_process`, commented "work around Ubuntu's ptrace breakage");
-the shipped patch works on a Linux desktop with `kernel.yama.ptrace_scope` set to 1.
+the shipped patch works on a Linux desktop with `kernel.yama.ptrace_scope` set to 1. The quick test loop: at
+`ptrace_scope` 1, a same-user read of ClientG's `/proc/<pid>/mem` returned its `MZ` header, while the same read of
+the Steam client failed; `/proc/<pid>/ns/user` put ClientG and wineserver in a user namespace of their own (the
+container's, mapped to the same user) and the shell and the Steam client in the initial one.
 
 > [!TIP]
 > **In Tiberian Factions**
