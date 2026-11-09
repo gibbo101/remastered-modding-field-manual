@@ -51,7 +51,9 @@ A rules file in the player's Documents folder, read by the DLL, so players can t
   `MPLAYER.INI` (only with the lobby's Aftermath units on), then `Fill_In_Data`, so a player pass belongs after
   `MPLAYER.INI`, and again in `Load_Game`. `Read_INI` keeps every key a file doesn't name. In a LAN game only the
   host simulates, so the host's file is everyone's rules (see [LAN games](engine/lan-games.md)). The traps:
-  `Verses` resets to 100% when a section omits it; a key set only by the player's file leaks into the next match;
+  `Verses` resets to 100% when a section omits it (see
+  [Known engine traps](troubleshooting/known-engine-traps.md#a-warhead-section-without-verses-resets-it-to-100));
+  a key set only by the player's file leaks into the next match;
   weapons and warheads are shared between units.
 - **Untested:** a player pass built and played; the `Verses` reset seen in play.
 - **The test:** a pass that sets only `Spread` on one warhead, then that warhead's damage against each armour type.

@@ -1,10 +1,10 @@
 ---
 title: Known engine traps
-description: "Crashes and misbehaviour in EA's released Red Alert source that any DLL mod built from it inherits. The mod search-path buffer overruns with about four mods enabled; another folder's RULES.INI is read before yours; a sidebar column of exactly 75 entries writes past its array; the name table fills; a crate that destroys the unit driving onto it leaves a call on a dead unit; a misspelt INI key makes Inaccurate=yes do nothing; fixes under switches that are off (FIXIT_HELI_LANDING, TOFIX) never compile; a dead target's coordinate is the map's origin; an animation's first stage runs no stage work; Cell_Building ignores a building's overlap cells. Production contracts new code must keep: orders never ask Can_Build, Get_Quantity counts from production start, an entry with production in flight must stay, a builder must be freed, a cheap refinery gets no harvester, the draw export's name can be NULL. Each with its fix."
+description: "Crashes and misbehaviour in EA's released Red Alert source that any DLL mod built from it inherits. The mod search-path buffer overruns with about four mods enabled; another folder's RULES.INI is read before yours; a sidebar column of exactly 75 entries writes past its array; the name table fills; a crate that destroys the unit driving onto it leaves a call on a dead unit; a misspelt INI key makes Inaccurate=yes do nothing; fixes under switches that are off (FIXIT_HELI_LANDING, TOFIX) never compile; a dead target's coordinate is the map's origin; an animation's first stage runs no stage work; Cell_Building ignores a building's overlap cells. A warhead section without Verses resets it to 100%. Production contracts new code must keep: orders never ask Can_Build, Get_Quantity counts from production start, an entry with production in flight must stay, a builder must be freed, a cheap refinery gets no harvester, the draw export's name can be NULL. Each with its fix."
 tags: [troubleshooting, crashes, engine, dll, ini, sidebar, crates, projectiles, defines, targets, production, animations, cells]
 holds_for: Steam build 21590013
 status: verified
-unproven: [whether the stock RedAlert.dll shipped with the game behaves exactly as EA's released source on each trap, the order in which the launcher registers enabled mods' folders]
+unproven: [the Verses reset seen in play, whether the stock RedAlert.dll shipped with the game behaves exactly as EA's released source on each trap, the order in which the launcher registers enabled mods' folders]
 ---
 
 > [!NOTE]
@@ -116,6 +116,18 @@ own `Inaccurate=yes` is ignored the same way.
 `Inaccuate=yes`, which the stock DLL reads. Mind the balance: turning it on for the stock projectiles changes every
 stock weapon that uses them. Vanilla Conquer keeps EA's spelling.
 
+## A warhead section without `Verses` resets it to 100%
+
+`WarheadTypeClass::Read_INI` runs for every INI file that has the warhead's section, and reads `Verses` with a
+default of `100%,100%,100%,100%,100%` (`WARHEAD.CPP`). A later file that names a warhead to change one key, such as
+a map's INI or a rules pass of your own, and leaves `Verses` out, resets that warhead's damage against every armour
+type to 100%. Its other keys keep what earlier files set. A `Verses` line with fewer than five values gives the
+armour types it misses 0%.
+
+**Fix:** repeat the warhead's full `Verses` line in every section that names it. In a DLL, apply `Verses` only
+when the key is present. Vanilla Conquer keeps EA's code. This one is read from the source and hasn't been seen in
+play.
+
 ## A fix in an `#ifdef` that never compiles
 
 Some of EA's code sits under switches that are off, and a change made there does nothing. `DEFINES.H` turns on
@@ -206,7 +218,9 @@ Each trap three ways:
   the crate chain through `FOOT.CPP`, `CELL.CPP` and `DRIVE.CPP`, with `Set_Speed` declared `virtual` in
   `FOOT.H`; `NameOverride[25]` in `GLOBALS.CPP`, its fill loop in `TECHNO.CPP` and the `<` test in `INLINE.H`; the
   `"Inaccuate"` key in `BBDATA.CPP`, in the Remastered source, in EA's original Red Alert source and in Vanilla
-  Conquer's `bbdata.cpp`, and its use in `BULLET.CPP`. Vanilla Conquer inherits the search-path code unchanged.
+  Conquer's `bbdata.cpp`, and its use in `BULLET.CPP`. The warhead: `Read_INI`'s `Is_Present` test and the
+  `Get_String` default for `Verses` in `WARHEAD.CPP`, the same line in Vanilla Conquer's `warhead.cpp`, and
+  `fixed(NULL)` reading 0 for a missing value. Vanilla Conquer inherits the search-path code unchanged.
   The switches: the commented-out `FIXIT_` lines and their note in `DEFINES.H`, no definition of `TOFIX` anywhere
   in the source tree, its 15 `#ifdef TOFIX` lines counted over the `.CPP` files, and the helicopter branch in
   `HOUSE.CPP` with `Who_Can_Build_Me`'s "in theory" test (`OBJECT.CPP`); Vanilla Conquer's `redalert/defines.h`
@@ -235,14 +249,15 @@ Each trap three ways:
   intercept keys its per-unit changes on `AssetName`; an effect keyed to an animation's starting stage never fired;
   and its TD refinery docked only once the harvester's own cell was tested too.
 - **The fixes** are in that mod's code and released, and the crashes stopped.
-- **Unproven:** that the stock `RedAlert.dll` behaves exactly as the released source on each trap (it's built from
+- **Unproven:** the `Verses` reset seen in play (it's read from the source only); that the stock `RedAlert.dll` behaves exactly as the released source on each trap (it's built from
   it, but the binary wasn't checked), and the order in which the launcher registers enabled mods' folders, which
   decides which mod's file wins.
 
 > [!TIP]
 > **In Tiberian Factions**
 >
-> TF fixed all of them. It hit the sidebar limit first, once its TD and Tiberian Sun trees joined Red Alert's; its
+> TF fixed all of them but the `Verses` reset, which its INI files never hit: every warhead section it ships
+> carries its `Verses` line. It hit the sidebar limit first, once its TD and Tiberian Sun trees joined Red Alert's; its
 > columns now hold 120. DontCryJustDie reported the search-path crash and the rules trap from his own mod's
 > experience. TF loads its rules from its own folder, unless a found `RULES.INI` carries TF's sections, and reads
 > both spellings of the inaccuracy key. Its `rules.ini` sets the five stock projectiles to `Inaccurate=no`, so they

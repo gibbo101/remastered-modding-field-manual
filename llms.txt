@@ -269,7 +269,7 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
   never compile; a dead target's As_Coord is the map origin; production contracts (orders never ask Can_Build,
   Get_Quantity counts from production start, keep sidebar entries with production in flight, a cheap refinery gets no
   harvester, the draw export's shape name can be NULL); an animation's first stage runs none of its stage work;
-  Cell_Building() misses the cells a building only overlaps.
+  Cell_Building() misses the cells a building only overlaps; a warhead section without Verses resets it to 100%.
 
 ## Patching the launcher in memory (advanced)
 
