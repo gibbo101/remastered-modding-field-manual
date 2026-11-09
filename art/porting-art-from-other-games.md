@@ -95,7 +95,7 @@ extent is about 0.81 of its side-on length), but a hull's height inflates that r
 - **The second half of an SHP is shadows.** An SHP that TS draws with a shadow (infantry, buildings, build-ups)
   holds its image frames first, then a shadow for each: frame n's shadow is frame n + count/2, which TS draws darkened under it. Decoded as art, those
   frames come out as flat purple silhouettes. Drop them, since a Remastered frame bakes its own shadow.
-- **Frame 1 is the damaged look.** A building below the yellow health threshold draws its next frame, so an idle
+- **Frame 1 is the damaged look.** A building at or below the yellow health threshold draws its next frame, so an idle
   building's base SHP has its healthy art at frame 0 and its damaged art at frame 1.
 - **An animation's damaged loop usually shares its file.** The damaged section plays a later range of the same SHP:
   `[GADEPT_A]` loops frames 0 to 4 of `GADEPT_A.SHP` and `[GADEPT_AD]` frames 5 to 9, then come the shadows, 10 to 19.
