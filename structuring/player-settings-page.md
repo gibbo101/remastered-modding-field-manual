@@ -77,7 +77,7 @@ settings file during a match.
 > [!TIP]
 > **In Tiberian Factions**
 >
-> TF's settings page has GENERAL and GAMEPLAY pages. GENERAL holds music per faction and the sidebar's sorting and
+> TF's settings page has GENERAL and GAMEPLAY pages, and a third tab, GAME RULES, that is still a placeholder. GENERAL holds music per faction and the sidebar's sorting and
 > badges. GAMEPLAY holds a CLASSIC AI master switch, the TF AI's fair fog, attack waves, naval and radar, and the
 > units' A* pathfinding, give way and smart harvesters. TF's A* is adapted from CFE Patch Redux. Switched off,
 > units use stock Red Alert's own pathfinder. Each per-player sidebar choice reaches the host as a mod

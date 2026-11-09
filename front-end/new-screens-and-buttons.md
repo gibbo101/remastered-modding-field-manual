@@ -190,4 +190,4 @@ player's.
 >
 > ![TF's ADD-ONS screen](img/add-ons-screen.jpg)
 >
-> TF's ADD-ONS screen: a screen of the mod's own, on the launcher's unused SplashScreen class. The pack logos are blanked here because they use EA's Tiberian Sun logo.
+> TF's ADD-ONS screen: a screen of the mod's own, on the launcher's unused SplashScreen class. The pack logos are removed from this shot because they use EA's Tiberian Sun logo.

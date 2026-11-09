@@ -114,4 +114,4 @@ search `ClientG.exe`'s strings for the name family.**
 >
 > ![TD's tab icons on a TS GDI sidebar](img/gdi-td-tab-icons.jpg)
 >
-> A TS GDI player's sidebar tabs: TD's green tab icons, from the rewritten prefix strings.
+> A TS GDI player's sidebar tabs: TD's tab icons, from the rewritten prefix strings (the selected tab lights green).

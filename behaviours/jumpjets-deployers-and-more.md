@@ -99,4 +99,4 @@ TS's Disc Thrower throws a disc that bounces (`Bouncy=yes`; OpenTS's `bounce.cpp
 >
 > ![Jumpjet Infantry beside a TS GDI base](img/jumpjet-infantry.jpg)
 >
-> TF's Jumpjet Infantry, selected, beside a TS GDI base: wings spread in flight, each with the selection box and health bar the launcher places.
+> TF's Jumpjet Infantry, selected, beside a TS GDI base: three in flight with wings spread and one landed with them folded, each with the selection box and health bar the launcher places.

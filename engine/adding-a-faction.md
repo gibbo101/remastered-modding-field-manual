@@ -126,4 +126,4 @@ need the DLL or a launcher patch:
 >
 > ![The lobby faction picker](img/lobby-faction-picker.jpg)
 >
-> The lobby picker's eight rows: GDI's silver coin, Nod's scorpion, Soviet and Allied, then a Soviet and an Allied duplicate, TS GDI's gold coin and two more Allied duplicates, plus random. The player's name is blanked.
+> The lobby picker's eight rows: GDI's silver coin, Nod's scorpion, Soviet and Allied, then a Soviet duplicate, TS GDI's gold coin and two Allied duplicates, plus random. The player's name is blanked.

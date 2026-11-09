@@ -195,4 +195,4 @@ DontCryJustDie pointed out its cost.
 >
 > ![TF's pathfinding switches](img/settings-units.jpg)
 >
-> TF's UNITS switches: A* pathfinding, give-way and the harvester fixes, each with an off state that is stock Red Alert's.
+> TF's UNITS switches: A* pathfinding, give-way and the harvester fixes, each with an off state that is stock Red Alert's. This shot has A* and give-way switched off.

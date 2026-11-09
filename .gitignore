@@ -7,3 +7,8 @@ HANDOFF.md
 
 # Next-session working files (cut plan, inventories), local only.
 handoff/
+
+# The website build (site/build.sh): Quartz checkout and output.
+.quartz-build/
+public/
+.playwright-mcp/

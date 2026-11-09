@@ -191,5 +191,3 @@ The step-by-step recipe, written for an AI coding assistant to follow, is Tiberi
 > Tiberian Sun units and its Red Alert 2 tanks are now HD rebuilds from 3D models, drawn in Remastered's camera.
 > Every port is packed at 8 canvas pixels per classic pixel, centred, and given a baked shadow fitted to EA's
 > Mammoth tanks.
->
-> <!-- screenshot: a TS Titan, a C&C3 Predator and an EA Medium Tank side by side -->
