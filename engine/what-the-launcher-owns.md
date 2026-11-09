@@ -83,6 +83,12 @@ receiver (`IncomingExternalGamePluginEventClass`) is a compiled switch over thos
 from the DLL has nowhere to land. The front end embeds a Lua 5.1 and a ClickScript interpreter, but no `.lua` file
 ships in any of the game's 21 MEGs, and no callback event carries a script, so neither is a way in.
 
+**Three programs.** `ClientLauncherG.exe` is the window with the game tiles. Picking a game starts the launcher,
+`ClientG.exe`, and beside it the instance server, `InstanceServerG.exe`, which loads your DLL: the server's command
+line (`InstanceServerG.exe GAME_INDEX=0 CLIENT_PORT=16000 RUN_AS_APP NO_AUTO_EXIT LAUNCH_FROM_CLIENT=`) is a format
+string in `ClientLauncherG.exe`, not in `ClientG.exe`, and the two start in the same instant. Under Proton, Linux's
+parent process IDs don't show this: all three are children of the Steam runtime.
+
 **The tools.** `ClientG.exe`, `ClientLauncherG.exe` and `InstanceServerG.exe` are native 32-bit Windows programs
 (PE32, no .NET runtime), so .NET decompilers don't apply: use a disassembler. The only .NET program in the install
 is the map editor, `CnCTDRAMapEditor.exe`, whose source EA released. When searching `ClientG.exe`'s strings for
@@ -121,6 +127,10 @@ Each row was checked three ways where possible:
   the CryptoPP, Lua 5.1, receiver-class and `SERVER_TO_CLIENT_EXTERNAL_GAME_PLUGIN_EVENT` strings in `ClientG.exe`;
   its event dispatcher's 14-way type switch, read from disk; every MEG in `Data/` listed for `.lua` files; and each
   executable's PE header.
+- **Which program starts the server:** `ClientLauncherG.exe`'s strings hold `InstanceServerG.exe`,
+  ` CLIENT_PORT=%d` and ` RUN_AS_APP NO_AUTO_EXIT LAUNCH_FROM_CLIENT= `, and `ClientG.exe` holds none of them (ASCII
+  or UTF-16); a running game's server had exactly that command line, and `/proc` gave `ClientG.exe` and
+  `InstanceServerG.exe` the same start time, on consecutive process IDs, just after the game tile was clicked.
 - **The co-op campaign mode:** `ClientG.exe`'s strings (`CoopCampaignMenuImplementationClass`,
   `Host_Coop_Campaign_Lobby` and its coordinator messages, `Button_CoopCampaign`); `CONFIG.MEG` read for this page
   (11 empty `<CoopCampaignType>` elements, `UI_CampaignMenu_CoOp` only as a scene-list key, no such member among its
