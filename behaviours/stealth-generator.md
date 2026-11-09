@@ -1,10 +1,10 @@
 ---
 title: A stealth generator
-description: A building that cloaks friendly buildings and units around it, driven through Red Alert's existing cloak system; the one missing line that lets buildings cloak, which types detect (Sensors=, all infantry and ships), the re-cloak delay hiding under SubmergeDelay, the reveals already built in, detectors that reveal stationary objects, armed buildings that uncloak to fire, bibs, and the traps that left a base cloaked forever.
+description: A building that cloaks friendly buildings and units around it, driven through Red Alert's existing cloak system; the one missing line that lets buildings cloak, which types detect (Sensors=, all infantry and ships), the re-cloak delay hiding under SubmergeDelay, the reveals already built in, detectors that reveal stationary objects, armed buildings that uncloak to fire, bibs, and the traps that left a base cloaked forever. Cloaking the only factory of a kind cancels its build.
 tags: [behaviours, stealth, cloak, buildings, tiberian-sun, dll]
 holds_for: Steam build 21590013
 status: verified
-unproven: [why a cloaked armed building failed to fire in play although EA's BuildingClass::Mission_Attack handles FIRE_CLOAKED]
+unproven: [whether a cloaked factory can start a new build, why a cloaked armed building failed to fire in play although EA's BuildingClass::Mission_Attack handles FIRE_CLOAKED]
 ---
 
 > [!NOTE]
@@ -89,6 +89,12 @@ Radio contact survives, since only `Detach_All(true)` breaks it.
   radio contact" rule held it visible. Block cloaking only while the partner is actually moving. Aircraft need their
   own cover pass too. The rule is still needed for a partner on its way in: a building that starts to cloak clears
   the destination of a harvester or aircraft heading to it (above), stranding it.
+- **Cloaking a house's only factory of a kind cancels what it's building.** `Do_Cloak` calls `Detach_All`, and
+  `BuildingClass::Detach_All` takes the building out of `Who_Can_Build_Me` for a moment: if no other building can
+  build the item in progress, the house abandons it and refunds what was spent. By the code, a second factory of the
+  kind keeps the build going. Seen in play: a Medium Tank 14% built was abandoned within a frame of its only war
+  factory starting to cloak. Keep a house's last factory of a kind out of the cover while it's producing. Whether a
+  cloaked factory can start a new build is untested.
 - **Footprints with holes.** Finding which building owns a bib has to walk the building's real footprint, holes and
   all, or some bibs float uncovered.
 
@@ -108,8 +114,12 @@ Radio contact survives, since only `Detach_All(true)` breaks it.
   (`IsScanner = true` for every infantry and vessel type), `RULES.CPP` (`CloakDelay` read from `SubmergeDelay`) and
   `DRIVE.CPP` (`MOVE_CLOAK` shimmering the cell); the stock `rules.ini`'s `SubmergeDelay=.02`. The working mod gives
   its Radar Jammer `Sensors=yes`, and saw units walking into a hidden base shimmer it.
+- **The cancelled build:** EA's `BUILDING.CPP` (`BuildingClass::Detach_All` abandoning its own `Factory`, then
+  the house's `Abandon_Production` when `Who_Can_Build_Me` finds no other builder) and the same code in Vanilla
+  Conquer; a skirmish in the working mod placing a generator beside its only war factory mid-build, its log showing
+  the Medium Tank abandoned and its cost refunded.
 - **A working mod:** the generator in its release, played under Proton on Linux and on the Steam Deck. The traps
-  above were each hit and fixed there.
+  above were each hit there, and all but the cancelled build fixed.
 - **Unproven:** in play, a cloaked armed building (an Obelisk) charged and failed to fire, which is why the ambush
   step exists. But EA's `BuildingClass::Mission_Attack` does handle the "cloaked" fire result by uncloaking, so the
   reason it didn't fire wasn't traced.

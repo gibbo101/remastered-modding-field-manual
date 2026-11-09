@@ -199,8 +199,8 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
   drain states, the 5x5 kill, free GuardRange line fill, EVA 00-I162/00-I170; the field drops on low power or with
   every generator off; its crackle is the anims' Report=; a section sells with no refund.
 - [A stealth generator](behaviours/stealth-generator.md): set IsCloakable and let Cloaking_AI cloak; buildings never
-  copy IsCloakable; scanner detection is one-way; hide bibs at draw time; Visual_Character per viewer; Do_Cloak
-  clears friends' NavCom.
+  copy IsCloakable; scanner detection is one-way; hide bibs at draw time; Visual_Character per viewer; Do_Cloak clears
+  friends' NavCom; cloaking a house's only factory of a kind cancels its build.
 - [EMP and stun](behaviours/emp-and-stun.md): RA has no timed stun (its Stun() only clears targets); port of OpenTS's
   EMPulseClass: Damage = duration, Spread = radius, stun gates per action; TS's distance-tested aircraft pass, core
   defenders spared, sparks only on mobile deployers.
