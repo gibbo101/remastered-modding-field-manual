@@ -160,7 +160,8 @@ These are methods one mod uses, each a DLL change:
   advantage and stops the factory pool running dry.
 - **Fair fog.** Route the AI's target picks, superweapon aim and attack destinations through what its own house has
   seen, instead of the whole map.
-- **Fix the bugs above,** and queue the radar dome once the base has power, a refinery, a barracks and a factory.
+- **Fix the bugs above,** and queue the radar dome once the economy stands: one working mod waits for two refineries
+  (or a map short of ore), a war factory and full power.
 - **Keep the stock AI one switch away.** See [A player settings page](../structuring/player-settings-page.md): its
   "classic AI" switch puts every change back to EA's code path.
 
