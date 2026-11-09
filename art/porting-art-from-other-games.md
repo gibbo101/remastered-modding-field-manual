@@ -187,7 +187,7 @@ The step-by-step recipe, written for an AI coding assistant to follow, is Tiberi
 > [!TIP]
 > **In Tiberian Factions**
 >
-> TF's Tiberian Sun GDI and Nod, its Red Alert 2 tanks and its C&C3 units all came through these pipelines. Its
+> TF's Tiberian Sun GDI, its Tiberian Sun Nod units, its Red Alert 2 tanks and its C&C3 units all came through these pipelines. Its
 > Tiberian Sun units and its Red Alert 2 tanks are now HD rebuilds from 3D models, drawn in Remastered's camera.
 > Every port is packed at 8 canvas pixels per classic pixel, centred, and given a baked shadow fitted to EA's
 > Mammoth tanks.
