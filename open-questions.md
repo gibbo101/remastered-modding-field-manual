@@ -76,8 +76,9 @@ Tiberian Sun's terrain as Red Alert theatres, with TS's own multiplayer maps con
 EA's guidelines bar music from C&C games in a mod, so the tracks would be converted on the player's machine.
 
 - **Established:** the target format is proven: converted Tiberian Sun scores play as MS-ADPCM WAVs (see
-  [Music by faction, and the jukebox](sound-and-music/music-by-faction-and-the-jukebox.md)). Tiberian Sun's scores
-  are `<section>.AUD` files in `SCORES.MIX`, Westwood IMA ADPCM at 22,050 Hz mono.
+  [Music by faction, and the jukebox](sound-and-music/music-by-faction-and-the-jukebox.md)), and where Tiberian
+  Sun keeps its scores and how they're encoded is on
+  [Porting art from other C&C games](art/porting-art-from-other-games.md#tiberian-sun).
 - **Untested:** an importer that runs on the player's machine; whether EA's guidelines accept a mod that builds C&C
   music this way; where each store installs Tiberian Sun.
 - **The test:** a reread of the guidelines first, then one track converted by the DLL inside the launcher.
