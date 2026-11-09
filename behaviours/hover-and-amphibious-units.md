@@ -106,4 +106,7 @@ Both columns are zero on the same lands, so the two types can share one movement
 > amphibious one, switching to a water hull while afloat. The Hover MLRS bobs as it hovers, and settles onto its
 > shadow when an E.M. pulse stuns it.
 >
-> <!-- screenshot: a Hover MLRS and an Amphibious APC crossing a shoreline -->
+> ![A Hover MLRS and an Amphibious APC off a shoreline](img/hover-amphibious.jpg)
+>
+> TS GDI's Hover MLRS hovering over open water beside its Amphibious APC, afloat on its water hull with its wheels
+> gone, just off the snowy beach they crossed.
