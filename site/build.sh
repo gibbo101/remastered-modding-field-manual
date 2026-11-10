@@ -41,6 +41,11 @@ troubleshooting|Troubleshooting
 clientg-ram|Patching the launcher (advanced)
 SECTIONS
 
-cp "$ROOT/site/quartz.config.ts" "$ROOT/site/quartz.layout.ts" "$QUARTZ"/
+cp "$ROOT/site/quartz.config.ts" "$QUARTZ"/
+# The sidebar puts Getting started first, its pages in the README's order; everything else stays alphabetical.
+ORDER=$(grep -o -E '\]\(getting-started/[a-z0-9-]+\.md\)' "$ROOT/README.md" \
+  | sed -E 's/^\]\(([a-z0-9-]+)\/([a-z0-9-]+)\.md\)$/\1\n\2/' | awk '!seen[$0]++' \
+  | sed 's/.*/"&"/' | paste -sd, -)
+sed "s/README_ORDER/[$ORDER]/" "$ROOT/site/quartz.layout.ts" > "$QUARTZ/quartz.layout.ts"
 cd "$QUARTZ"
 npx quartz build --directory content --output "$ROOT/public" "$@"

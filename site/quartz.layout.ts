@@ -14,6 +14,21 @@ export const sharedPageComponents: SharedLayout = {
   }),
 }
 
+// Getting started leads the sidebar: build.sh replaces README_ORDER with it and its pages, in the README's order.
+const explorer = () =>
+  Component.Explorer({
+    sortFn: (a, b) => {
+      // No inner named functions: the explorer runs this function's source in the browser, without the bundler's helpers.
+      const order: string[] = README_ORDER
+      const ia = order.indexOf(a.slugSegment ?? "")
+      const ib = order.indexOf(b.slugSegment ?? "")
+      const diff = (ia < 0 ? order.length : ia) - (ib < 0 ? order.length : ib)
+      if (diff !== 0) return diff
+      if (a.isFolder !== b.isFolder) return a.isFolder ? -1 : 1
+      return a.displayName.localeCompare(b.displayName, undefined, { numeric: true, sensitivity: "base" })
+    },
+  })
+
 // components for pages that display a single page (e.g. a single note)
 export const defaultContentPageLayout: PageLayout = {
   beforeBody: [
@@ -38,7 +53,7 @@ export const defaultContentPageLayout: PageLayout = {
         { Component: Component.ReaderMode() },
       ],
     }),
-    Component.Explorer(),
+    explorer(),
   ],
   right: [
     Component.Graph(),
@@ -62,7 +77,7 @@ export const defaultListPageLayout: PageLayout = {
         { Component: Component.Darkmode() },
       ],
     }),
-    Component.Explorer(),
+    explorer(),
   ],
   right: [],
 }
