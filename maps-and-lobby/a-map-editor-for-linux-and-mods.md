@@ -57,22 +57,64 @@ other objects survive a load and save, and it lists them rather than dropping th
 ## Teaching it your mod: `mapeditor.json`
 
 A mod that adds types ships a `mapeditor.json` beside its `ccmod.json`. The editor reads it for every loaded mod and
-builds the mod's types from it at runtime, so nothing about any mod is compiled into the editor. A format-1 manifest
-holds:
+builds the mod's types from it at runtime, so nothing about any mod is compiled into the editor.
 
-- `buildings`: each with its engine `StructType` id, INI name, text ID or display name, footprint and occupancy mask,
-  power, storage, owner, art name and flags such as `Factory`, `Bib` or `Wall`.
-- `units`: vehicles, aircraft and vessels, with their art frame layout, turrets and flags. Each kind has its own id
-  range, as in the engine.
-- `infantry`: id, name, owner and flags.
-- `templates`: terrain templates by `TemplateType` id, with size, land types and an icon mask. A template appears in
-  exactly the theatres where the mod ships art for it.
-- `resources`: harvestable resources beyond ore and gems, for the random map generator.
+### A small manifest
 
-The editor never fails on a bad manifest. A file in an unknown format is skipped whole, a malformed entry or an unknown
-flag skips that entry, and each skip is a warning that `validate` reports. On an id or name clash the stock game's
-type wins, then the earlier mod's. The full format, with every field and its default, is in the editor's
-[`docs/mapeditor-json.md`](https://github.com/gibbo101/cnc-map-editor/blob/main/docs/mapeditor-json.md).
+This one adds a building, a vehicle, an infantryman and a terrain template to Red Alert. It loads with no warnings:
+
+```json
+{
+  "format": 1,
+  "game_type": "RA",
+  "buildings": [
+    { "id": 87, "name": "xbunk", "display_name": "Bunker", "owner": "GoodGuy",
+      "width": 2, "height": 2, "occupy_mask": "11 10", "power_usage": 10,
+      "flags": ["Bib"] }
+  ],
+  "units": [
+    { "id": 22, "kind": "vehicle", "name": "xtank", "display_name": "Assault Tank",
+      "owner": "GoodGuy", "body_frames": ["Frames32Full"],
+      "turret_frames": ["Frames32Full"], "flags": ["Armed", "Turret"] }
+  ],
+  "infantry": [
+    { "id": 26, "name": "xrifle", "display_name": "Rifleman", "owner": "GoodGuy",
+      "flags": ["Armed"] }
+  ],
+  "templates": [
+    { "id": 401, "name": "xpond", "width": 2, "height": 2, "lands": "WW WW", "mask": null }
+  ]
+}
+```
+
+### The fields
+
+- **`format`** must be `1`, and **`game_type`** `"RA"` or `"TD"`; a manifest for the other game is ignored. Every
+  section is optional.
+- **`id` and `name`** must match your DLL: the type's position in the engine's type list (`StructType`, `UnitType`
+  and so on) and its INI name, in lower case. Vehicles, aircraft and vessels each count their ids separately, as the
+  engine does, so `kind` says which list a unit is in.
+- **The label** is `text_id`, a game text key, or `display_name`, a plain English name. Each type needs one of them.
+- **`owner`** is the house the type belongs to: `GoodGuy`, `BadGuy`, `Neutral` and so on.
+- **Buildings** give their footprint as `width` and `height` in cells, and `occupy_mask` as rows separated by spaces,
+  `1` for an occupied cell and `0` for a free one; leave it out for a solid footprint. They can also give power,
+  storage, an art name that differs from `name`, and flags such as `Factory`, `Bib`, `Turret` or `Wall`.
+- **Units** describe their art: `body_frames` (required) and `turret_frames` say how the frames are laid out, such as
+  `Frames32Full` (32 facings) or `Frames08Cardinal` (8). Their flags include `Armed`, `Turret` and `Harvester`.
+- **Templates** take an id from 401 up, their size in cells, and `lands`: one letter per cell, rows separated by
+  spaces (`C` clear, `B` beach, `I` rock, `R` road, `W` water, `V` river, `H` rough). `mask` drops cells with a `0`.
+  The editor offers a template only in theatres where the mod ships art for it.
+- **`resources`** lists harvestable resources beyond ore and gems, for the random map generator: a flavour name, its
+  overlay names, and a building or terrain object that seeds each field.
+
+### When an entry is wrong
+
+The editor never fails on a bad manifest. A file in an unknown format is skipped whole, and a malformed entry or an
+unknown flag skips just that entry. Each skip is a warning that `validate` prints, such as
+`skipping building 'xbunk': unknown BuildingTypeFlag 'Bibb'`. When an id or name clashes with a type already
+loaded, the first one wins: the stock game's types, then each mod in load order. The editor's
+[`docs/mapeditor-json.md`](https://github.com/gibbo101/cnc-map-editor/blob/main/docs/mapeditor-json.md) has every
+field, its default and every flag.
 
 A mod can write its manifest by hand or generate it with a script. Either way, regenerate or edit it whenever a type
 is added or changes, or the editor offers the old one.
@@ -103,8 +145,7 @@ does. `cncmap` with no arguments prints every option. Until there's a release, r
 - **Maps over 128 × 128.** It keeps Mobius's caps: 128 × 128 for Red Alert, 64 × 64 for Tiberian Dawn (128 × 128
   for its megamaps). The game can be made to run bigger maps (see [Bigger maps](bigger-maps.md)), but no editor writes
   them yet.
-- **A finished release.** There are no prebuilt downloads: you build it with the .NET 8 SDK and run it with
-  `dotnet run`, as its README shows.
+- **No prebuilt downloads yet.** Build it with the .NET 8 SDK and run it with `dotnet run`, as its README shows.
 
 ## How it was verified
 
@@ -117,7 +158,8 @@ does. `cncmap` with no arguments prints every option. Until there's a release, r
 - **The features:** each one in the list has tests in the editor's suites (lossless load, manifest parsing, mod
   discovery, new maps, the generator, undo, the trigger and team dialogs), its README, and its source.
 - **The manifest:** the format document, the parser's tests (malformed entries, unknown flags, unsupported formats),
-  and Tiberian Factions' generated manifest (62 buildings, 57 units, 14 infantry, 210 templates, 1 resource) loading
+  the example above loaded with `cncmap validate --mod` (clean, and with a bad flag and a clashing name, the two
+  warnings), and Tiberian Factions' generated manifest (62 buildings, 57 units, 14 infantry, 210 templates, 1 resource) loading
   through it.
 - **The caps:** `MaxSize` in the editor's `RedAlert/Constants.cs` and `TiberianDawn/Constants.cs`, the same values
   as Mobius's; EA's editor source has the same 128 and 64 (it has no megamap size).
