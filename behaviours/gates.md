@@ -99,7 +99,7 @@ doors.
   fill and the "vehicle or building" bit are in EA's `MAP.CPP` (`Zone_Span`) and `CELL.CPP` (`Is_Clear_To_Move`).
 - **TS's model:** OpenTS's `Try_Open_Gate`, `Open_Gate`, `Is_Gate_Open` and the gate's opening mission, and TS's
   `RULES.INI` (`Gate=yes`, `DeployTime=.044`, `GateCloseDelay=.2`).
-- **A working mod:** six gate types in its release (TS GDI, TS Nod, Allied, Soviet Tesla, TD GDI, TD Nod laser),
+- **Tiberian Factions:** six gate types in its release (TS GDI, TS Nod, Allied, Soviet Tesla, TD GDI, TD Nod laser),
   with the open-on-request, hold-while-occupied and ally rules above, and the zone-rebuild fix, played under Proton
   on Linux and on the Steam Deck, LAN included.
 - **Unproven:** an enemy unit caught in a gate as it starts to close, and two players' units passing one gate in LAN.

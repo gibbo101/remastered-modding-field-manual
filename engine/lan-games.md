@@ -73,13 +73,13 @@ single player. In multiplayer it's on for everyone or for no one.
   `Session.MaxAhead` frames of the others, and whose `Compute_Game_CRC` records a checksum of the whole game for each
   of the last 32 frames.
 - **One simulation on the host:** EA's own comment and context switching in `DLLInterface.cpp`; the executables'
-  imports (the instance server names `CNC_Advance_Instance`, the launcher only `CNC_Version`); and a working mod
+  imports (the instance server names `CNC_Advance_Instance`, the launcher only `CNC_Version`); and Tiberian Factions,
   whose LAN joiners needed launcher-side patches for anything per player.
-- **Per-player sounds:** EA's `On_Sound_Effect` with a house argument, and its beacon loop. A working mod plays
+- **Per-player sounds:** EA's `On_Sound_Effect` with a house argument, and its beacon loop. TF plays
   its deploy, placement and build-up sounds to their owner this way in LAN. Whether a joiner hears their own
   faction's credit tick is still untested.
 - **The join check:** the strings `MODS REQUIRED`, `Must Disable` and `Must Enable` in the base game's
-  `MASTERTEXTFILE_EN-US.LOC`, and a working mod's add-on behaviour in LAN. That "Must Enable" is shown for a
+  `MASTERTEXTFILE_EN-US.LOC`, and TF's add-on behaviour in LAN. That "Must Enable" is shown for a
   missing mod is read from the string's presence, not seen.
 - **Tested** in LAN games with a Steam Deck hosting and a Linux desktop joining.
 - **Unproven:** EA's code tests `PlayerPtr` or `IsPlayerControl` in about 80 other places. Any of them that runs in

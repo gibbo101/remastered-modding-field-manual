@@ -160,19 +160,19 @@ zero first.
 - **The click handler:** the bytes above read from disk; `0x0B` is `SPECIAL` in EA's `DllObjectTypeEnum`; the
   cursor function's writes of 0, 4 and 5 to `0x20F1C90` disassembled for this page. The two construction requests:
   `SIDEBAR_REQUEST_START_CONSTRUCTION_MULTI` in EA's `DLLInterface.h` and its fall-through, with the "1x or 5x Left
-  click" comment, in `CNC_Handle_Sidebar_Request` (`DLLInterface.cpp`); a working mod's handler takes both, after
+  click" comment, in `CNC_Handle_Sidebar_Request` (`DLLInterface.cpp`); Tiberian Factions' handler takes both, after
   its one-click superweapons were seen arriving as either.
 - **The entry copy's fields:** the handler's byte tests of `+0x44` to `+0x47` and the cursor function's reads of
   `+0x18`, `+0x1C` and `+0x24`, disassembled for this page, line up with EA's `CNCSidebarEntryStruct`
   (`DLLInterface.h`) once the name is a `std::string` (the cursor function checks its capacity at `+0x14`) and the
-  placement list a vector. A working mod's notes give the same offsets.
+  placement list a vector. TF's notes give the same offsets.
 - **The twin:** `0x1689130` has one caller, in the launcher's event handling, which passes it the targeting event's
   four fields (type, ID, name, superweapon type). EA's `On_Special_Weapon_Targetting` sends that event, and its
   only callers in Red Alert are the Chronosphere's second step (`HOUSE.CPP`, `SPC_CHRONO2`) and the Chrono Tank
   (`UNIT.CPP`).
-- **In play:** a released mod routes deploy, camera-to-yard and both select-alls this way, and fires two
+- **In play:** TF routes deploy, camera-to-yard and both select-alls this way, and fires two
   superweapons on one click, on Linux under Proton and on the Steam Deck, in skirmish and in a LAN game with a
-  joiner. The aiming traffic, the tab rule and the stock keys' name tests are that mod's records (observed).
+  joiner. The aiming traffic, the tab rule and the stock keys' name tests are TF's records (observed).
 
 > [!TIP]
 > **In Tiberian Factions**

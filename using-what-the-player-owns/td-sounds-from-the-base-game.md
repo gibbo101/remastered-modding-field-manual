@@ -152,10 +152,10 @@ such as `Data/AUDIO/EN-US/` for voices. Route them with alias events exactly as 
 
 The DLL side was read in EA's released Red Alert source (the `SoundEffectName[]` and `Speech[]` tables, the
 16-byte fields, and the INI's lookup by name). The priority and context copy is in `On_Sound_Effect` in EA's Red
-Alert and TD `DLLInterface.cpp`, unchanged in Vanilla Conquer and in a working mod's DLL. The data side was read from the base game's `CONFIG.MEG` and sound
+Alert and TD `DLLInterface.cpp`, unchanged in Vanilla Conquer and in Tiberian Factions' DLL. The data side was read from the base game's `CONFIG.MEG` and sound
 MEGs: event counts, prefix pairs, presets, EA's own Red Alert events that play TD samples, and the format of every
-sample measured. In a shipped mod, the TD credit tick and around a hundred TD EVA lines play in game from the base
-game's samples, none of them shipped, and the mod routes its TD weapon reports the same way. The PCM crash was
+sample measured. In TF, the TD credit tick and around a hundred TD EVA lines play in game from the base
+game's samples, none of them shipped, and TF routes its TD weapon reports the same way. The PCM crash was
 taken from two identical crash records (`EXCEPTION_INT_DIVIDE_BY_ZERO` at the same address), and the instruction
 there is a `div esi` in the client named above. Tested under Proton on Linux and on the Steam Deck.
 
@@ -164,17 +164,17 @@ The variant suffix is in EA's `On_Sound_Effect` (`DLLInterface.cpp`), which appe
 variation each caller passes is in EA's `INFANTRY.CPP` (`ID+1`), `DRIVE.CPP` and `AIRCRAFT.CPP` (`-(ID+1)`), and
 `AUDIO.CPP`'s own copy of the suffix code says "For infantry, use a variation on the response. For vehicles, always
 use the vehicle response table." The stock events per suffix were counted for this page: 11 response names carry
-`.V01` and `.V03`, 6 carry `.V00` and `.V02`. A shipped mod gives its Tiberian Sun units four recordings per
+`.V01` and `.V03`, 6 carry `.V00` and `.V02`. TF gives its Tiberian Sun units four recordings per
 response event, two infantry and two vehicle, and they play. The sample
-rates and block sizes were read from the fmt chunk of every TD EVA sample in `SFX2D_EN-US.MEG`. A shipped mod's
+rates and block sizes were read from the fmt chunk of every TD EVA sample in `SFX2D_EN-US.MEG`. TF's
 DLL-sent EVA lines are stereo 44,077 Hz with 1024-byte blocks (fmt chunks read for this page), and play in game.
 
 The commando lines were listed from `SFX2D_EN-US.MEG` and the stock `SFXEVENTSLOCALIZED.XML` (the `TDC_`, `TDR_`,
-`RAC_` and `RAR_` events of the same bare names), against EA's `AUDIO.CPP`, where Tanya's lines take those names. A
-shipped mod plays TD's commando under `TD`-prefixed names. The `VoxType` width is EA's `DEFINES.H`, where the 111
-lines were counted, and that mod widens it to carry TD's EVA lines.
+`RAC_` and `RAR_` events of the same bare names), against EA's `AUDIO.CPP`, where Tanya's lines take those names. TF
+plays TD's commando under `TD`-prefixed names. The `VoxType` width is EA's `DEFINES.H`, where the 111
+lines were counted, and TF widens it to carry TD's EVA lines.
 
-**Unproven:** in one early test a routed TD sound stayed silent until its sample was copied into the mod, and the
+**Unproven:** in one early test a routed TD sound stayed silent until its sample was copied into TF, and the
 cause was never found. Every later route to a base sample played. If a routed TD sound is silent, shipping a copy
 of its two samples is a known workaround.
 

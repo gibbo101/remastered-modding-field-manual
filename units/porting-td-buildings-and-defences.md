@@ -281,8 +281,8 @@ offsets. The Obelisk's sideways shift doesn't: a building's constructor passes n
 - **A door's frames follow its `Open_Door(rate, stages)` call.** `DoorClass` (`DOOR.CPP`) shows stages 0 to
   `stages` − 2, and the factory adds a damaged set after them. Red Alert's opens with `Open_Door(8, 5)`: four door
   frames, plus 4 when damaged. TD's opens with `Open_Door(2, 11)`: ten, plus 10, the 20 frames TD's `WEAP2` has.
-  Give the overlay's tileset a shape for every frame the code can ask for. A working mod that kept Red Alert's eight
-  shapes under TD's call drew white squares for the rest.
+  Give the overlay's tileset a shape for every frame the code can ask for. When Tiberian Factions kept Red Alert's eight
+  shapes under TD's call, it drew white squares for the rest.
 - **`One_Time` runs after `rules.ini`.** `Init_Game` processes `rules.ini` (then `aftrmath.ini`) first, and
   `Init_Bulk_Data` runs every type's `One_Time` later. Anything `One_Time` sets, such as the `_anims` table's
   animation ranges, overrides an INI key your DLL reads for the same field.
@@ -369,14 +369,14 @@ offsets. The Obelisk's sideways shift doesn't: a building's constructor passes n
   and the `_anims` table without `STRUCT_SAM` (`BDATA.CPP`); `DoorClass::Open_Door` storing `stages-1` and
   `Door_Stage` (Red Alert's `DOOR.CPP`), `Open_Door(DOOR_RATE, DOOR_STAGES)` with 8 and 5 and the `+4` damaged
   overlay in Red Alert's `BUILDING.CPP`, `Open_Door(2, 11)` and `+10` in TD's; and the `NULL` return at the top of
-  Red Alert's `BuildingClass::Draw_It`. The working mod's TD SAM uses TD's states under its own type, its TD war
+  Red Alert's `BuildingClass::Draw_It`. Tiberian Factions' TD SAM uses TD's states under its own type, its TD war
   factory calls `Open_Door(2, 11)` with a 20-shape overlay tileset, and its TD buildings without a classic shape
   of their own were invisible until they got donors.
 - **The refinery stubs, the size and the facing:** EA's TD `BUILDING.CPP` (`RADIO_IM_IN` returning `RADIO_ATTACH`
   for `STRUCT_REFINERY`, `Mission_Harvest`), TD's `UNIT.CPP` (`RADIO_ATTACH`: `Limbo()` and `Attach`) and
   `DRIVE.CPP` (`Offload_Tiberium_Bail` paying credits); Red Alert's `BUILDING.CPP` (`MISSION_UNLOAD` for the
   refinery, `Target_Coord`), `UNIT.CPP` (the empty `RADIO_ATTACH` case, the `TOFIX` payout) and `BDATA.CPP`
-  (`StoreList` and `List21`, `FACING_S` on `POWR`, `APWR` and `TSLA`). The working mod ports TD's attach and a
+  (`StoreList` and `List21`, `FACING_S` on `POWR`, `APWR` and `TSLA`). TF ports TD's attach and a
   per-bail payout for its TD refinery, and its 2x1 Stealth Generator, built on the silo's constructor, needed
   `List21` and `FACING_NONE` after attackers aimed a cell south of it.
 - **More of the game's files:** the `<Frame />` shape 0 of each TD `MAKE` tile in `CONFIG.MEG`'s TD tilesets, and
@@ -384,7 +384,7 @@ offsets. The Obelisk's sideways shift doesn't: a building's constructor passes n
 - **The game's files:** stock `rules.ini`'s `Anim=MINIGUN` and `Anim=SAMFIRE` weapons; the frame counts of TD's
   `SAM.ZIP` (129), `SAMMAKE.ZIP` (frames 1 to 29), `ATWR.ZIP` (3), `SILO.ZIP` (11) and `MSAM.ZIP` (96) in
   `TEXTURES_TD_SRGB.MEG`.
-- **A working mod:** TD's power plants, barracks, silo, guard towers, gun turret, SAM site, Obelisk and the rest,
+- **TF:** TD's power plants, barracks, silo, guard towers, gun turret, SAM site, Obelisk and the rest,
   each a type of its own, shipped and played under Proton on Linux and on the Steam Deck. Each trap above was hit
   there: the tower frozen on one frame with the turret flag set, the SAM drawing half-risen, the Obelisk charging far
   faster than TD's, the silo always empty, a `NUKE`-named building that never built, prerequisites on new buildings

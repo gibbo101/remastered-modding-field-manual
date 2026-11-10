@@ -126,14 +126,14 @@ owns the placement ghost, so the line appears only when the second end is placed
   (`Limbo`, then `Delete_Me`, the cost read and discarded) and `Can_Demolish` (only while
   `FirestormDefenseActivated` is false). The sounds: `ART.INI`'s three `Report=FIRSTRM1` lines, `animtype.cpp`
   reading `Report` and `AnimClass::Start` playing it, and no Firestorm sound call anywhere in OpenTS. The frames:
-  the SHP headers of `GTFSDF_A.SHP` and `GAFSDF_A.SHP` (8 frames, 48 × 48). The working mod
+  the SHP headers of `GTFSDF_A.SHP` and `GAFSDF_A.SHP` (8 frames, 48 × 48). Tiberian Factions
   reproduces the +32 frame, the `FSIDLE` rule and both EVA lines. The AI rule, the 5 × 5 kill, jumpjets, the
   neighbour refresh and the power toggle are OpenTS's reading of TS, not tested in TS itself.
 - **The placement map:** EA's `DLLInterface.cpp` (`Calculate_Placement_Distances`), the same in Vanilla Conquer,
-  and the working mod's copy, which it limits for wall sections.
-- **The same rules in Red Alert:** the working mod's charge-drain `SuperClass` refunds three frames of charge per
+  and TF's copy, which it limits for wall sections.
+- **The same rules in Red Alert:** TF's charge-drain `SuperClass` refunds three frames of charge per
   frame of drain left and keeps a part-charged weapon usable, charges $250 a section, and spares its Hunter Seeker.
-- **A working mod:** the generator, sections, field, toggle and line fill in its release, played under Proton on
+- **TF:** the generator, sections, field, toggle and line fill in its release, played under Proton on
   Linux and on the Steam Deck.
 - **Unproven:** the enemy-side checks in a LAN game.
 
@@ -144,6 +144,7 @@ owns the placement ghost, so the line appears only when the second end is placed
 > what's left. Sections cost $250, as in TS. Line fill works for every wall in the mod, from sandbags to
 > Firestorm sections.
 >
-> ![A live Firestorm wall](img/firestorm-wall-live.jpg)
+> ![The Firestorm field rising](img/firestorm-field-rising.gif)
 >
-> TS GDI's Firestorm Generator with the field up: its core glows blue, and so does the wall line beside it, posts and bars alike.
+> TS GDI's Firestorm Generator raising the field. While it's down, a harvester drives straight over the sections; once
+> it's up, the generator's core and the whole wall line, posts and bars alike, glow blue, and the field crackles.

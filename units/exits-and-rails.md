@@ -66,7 +66,7 @@ pathfinding takes over.
 ## Traps
 
 - **Never write a path into one static table.** If every unit's path is written into one shared table, two units
-  on it at once follow each other's offsets. In a working mod, a harvester leaving the war factory while another
+  on it at once follow each other's offsets. In Tiberian Factions, a harvester leaving the war factory while another
   reversed into a refinery followed the refinery's path from the factory, and drove out of the back of the
   building. Each unit has to keep its own rail.
 - **Track numbers are saved.** `TrackNumber` is part of the unit's saved state, so a save stores which track the
@@ -99,8 +99,8 @@ pathfinding takes over.
 
 ## How it was verified
 
-- **The repair pad:** EA's `ListFix` (`BDATA.CPP`), CFE Patch Redux's `UnitClass::DoSmarterRunAway`, and a
-  working mod's notes on porting it.
+- **The repair pad:** EA's `ListFix` (`BDATA.CPP`), CFE Patch Redux's `UnitClass::DoSmarterRunAway`, and
+  Tiberian Factions' notes on porting it.
 - **The stock exit and tracks:** EA's `BUILDING.CPP` (`Exit_Object`, the war factory and barracks cases), `DRIVE.H`
   (`TrackControl[67]`, `RawTracks[13]`, `Track1`–`Track13`, `TrackNumber`, `TrackIndex`) and `CELL.CPP`
   (`Closest_Free_Spot`). The south `Track13` under `#if(1)`, the south-west one under `#else` and its `DIR_SW`
@@ -108,7 +108,7 @@ pathfinding takes over.
   are saved: `TFixedIHeapClass::Save` (`HEAP.CPP`) writes each object whole. The two-cell tracks: `F_D` in
   `DRIVE.H`, its entries in `TrackControl` and the `dest` step in `Start_Of_Move` (`DRIVE.CPP`, the same in
   Vanilla Conquer's `drive.cpp`).
-- **The rail and its traps:** a working mod's code (a per-unit `Rail_To` in its `DriveClass`), and its history: the
+- **The rail and its traps:** TF's code (a per-unit `Rail_To` in its `DriveClass`), and its history: the
   harvester that drove out of the back of the factory and its fix, the removed tracks left as empty slots because
   saves store their numbers, the doorway sort, and the deeper walker seats. Its service depot's drive-on check in
   `Start_Of_Move` missed vehicles that curved onto the depot's middle cell, until it also tested the cell after
@@ -116,13 +116,13 @@ pathfinding takes over.
   appended south-west track, forced from `Mission_Unload`, while Red Alert's factory keeps the stock one.
 - **Exit points, exit lists and `Find_Exit_Cell`:** EA's `BUILDING.CPP` (`Exit_Coord` adding `ExitCoordinate` to
   `Coord`; `Find_Exit_Cell` adding each `ExitList` offset to the top-left cell and calling `techno->Can_Enter_Cell`
-  unguarded) and `BDATA.CPP` (the tent's `XYP_COORD(24,47)` on `BSIZE_22`). The working mod's Tiberian Sun barracks,
+  unguarded) and `BDATA.CPP` (the tent's `XYP_COORD(24,47)` on `BSIZE_22`). TF's Tiberian Sun barracks,
   a 2x1, spawned infantry a cell below its door on the tent's exit point until it got its own point and list, and
   its war factory tests `Contact_With_Whom()` before `Find_Exit_Cell` in the states that run after contact drops.
 - **The refinery tracks:** EA's `DRIVE.H` (`BACKUP_INTO_REFINERY`, `OUT_OF_REFINERY`), Red Alert's `DRIVE.CPP`
   (their `TrackControl` entries with `F_`, `Track11`'s south-west facings, `Smooth_Turn`'s flag tests), no other use
-  in Red Alert's `.CPP` files (`grep -a`), and TD's `UNIT.CPP` turning to `DIR_SW` before `Force_Track`. The working
-  mod turns its TD harvester to south-west first too; at other facings it saw the truck snap.
+  in Red Alert's `.CPP` files (`grep -a`), and TD's `UNIT.CPP` turning to `DIR_SW` before `Force_Track`. TF
+  turns its TD harvester to south-west first too; at other facings it saw the truck snap.
 - **Observed, not traced:** a deployed mobile war factory that sometimes loses units it has built.
 
 > [!TIP]

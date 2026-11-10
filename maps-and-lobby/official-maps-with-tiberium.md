@@ -132,12 +132,12 @@ resource's tiles to the tileset of every theatre your converted maps use: for sn
 - **The game's files, measured for this page:** 230 `SCM…EA.INI` names found by CRC in `general.mix`, which also
   holds ten `SCM…EQ.INI` files; the theatre, `[STRUCTURES]` and `[Digest]` of all 230; `MAIN.MIX`'s header flags
   (0); `SCM05EA.INI`'s sections, its three mines and its bounds and starts, matching its preview entry; the
-  repeated starts in `SCMD2EA.INI`, and its preview entry's four in first-seen order (a working mod's key lookup
+  repeated starts in `SCMD2EA.INI`, and its preview entry's four in first-seen order (Tiberian Factions' key lookup
   drops the repeats the same way); the stock thumbnails' size, format and mip count, and that size worked out from
   the DDS layout (a 16-byte block per 4 × 4 pixels, at least one block a mip); the Keep off the Grass thumbnail
   beside its map's `[TERRAIN]` trees; Docklands' thumbnail rows; and no `TIB01` tile in Red Alert's stock snow and
   temperate tilesets.
-- **A working mod:** 151 official maps rebuilt this way, each with its repainted thumbnail, shipped as data. Keep off
+- **TF:** 151 official maps rebuilt this way, each with its repainted thumbnail, shipped as data. Keep off
   the Grass was played on the Steam Deck with its East field as Tiberium and its blossom tree standing in it, and the
   repainted thumbnail showed in the lobby. Middle Mayhem, a snow map, drew winter Tiberium with no missing art on
   the Linux desktop.

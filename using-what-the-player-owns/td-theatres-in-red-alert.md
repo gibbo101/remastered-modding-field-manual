@@ -122,12 +122,12 @@ Each claim was checked three ways:
   base install;
 - against EA's released source: the `TheaterType` enums of both games, `CnCTheaterType` and the theatre export in
   `DLLInterface`, and `Theaters[]`;
-- against a working mod. For each of the six theatres it generated a map with every template placed once. All six
+- against Tiberian Factions. For each of the six theatres it generated a map with every template placed once. All six
   drew every template and units spawned. It was played under Proton on Linux and on the Steam Deck, LAN included.
 
-The desert objects are missing from EA's Red Alert `DEFINES.H` and present, flagged for desert, in TD's; a working
-mod adds them and its desert maps place them. The `.BIN` layout is EA's TD `MAP.CPP` (`TemplateType` is a byte in
-TD's `DEFINES.H`, the map 64 × 64), and a working mod's converter reads TD's maps with it. The HD names were listed
+The desert objects are missing from EA's Red Alert `DEFINES.H` and present, flagged for desert, in TD's; TF
+adds them and its desert maps place them. The `.BIN` layout is EA's TD `MAP.CPP` (`TemplateType` is a byte in
+TD's `DEFINES.H`, the map 64 × 64), and TF's converter reads TD's maps with it. The HD names were listed
 from `TEXTURES_TD_SRGB.MEG` for this page.
 
 > [!TIP]

@@ -108,17 +108,17 @@ Radio contact survives, since only `Detach_All(true)` breaks it.
   and `Techno_Draw_Object` switching on it; `Do_Cloak` calling `Detach_All(false)`; `TechnoClass::Detach` sending
   `RADIO_OVER_OUT` only when `all` is set), `FOOT.CPP` (`FootClass::Detach` clearing a matching `NavCom`),
   `TRACKER.CPP` (`Detach_This_From_All` walking every house's objects) and `DLLInterface.cpp` (the export copying
-  `Cloak`); the same in Vanilla Conquer; and the working mod, which hides a cloaked building's bib when
+  `Cloak`); the same in Vanilla Conquer; and Tiberian Factions, which hides a cloaked building's bib when
   `Visual_Character` is `VISUAL_HIDDEN`, and holds a building's cloak while its radio partner has a `NavCom`.
 - **Detectors and the delay:** EA's `TECHNO.CPP` (`Sensors=` read into `IsScanner`), `IDATA.CPP` and `VDATA.CPP`
   (`IsScanner = true` for every infantry and vessel type), `RULES.CPP` (`CloakDelay` read from `SubmergeDelay`) and
-  `DRIVE.CPP` (`MOVE_CLOAK` shimmering the cell); the stock `rules.ini`'s `SubmergeDelay=.02`. The working mod gives
+  `DRIVE.CPP` (`MOVE_CLOAK` shimmering the cell); the stock `rules.ini`'s `SubmergeDelay=.02`. TF gives
   its Radar Jammer `Sensors=yes`, and saw units walking into a hidden base shimmer it.
 - **The cancelled build:** EA's `BUILDING.CPP` (`BuildingClass::Detach_All` abandoning its own `Factory`, then
   the house's `Abandon_Production` when `Who_Can_Build_Me` finds no other builder) and the same code in Vanilla
-  Conquer; a skirmish in the working mod placing a generator beside its only war factory mid-build, its log showing
+  Conquer; a skirmish in TF placing a generator beside its only war factory mid-build, its log showing
   the Medium Tank abandoned and its cost refunded.
-- **A working mod:** the generator in its release, played under Proton on Linux and on the Steam Deck. The traps
+- **TF:** the generator in its release, played under Proton on Linux and on the Steam Deck. The traps
   above were each hit there, and all but the cancelled build fixed.
 - **Unproven:** in play, a cloaked armed building (an Obelisk) charged and failed to fire, which is why the ambush
   step exists. But EA's `BuildingClass::Mission_Attack` does handle the "cloaked" fire result by uncloaking, so the

@@ -58,8 +58,8 @@ spread code. Stock spreading always plants ore, whatever the source cell holds (
 - **A blossom tree can be a building** owned by the neutral house, drawn with TD's blossom-tree art. On each growth
   tick it spreads a neighbouring Tiberium cell, or failing that seeds an empty one.
 - **Trees turning is your own rule, not TD's.** In TD a blossom tree is a terrain object the map places; its
-  random "blossoming" only animates its pod, and no ordinary tree ever becomes one. A mod can add the rule: the
-  working mod turns a tree with Tiberium in six or more of its eight neighbours into a blossom tree.
+  random "blossoming" only animates its pod, and no ordinary tree ever becomes one. A mod can add the rule:
+  Tiberian Factions turns a tree with Tiberium in six or more of its eight neighbours into a blossom tree.
 - **Make it invulnerable,** as TD's are. A damaged blossom tree asks for damage frames its art doesn't have, and
   those draw as white squares.
 
@@ -85,20 +85,20 @@ TD turns some infantry killed by Tiberium into Visceroids, hostile to everyone.
 - **The shared land type and the resource range:** EA's `ODATA.CPP` (ore and gems are `LAND_TIBERIUM`) and
   `DLLInterface.cpp` (`IsResource` only for `OVERLAY_GOLD1` to `OVERLAY_GEMS4`).
 - **Placement:** EA's `CELL.CPP` (`Is_Clear_To_Build` returning false for any overlay unless `Debug_Map`), the same
-  in Vanilla Conquer, and a working mod's long test matches, where spreading Tiberium left no legal cell near the
+  in Vanilla Conquer, and Tiberian Factions' long test matches, where spreading Tiberium left no legal cell near the
   yard.
 - **Growth and the lobby option:** EA's `CELL.CPP` (`Can_Tiberium_Grow` and `Can_Tiberium_Spread`: the
   `Session.Options.Tiberium` test outside `GAME_NORMAL`, and the `OVERLAY_GOLD1`–`OVERLAY_GOLD4` list), `MAP.CPP`
   (`MapClass::Logic`'s scan count and the `GAME_GLYPHX_MULTIPLAYER` multiplier) and `RULES.H` (`GrowthRate`, minutes
-  between growth steps); the same in Vanilla Conquer; and a working mod that adds its Tiberium overlay to both tests
+  between growth steps); the same in Vanilla Conquer; and TF, which adds its Tiberium overlay to both tests
   and grows it only with the option on.
 - **TD's behaviour:** EA's TD `INFANTRY.CPP` (2 damage on reaching a cell's centre, not for `INFANTRY_E5`), and
   `HOUSE_JP` in Red Alert's `DEFINES.H`.
 - **Blossom trees in TD:** EA's TD `TDATA.CPP` (only the two blossom-tree types spawn Tiberium and transform, and
   both are immune to damage) and `TERRAIN.CPP` (`IsBlossoming` set at random on an existing blossom tree; nothing creates
-  one in play); the working mod's tree-turning rule is in its own `TerrainClass::AI` (six or more `TIB01`
+  one in play); TF's tree-turning rule is in its own `TerrainClass::AI` (six or more `TIB01`
   neighbours).
-- **A working mod:** Tiberium as its own overlay, blossom trees, infantry damage and Visceroids, shipped and played
+- **TF:** Tiberium as its own overlay, blossom trees, infantry damage and Visceroids, shipped and played
   on official maps where Tiberium and ore fields meet, under Proton on Linux and on the Steam Deck.
 
 > [!TIP]

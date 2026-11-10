@@ -78,9 +78,9 @@ item's page.
 
 ## Routes that don't work
 
-- **EA's standalone `Uploader.exe`.** In one mod's tests it hung at the same "preparing config" step, on Windows and
-  under Proton, and one attempt left an empty item behind on the Workshop. Whether a Steam restart clears it for
-  that tool too wasn't tested. The publish code that works is the map editor's (`SteamworksUGC.cs`), which this tool
+- **EA's standalone `Uploader.exe`.** In Tiberian Factions' tests it hung at the same "preparing config" step, on
+  Windows and under Proton, and one attempt left an empty item behind on the Workshop. Whether a Steam restart clears it
+  for that tool too wasn't tested. The publish code that works is the map editor's (`SteamworksUGC.cs`), which this tool
   follows.
 
 ## How it was verified
@@ -89,16 +89,16 @@ item's page.
   tool's source and README, and the `.workshop.json` files of installed Workshop mods (their tags).
 - **The tags:** `RedAlertMod` and `TiberianDawnMod` beside the launcher's `steamworkshopmods.cpp` Workshop query in
   `ClientG.exe`; EA's map editor's `SteamDialog.cs` (its map tags); `SteamMultiExtraTags` in the community map
-  editor's source; and a working mod's publish manifest.
+  editor's source; and Tiberian Factions' publish manifest.
 - **The limits:** `k_cchPublishedDocumentDescriptionMax = 8000` and the visibility enum in the Steamworks.NET
   copy bundled with EA's source, and a real publish that failed at 8660 characters. Steamworks' newer enum adds
   `3` for unlisted.
-- **The restart:** a shipped mod's runbook, the tool's 60-second watchdog in its source, and an earlier report of
+- **The restart:** TF's runbook, the tool's 60-second watchdog in its source, and an earlier report of
   the same hang from other C&C Remastered modders. The log lines are from a real `workshop_log.txt` after a
   successful publish; the other-device check is in the runbook and the tool's README, untested as a cause.
 - **The manifest fields:** the tool's source (`ResolvePath` from the manifest's folder, `SetItemPreview` only when a
   preview is named), its README, and the runbook; `metadata` empty in 24 of 25 installed mods' `.workshop.json`.
-- **`Uploader.exe`:** a shipped mod's runbook (hung on Windows and under Wine/Proton) and its notes on the
+- **`Uploader.exe`:** TF's runbook (hung on Windows and under Wine/Proton) and its notes on the
   empty item that tool created and left behind; the tool's README names the same hang.
 - **The layout:** a survey of every Workshop mod installed on one machine (each has the named subfolder).
 - Observed once, in a real publish: a symlinked mod folder broke installs.

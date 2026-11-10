@@ -284,7 +284,7 @@ Infantry take `InfantryTypeClass` and two animation tables, `DoControls` for the
 - **The game's files:** stock `rules.ini`'s track and wheel speeds, `HomingScatter=2.0`, `BallisticScatter=1.0`,
   `SubmergeDelay=.02`, `ROT=5` on its homing projectiles and `C4=yes` on Tanya; the HD frame counts in
   `TEXTURES_TD_SRGB.MEG` and `TEXTURES_RA_SRGB.MEG`: `E1.ZIP` 532 in both, `APC.ZIP` 38 in both, TD's `STNK.ZIP` 32.
-- **A working mod:** every TD vehicle and infantryman ported this way, and each trap above hit and fixed in play:
+- **Tiberian Factions:** every TD vehicle and infantryman ported this way, and each trap above hit and fixed in play:
   a missile that overshot its arming window with TD's speed written raw, TD's cadence and scatter ported in code, a
   transport added to the four `UNIT_APC` tests, and a C4 commando whose demolition needed no code. Also an
   anti-aircraft missile with `Speed=100` that never left its launcher, spray weapons that burst on every hit until

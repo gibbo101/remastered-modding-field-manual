@@ -147,20 +147,20 @@ registered there.
 
 - **MEG:** EA's `Megafile.cs` and `MegafileBuilder.cs` (layout, version 0.99, upper-case paths, entries sorted by
   CRC), the first words of the base game's `CONFIG.MEG` read for this page (`0xFFFFFFFF`, `0x3F7D70A4`, then the
-  header), and a byte-identical repack of `CONFIG.MEG` with a working mod's tool.
+  header), and a byte-identical repack of `CONFIG.MEG` with Tiberian Factions' tool.
 - **Classic MIX:** the base game's `CONQUER.MIX`, read for this page (266 files, index sorted by signed CRC), EA's
   `MIXFILE.H`, and Vanilla Conquer's MIX tool, whose `pack` writes the same layout.
 - **The hash:** computed for this page, `ww_crc("00-0000.aud") = 0x1D597662`, matching the XCC database's Red Alert
   CRC for that name. Every entry in `CONQUER.MIX` resolves with it.
 - **Red Alert's outer MIX:** the flags of every MIX in the install's `CNCDATA/RED_ALERT/` folders, read for this
   page (the table above). The key chain mirrors
-  EA's `PK.CPP`, `BLOWFISH.CPP` and `MIXFILE.H`, and a working mod's reader extracts Red Alert's `PALETTE.CPS`
+  EA's `PK.CPP`, `BLOWFISH.CPP` and `MIXFILE.H`, and TF's reader extracts Red Alert's `PALETTE.CPS`
   with it. The word order is EA's `BLOWFISH.CPP` (its `Int` union puts byte 0 in the most significant place) and
   Vanilla Conquer's copy; that reader uses a stock Blowfish library, and `REDALERT.MIX`'s index decrypts with it
   (its six nested MIXes add up to 25,046,164 bytes).
 - **Where Red Alert's files are:** `REDALERT.MIX`, `LOCAL.MIX`, `EXPAND2.MIX` and `MAIN.MIX` listed for this page
-  with a working mod's reader (every name resolved), and `rules.ini` extracted and read; the same layout in that
-  mod's MIX notes; EA's `INIT.CPP` for the names it loads.
+  with TF's reader (every name resolved), and `rules.ini` extracted and read; the same layout in TF's
+  MIX notes; EA's `INIT.CPP` for the names it loads.
 
 > [!TIP]
 > **In Tiberian Factions**

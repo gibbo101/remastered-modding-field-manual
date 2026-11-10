@@ -42,7 +42,7 @@ base game's text, so any text ID it defines can be used anywhere a text ID goes.
 - **Line endings:** CRLF in the sample below, and LF loads too.
 - **Write `&` as `&&`.** The launcher's font reads a single `&` as a shortcut marker. EA's own strings do the same
   (`C&&C`, `SKIRMISH && ONLINE`). This holds for every launcher string, `.LOC` included.
-- **Keep double quotes out of the text.** A working mod's build rule bans them; what one does hasn't been tested.
+- **Keep double quotes out of the text.** Tiberian Factions' build rule bans them; what one does hasn't been tested.
 
 Then point at your IDs. A buildable object's sidebar name and description come from its `ObjectNameTextID` and
 `ObjectDescriptionTextID` in its `ObjectTypeClass` entry. A skirmish entry's name comes from its
@@ -75,19 +75,19 @@ So a value can grow if another gives the same bytes back, and the file's total s
 
 - **An ID found nowhere shows raw.** The sidebar then reads `TEXT_UNIT_MY_TANK`. Check the spelling in both files.
 - **`rules.ini`'s `Name=` isn't the sidebar name.** It sets only the in-world hover tooltip. The sidebar reads
-  the object's text ID. Observed in a working mod, not read from code.
+  the object's text ID. Observed in Tiberian Factions, not read from code.
 - **One string per language file.** If you edit a `.LOC`, edit every language you ship for. `ModText.csv` carries
   all languages in one file.
 
 ## How it was verified
 
 - **`ModText.csv`:** DontCryJustDie's "Nuke Tank Sample Mod" ships one (UTF-16 LE with a BOM, these columns,
-  `//` comments). The launcher is what reads it: neither that sample's host DLL (his "Veterancy and more") nor a
-  working mod's own DLL contains any code for the file, and both mods' strings show in game. A working mod ships its own for every new unit and
+  `//` comments). The launcher is what reads it: neither that sample's host DLL (his "Veterancy and more") nor
+  Tiberian Factions' own DLL contains any code for the file, and both mods' strings show in game. TF ships its own for every new unit and
   building name, with LF line endings, and they show in the sidebar. `ClientG.exe`'s mod loader lists `CSV` among
   the file types it takes from a mod (beside `Loading mod: %s` in `ModManagerClass::Load_Mod`). The name
   `ModText.csv` itself appears in no game binary, so how the launcher picks this file out is unknown.
-- **`&&`:** 79 `&&` pairs in the stock English `.LOC` (`C&&C`, `Locate && free the hostages`); a working mod's
+- **`&&`:** 79 `&&` pairs in the stock English `.LOC` (`C&&C`, `Locate && free the hostages`); TF's
   build rule writes `&&` in its `ModText.csv` and screen text, and one `&` shows in game.
 - **The `.LOC` format:** the stock English table parsed exactly as above: 6,852 records, sorted by hash, every
   hash the CRC-32 of its key, and the file ending where the keys end. Same-size relabels and a byte-neutral regrow

@@ -136,32 +136,32 @@ type's `ImageData` as a donor, fixes it. The DLL side is on [Adding a unit](../u
 ## How it was verified
 
 - **Infantry in the units tileset:** the 19 files in `CONFIG.MEG`'s `DATA\XML\TILESETS\` (none for infantry), the
-  532 `E1` tiles counted in `RA_UNITS.XML`, and a working mod's infantry ports, registered there by its build tool.
+  532 `E1` tiles counted in `RA_UNITS.XML`, and Tiberian Factions' infantry ports, registered there by its build tool.
 - **The pieces and the names:** the base game's `2TNK.ZIP`, `POWR.ZIP` and `WEAP.ZIP` (`TEXTURES_RA_SRGB.MEG`),
   `RA_UNITS.XML` and `RABUILDABLES.XML` (`CONFIG.MEG`), all read for this page. `TypeName` from `IniName` and
   `AssetName` from `Graphic_Name()` in EA's `DLLInterface.cpp`, and `Image=` read in EA's `TECHNO.CPP`
   (`TechnoTypeClass::Read_INI`) and `BBDATA.CPP`.
 - **The × 5.33 sizes:** the classic `2TNK.SHP`, `POWR.SHP` and `WEAP.SHP` from Red Alert's MIXes, against the HD
-  `.meta` files, all read for this page. A working mod's squashed buildings, fixed by matching the canvas to the
+  `.meta` files, all read for this page. TF's squashed buildings, fixed by matching the canvas to the
   classic frame, showed the same rule.
-- **Leptons per canvas pixel:** the constants in EA's `DISPLAY.H` (`PIXEL_LEPTON_W` is their ratio). A working
-  mod packs its units at ×8 and derives its muzzle tables at 4/3 leptons a pixel; an earlier fire point built on
+- **Leptons per canvas pixel:** the constants in EA's `DISPLAY.H` (`PIXEL_LEPTON_W` is their ratio). TF
+  packs its units at ×8 and derives its muzzle tables at 4/3 leptons a pixel; an earlier fire point built on
   a quarter of the real rate fired shells from near the hull's centre, a cell and a half out at long range.
 - **Sizes sent per draw:** EA's `CC_Draw_Shape` (`CONQUER.CPP`), the overlay and smudge entries in
-  `DLLInterface.cpp`, and `BuildingClass::Get_Image_Data` (`BUILDING.CPP`). A working mod's building whose
+  `DLLInterface.cpp`, and `BuildingClass::Get_Image_Data` (`BUILDING.CPP`). TF's building whose
   build-up donor didn't match its footprint drew a squashed build-up, fixed by a donor of the right size; its
   Disc Thrower's disc, on another bullet's shape, flew at that bullet's size until it got a classic shape of its
   own; and its build gives every new overlay its own classic shape.
-- **No house colour on ground art:** EA's `DLLInterface.cpp` (the smudge entry's `Owner` set from the cell), and a
-  working mod's building aprons, whose hazard stripes it bakes in gold because the launcher never remapped them.
+- **No house colour on ground art:** EA's `DLLInterface.cpp` (the smudge entry's `Owner` set from the cell), and
+  TF's building aprons, whose hazard stripes it bakes in gold because the launcher never remapped them.
 - **Theatre art:** `IsTheaterShape` set from the type's `IsTheater` in EA's `CELL.CPP`, `BUILDING.CPP` and the
   overlay export, and always for smudges (`SDATA.CPP`, and the smudge export: "Smudges are always
   theater-specific"); `GOLD01` (theatre art) and `SBAG` (not) in `ODATA.CPP`; `GOLD01`, `BIB1` and `SBAG` counted in
-  the stock tilesets for this page. A working mod's building aprons, theatre-specific smudges, draw only from
+  the stock tilesets for this page. TF's building aprons, theatre-specific smudges, draw only from
   the copies of their tiles in each theatre's terrain tileset.
-- **Registration and the white boxes:** a working mod's tileset and buildables files (970 `RA_` entries), its
+- **Registration and the white boxes:** TF's tileset and buildables files (970 `RA_` entries), its
   port notes, and the base game's tileset index.
-- **Observed only:** the `<Missing>` hover text and the stock-name clash, both from a working mod's early ports.
+- **Observed only:** the `<Missing>` hover text and the stock-name clash, both from TF's early ports.
 
 **Credit:** DontCryJustDie suggested sharing art with `Image=`, and his TD-Assets set the `TD` naming.
 

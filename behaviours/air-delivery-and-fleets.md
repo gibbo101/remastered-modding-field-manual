@@ -41,7 +41,7 @@ the map edge, sets the vehicle down beside the strip, and leaves (TD's `BUILDING
    for the cargo plane alone, so Red Alert's own planes keep hunting. TD's `Enter_Idle_Mode` is what starts it: an
    airborne loaner with cargo and no team gets `MISSION_UNLOAD`. Red Alert's has no such branch, so without one
    the plane falls back to its idle mission instead of unloading. TD's run sets the cargo down when the plane is
-   within `0x80` leptons of the strip (`FLY_TO_AIRSTRIP`). A working mod's plane, flown at Red Alert's speeds,
+   within `0x80` leptons of the strip (`FLY_TO_AIRSTRIP`). Tiberian Factions' plane, flown at Red Alert's speeds,
    overshot that window, turned back and circled, until the window was widened to `0x200`.
 6. **Several deliveries in a row:** a second plane can arrive while the first is still in radio contact with the
    strip. Placement has to retry instead of giving up, planes should come in from a fixed edge with a fallback when
@@ -104,29 +104,29 @@ A new `SpecialWeaponType` falls to `SW_UNKNOWN` there, so add a case:
   no cargo plane in its aircraft list. The box and the landing run: Red Alert's `AADATA.CPP` (`Dimensions`, 56x56
   for `AIRCRAFT_BADGER`, else 21x20) and `AIRCRAFT.CPP` (`Mission_Unload`'s fixed-wing `Mission_Hunt`;
   `Enter_Idle_Mode` with no cargo branch), against TD's `AIRCRAFT.CPP` (`PICK_AIRSTRIP`, `FLY_TO_AIRSTRIP`,
-  `BUG_OUT`; the airborne `Is_Something_Attached` and `IsALoaner` test giving `MISSION_UNLOAD`). The working mod's
+  `BUG_OUT`; the airborne `Is_Something_Attached` and `IsALoaner` test giving `MISSION_UNLOAD`). Tiberian Factions'
   cargo plane has its own `Dimensions` branch and TD's unload states, gated to its type, and its notes record the
   frozen mission before the idle branch was added.
 - **Superweapon types and names:** EA's `DLLInterface.cpp` (`Convert_Special_Weapon_Type`: the `SW_*` names, the
   16-byte `strncpy`, `SW_UNKNOWN` for anything else) and `DLLInterface.h` (`DllSuperweaponTypeEnum`, with
-  `SW_ION_CANNON` among TD's values), the stock `RA_SW_*` entries in `RABUILDABLES.XML`, and the working mod's four
+  `SW_ION_CANNON` among TD's values), the stock `RA_SW_*` entries in `RABUILDABLES.XML`, and TF's four
   new targeted powers routed as `SW_ION_CANNON`, and others as `SW_NUKE`, `SW_PARA_INFANTRY` and `SW_SPY_MISSION`,
   each with its own `RA_SW_*` entry.
 - **The landing window, the edge and the forced attack:** TD's `AIRCRAFT.CPP` (`navdist < 0x0080` in
   `FLY_TO_AIRSTRIP`), the commented-out cargo clause in both games' `Edge_Of_World_AI`, Red Alert's `What_Action`
   (`ctrldown ||` before `IsLegalTarget`, the `Height == 0` test) and TD's (`AIRCRAFT_CARGO` left out, `Altitude
-  == 0`) in each `TECHNO.CPP`. The working mod's cargo plane drops at `0x200`, restores the edge clause for its
+  == 0`) in each `TECHNO.CPP`. TF's cargo plane drops at `0x200`, restores the edge clause for its
   type, and adds the cargo-plane test to its `What_Action` after its parked plane could be force-attacked.
 - **The short-range trap:** EA's `AIRCRAFT.CPP` (`Mission_Attack` handing fixed-wing aircraft to `Mission_Hunt`,
   `Good_Fire_Location`'s loop, and `PICK_ATTACK_LOCATION` falling to `RETURN_TO_BASE` when it returns nothing), the
-  same in Vanilla Conquer, and the working mod's Orca Bomber, whose 1.5-cell bombs needed the target cell as the
+  same in Vanilla Conquer, and TF's Orca Bomber, whose 1.5-cell bombs needed the target cell as the
   firing spot.
 - **The set-down:** EA's `UNIT.CPP` (`Can_Enter_Cell` returning a blocked result for a cell another object
   occupies) and `FOOT.CPP` (`FootClass::Mark`, whose `MARK_UP` takes a grounded object out of its cell with
-  `Map.Pick_Up`), and the working mod's Carryall, whose set-down lifts the carrier with `MARK_UP`, places the load at
+  `Map.Pick_Up`), and TF's Carryall, whose set-down lifts the carrier with `MARK_UP`, places the load at
   the carrier's coordinate, and falls back to `Nearby_Location` only when `Can_Enter_Cell` still refuses. The
   one-frame slide and the push into the next cell were seen in play.
-- **A working mod:** cargo-plane delivery at its Nod airstrip, its GDI and Nod navies and airfield, and its Nod
+- **TF:** cargo-plane delivery at its Nod airstrip, its GDI and Nod navies and airfield, and its Nod
   paratroops and recon flight, shipped and played under Proton on Linux and on the Steam Deck. The roster leak was hit
   in its first navy and A-10 builds and reverted.
 

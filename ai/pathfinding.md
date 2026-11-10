@@ -1,6 +1,6 @@
 ---
 title: Pathfinding
-description: "Red Alert's stock pathfinder (EA's edge-following Find_Path, with no A*), movement zones and what they ignore, the move thresholds and the head-on rule that jams vehicle columns in one-cell gaps, group moves that send every unit to one cell, and the fixes one mod ships: an A* search from CFE Patch Redux tried first, give-way and corridor claims at chokepoints, and a give-up rule that ends path-failure livelocks."
+description: "Red Alert's stock pathfinder (EA's edge-following Find_Path, with no A*), movement zones and what they ignore, the move thresholds and the head-on rule that jams vehicle columns in one-cell gaps, group moves that send every unit to one cell, and the fixes Tiberian Factions ships: an A* search from CFE Patch Redux tried first, give-way and corridor claims at chokepoints, and a give-up rule that ends path-failure livelocks."
 tags: [ai, pathfinding, a-star, movement, zones, dll]
 holds_for: Steam build 21590013
 status: verified
@@ -84,7 +84,7 @@ destination, and a vehicle whose target is out of reach gets `IsScanLimited`, so
 range (`DRIVE.CPP`, `FOOT.CPP`). A mod that resets that count while traffic blocks the way (waiting its turn at a
 pinch) brings the endless loop back to vehicles in a busy base, unless it also gives up on no progress.
 
-## What one mod ships
+## What Tiberian Factions ships
 
 Each of these is a DLL change, and each can be switched off for EA's stock behaviour (see
 [A player settings page](../structuring/player-settings-page.md)).
@@ -139,7 +139,7 @@ its turn instead of taking the edge-follower's long detour.
 When a group move isn't a formation move, give each unit its own free cell near the click, in the same zone as
 the clicked cell, instead of the click itself. Do it where `Mouse_Left_Release` sets each unit's destination: that
 destination travels in the unit's order event, so nothing in the simulation changes and LAN play needs no extra
-care. In one mod's play log, 252 of 325 A\* fallbacks in a match were units ordered onto the same cell; spreading
+care. In TF's play log, 252 of 325 A\* fallbacks in a match were units ordered onto the same cell; spreading
 roughly halved the fallback rate.
 
 ### Giving up on a hopeless path
@@ -151,7 +151,7 @@ Any movement or successful path starts the count again, so a queue that advances
   among unreachable targets, so a count keyed on source *and* destination never builds up.
 - **Abort from the caller, never from inside the pathfinder.** `Assign_Destination` is virtual (`FOOT.H`, `UNIT.H`,
   `DRIVE.H`), and the overrides run radio protocols and reassign missions. Called from inside `Basic_Path`, it can tear
-  down a harvester's dock contact while the movement code is still running. In a working mod, that crashed the game
+  down a harvester's dock contact while the movement code is still running. In TF, that crashed the game
   on two machines within minutes.
 - **Guard recursion in give-way.** `DriveClass::Assign_Destination` calls `Start_Of_Move` straight away when the unit
   isn't already driving (`DRIVE.CPP`), so a retreat decided inside `Start_Of_Move` starts a nested move, which can
@@ -163,25 +163,25 @@ Any movement or successful path starts the count again, so a queue that advances
   `MAX_MLIST_SIZE`, `MAX_PATH_EDGE_FOLLOW`), with no A\* anywhere in EA's source (searched with `grep -a`).
 - **Zones:** EA's `MZoneType` (`DEFINES.H`), `Zone_Span` (`MAP.CPP`, calling `Is_Clear_To_Move` with infantry and
   vehicles ignored), `Is_Clear_To_Move` (`CELL.CPP`: the `0xE0` and `0x5F` masks and the `IsWall` test), the
-  occupancy bits in `CELL.H`, and every `Zone_Reset` caller; Vanilla Conquer's `cell.cpp` and a working mod's fork
-  have the same mask, and the mod's harvester notes trace its dead route to it.
+  occupancy bits in `CELL.H`, and every `Zone_Reset` caller; Vanilla Conquer's `cell.cpp` and Tiberian Factions' fork
+  have the same mask, and TF's harvester notes trace its dead route to it.
 - **The head-on rule and the give-up gate:** EA's `UNIT.CPP` (`face == techface && Distance <= 0x1FF`, `MOVE_NO`)
   and `INFANTRY.CPP` (the zone-mismatch abort). No such rule in `INFANTRY.CPP`'s own `Can_Enter_Cell`.
 - **Vehicles give up:** EA's `DRIVE.CPP` (`TryTryAgain--`, then `Assign_Destination(TARGET_NONE)`; `IsScanLimited`),
-  `PATH_RETRY=10` in `FOOT.H` and the limited scan in `FOOT.CPP`'s `Greatest_Threat`. The loop came back in a working
-  mod whose traffic wait reset the count; neither EA's source nor Vanilla Conquer's has that reset.
+  `PATH_RETRY=10` in `FOOT.H` and the limited scan in `FOOT.CPP`'s `Greatest_Threat`. The loop came back in TF,
+  whose traffic wait reset the count; neither EA's source nor Vanilla Conquer's has that reset.
 - **Move thresholds:** EA's `MoveType` (`DEFINES.H`), the ally ratings in `UnitClass::Can_Enter_Cell` and the
-  escalation loop in `Basic_Path` (`FOOT.CPP`). A working mod's diagnostic log recorded thousands of head-on
+  escalation loop in `Basic_Path` (`FOOT.CPP`). TF's diagnostic log recorded thousands of head-on
   `MOVE_NO` ratings at the jammed pinch.
 - **Group moves:** EA's `Mouse_Left_Release` (`DISPLAY.CPP`: `newmove = cell` unless `FormMove`); CFE's A\*
-  (`impassableCloseEnough = 3`, return 0); a working mod's play log of its A\* fallbacks before and after spreading,
+  (`impassableCloseEnough = 3`, return 0); TF's play log of its A\* fallbacks before and after spreading,
   and its spread code at the same hook.
 - **The 200-step buffer:** EA's `workpath1[200]` in `Basic_Path`, CFE's 1.8 changelog ("a crash bug with A-Star
   pathfinding when the shortest path was more than 200 cells long") and its fix commit, which stops the trim one
   step short to leave room for the end marker.
-- **The recursion:** EA's `DriveClass::Assign_Destination` (`if (!IsDriving ...) Start_Of_Move()`), a working mod's
+- **The recursion:** EA's `DriveClass::Assign_Destination` (`if (!IsDriving ...) Start_Of_Move()`), TF's
   crash dump of the overflow, and its guard.
-- **The fixes:** a working mod's design notes and code (`Find_Path_AStar` marked as a CFE Patch Redux port, the
+- **The fixes:** TF's design notes and code (`Find_Path_AStar` marked as a CFE Patch Redux port, the
   budget, `Give_Way_Decision`, the corridor claims, `Try_Deadlock_Scatter`, the no-progress detector), each checked
   in play: a 1-wide pinch on a snow map for the claims, and a live match for the livelock. None of them exists in
   EA's source.

@@ -82,13 +82,13 @@ Every unit, building or other type whose INI section sets `Name=` takes a slot i
 - **The lookup can't reach the last slot.** `Text_String` (`INLINE.H`) tests `abs(string) < ARRAY_SIZE(NameOverride)`
   and then reads slot `-(string + 1)`, so slot 24 is never returned.
 
-A mod that keeps adding named types runs out of slots, and a name comes back `NULL`. In a working mod that showed as
+A mod that keeps adding named types runs out of slots, and a name comes back `NULL`. In Tiberian Factions that showed as
 a crash when a refinery was placed or an MCV deployed, at around the 30th type. The crash is in `InstanceServerG.exe`,
 the process your DLL runs in, not the launcher: the export's `OverrideDisplayName` is a `const char*`
 (`DLLInterface.h`), copied into a string there, and a `NULL` crashes the copy. Stock Red Alert names few enough types
 never to hit it.
 
-**Fix:** make the table much bigger (one working mod uses 256), skip a type already in the table before taking a
+**Fix:** make the table much bigger (TF uses 256), skip a type already in the table before taking a
 new slot, change the lookup test to `<=`, and treat a `NULL` name as no override.
 
 ## A crate that kills the unit driving onto it
@@ -101,7 +101,7 @@ answers a false return by calling `Set_Speed(0)`, a **virtual** call, on the uni
 Start_Driver".
 
 **Fix:** after any call that can pick up a crate (`Start_Driver`, `Per_Cell_Process`), check `IsActive`, and
-return at once if the unit is gone. A working mod linked it to crashes in LAN games with crates on, which stopped
+return at once if the unit is gone. Tiberian Factions linked it to crashes in LAN games with crates on, which stopped
 after the fix.
 
 ## `Inaccurate=yes` does nothing: the key is spelt `Inaccuate`
@@ -112,9 +112,9 @@ and `Ballistic`, and the game never reads it. Those projectiles still scatter wh
 armour-piercing or fuelled shot is aimed at infantry or the ground (`BulletClass::Unlimbo`), but not by type. Your
 own `Inaccurate=yes` is ignored the same way.
 
-**Fix:** in a DLL, read both spellings, the correct one second so it wins. A data-only mod can write
-`Inaccuate=yes`, which the stock DLL reads. Mind the balance: turning it on for the stock projectiles changes every
-stock weapon that uses them. Vanilla Conquer keeps EA's spelling.
+**Fix:** in a DLL, read both spellings, the correct one second so it wins, as Tiberian Factions does. A data-only mod
+can write `Inaccuate=yes`, which the stock DLL reads. Mind the balance: turning it on for the stock projectiles changes
+every stock weapon that uses them. Vanilla Conquer keeps EA's spelling.
 
 ## A warhead section without `Verses` resets it to 100%
 
@@ -237,7 +237,7 @@ Each trap three ways:
   passing `NULL`, and the `Graphic_Name` fallback in `DLL_Draw_Intercept`.
 - **The game's files:** stock `rules.ini` (from `REDALERT.MIX`) sets `Inaccurate=yes` on five projectiles and
   never the key the code reads.
-- **A working mod hit each one:** the search-path crash, reported by another modder running several mods; another
+- **Tiberian Factions hit each one:** the search-path crash, reported by another modder running several mods; another
   rules mod's `RULES.INI` replacing its own; the sidebar overrun and the name table, both found as its roster grew; and the crate crash,
   found from minidumps. The name table's crash was a string built from `NULL` in `InstanceServerG.exe`. Its
   projectile code reads both spellings of the inaccuracy key. A helicopter-placement fix of its own did nothing
@@ -248,7 +248,7 @@ Each trap three ways:
   `Grand_Opening`; a token-price test lever lost the free harvester, so it gives credits instead; its draw
   intercept keys its per-unit changes on `AssetName`; an effect keyed to an animation's starting stage never fired;
   and its TD refinery docked only once the harvester's own cell was tested too.
-- **The fixes** are in that mod's code and released, and the crashes stopped.
+- **The fixes** are in TF's code and released, and the crashes stopped.
 - **Unproven:** the `Verses` reset seen in play (it's read from the source only); that the stock `RedAlert.dll` behaves exactly as the released source on each trap (it's built from
   it, but the binary wasn't checked), and the order in which the launcher registers enabled mods' folders, which
   decides which mod's file wins.
@@ -260,5 +260,6 @@ Each trap three ways:
 > carries its `Verses` line. It hit the sidebar limit first, once its TD and Tiberian Sun trees joined Red Alert's; its
 > columns now hold 120. DontCryJustDie reported the search-path crash and the rules trap from his own mod's
 > experience. TF loads its rules from its own folder, unless a found `RULES.INI` carries TF's sections, and reads
-> both spellings of the inaccuracy key. Its `rules.ini` sets the five stock projectiles to `Inaccurate=no`, so they
-> stay as accurate as Red Alert has always played them.
+> both spellings of the inaccuracy key, so its own `rules.ini` uses the correct one. It sets the five stock
+> projectiles to `Inaccurate=no`, so they stay as accurate as Red Alert has always played them, and turns it on only
+> for a Tiberian Sun artillery shell (`TSBallistic2`).

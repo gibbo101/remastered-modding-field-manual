@@ -66,12 +66,12 @@ settings file during a match.
 
 ## How it was verified
 
-- **The design and the file:** a shipped mod's settings page (released in its 5.7.0), its settings code
+- **The design and the file:** Tiberian Factions' settings page (released in its 5.7.0), its settings code
   (`GetPrivateProfileIntA` with a default of 1, keys written only when switched off, read once when a match
   starts), and its documentation.
 - **LAN:** a LAN game with a Steam Deck joining a PC host, set differently. Each player saw their own sidebar,
   and the host's simulation switches applied to both.
-- **"Classic" mode:** played against a Soviet, a Nod and a TS GDI computer house with the mod's classic AI. Each
+- **"Classic" mode:** played against a Soviet, a Nod and a TS GDI computer house with TF's classic AI. Each
   built vanilla's order, using its own faction's buildings.
 
 > [!TIP]

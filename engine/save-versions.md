@@ -37,8 +37,8 @@ constant plus the `sizeof()` of every saved game class (`AircraftClass`, `Buildi
   in the wrong places. Reordering an enum of types is the usual way to do this by accident.
 
 **The trap:** in EA's `Load_Game` the DLL's own save data is read (`DLLLoad`) *before* the version check, and its
-result is ignored. So a save from another build is read into the DLL's state before anything refuses it. In a
-working mod, old saves crashed rather than being refused (observed).
+result is ignored. So a save from another build is read into the DLL's state before anything refuses it. In
+Tiberian Factions, old saves crashed rather than being refused (observed).
 
 **The fix:** write your own marker and version first in the DLL's save data (`DLLExportClass::Save`), check them
 first in `DLLExportClass::Load`, and make `Load_Game` stop when `DLLLoad` returns false. A save from another build
@@ -66,11 +66,11 @@ them out of the `NoInitClass` one. Vanilla Conquer loads the same way.
 ## How it was verified
 
 - **Saves:** `SAVEGAME_VERSION` and the order of `DLLLoad` and the version check in EA's `SAVELOAD.CPP`, with
-  `DLLExportClass::Load` reading without checking. A working mod writes its own marker and version first, and
+  `DLLExportClass::Load` reading without checking. Tiberian Factions writes its own marker and version first, and
   refuses any other save. The crash on an old save is observed, not traced.
 - **The load screen's refusal:** the code round `0x64E4D6` and the push at `0x64E540`, read from `ClientG.exe` on
-  disk, with `TEXT_LOAD_MISSING_CUSTOM_MAP` (28 characters) at the pushed address; a shipped mod that hooks both
-  sites, checking those stock bytes first, and greys Load with its own reason; and that mod's notes.
+  disk, with `TEXT_LOAD_MISSING_CUSTOM_MAP` (28 characters) at the pushed address; TF, which hooks both
+  sites, checking those stock bytes first, and greys Load with its own reason; and TF's notes.
 - **The constructor on load:** EA's `TFixedIHeapClass::Load` (`HEAP.CPP`: `file.Get(ptr, sizeof(T))` then
   `new(ptr) T(NoInitClass())`), the same two lines in Vanilla Conquer's `heap.cpp`, and CFE Patch Redux, which hit
   it: its 1.8 changelog fixes "veterancy and other mod variables being reset to 0 when loading a saved game in RA",

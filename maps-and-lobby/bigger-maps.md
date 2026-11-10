@@ -17,8 +17,8 @@ unproven: [LAN games with a joiner on a big map, a map editor for the 256 grid (
 **Holds for:** C&C Remastered Collection, Steam build 21590013. EA has stopped patching the game and archived the
 source in January 2025, so this should hold.
 
-**Status:** built and played on Linux and the Steam Deck, but not yet in a released mod. LAN with a joiner hasn't
-been tested.
+**Status:** built and played on Linux and the Steam Deck, but not yet in a Tiberian Factions release. LAN with a joiner
+hasn't been tested.
 
 **HD mode only.** Classic graphics can't draw a map past 128 cells: the legacy renderer's buffer is 128 cells wide,
 and big maps run with it switched off (see the engine side below). A mod with big maps should lock classic mode
@@ -265,8 +265,12 @@ At its worst the server spends about 8 ms of each 17 ms tick, and the match ran 
   each change read in the working build's code. The MapPack framing (`LCWPIPE.H`'s block header, `Put_UUBlock` in
   `INI.CPP`, the `TemplateType` and `OverlayType` sentinels in `DEFINES.H`) was also checked by decoding a custom map
   from the game's `Local_Custom_Maps` folder, and by a TD-to-RA map converter whose maps the game loads.
-- **Play:** a 200×200 skirmish against the AI, and a 25-minute eight-player match at 253×253 with timing logs, on
-  the Steam Deck. An official Red Alert map and a converted TD map play unchanged on the 256 grid.
+- **Play:** a 200×200 skirmish against the AI, and a 25-minute eight-player match at 253×253 with timing logs, on the
+  Steam Deck. An official Red Alert map and a converted TD map play unchanged on the 256 grid. Buildings place normally
+  on the 253×253 maze, also on the Steam Deck. In one earlier headless run on a desktop no placement footprint
+  appeared; probably the headless pointer trap in
+  [Testing under Proton](../getting-started/testing-under-proton.md#testing-with-no-one-at-the-screen), not the map
+  (unproven).
 - **The router:** checked natively against brute-force shortest paths on 253×253 open, maze and random grids,
   with no wrong unreachable verdict and routes within 11% of the shortest.
 - **Not yet:** LAN with a joiner, and how the lobby reads a 256-wide map's start markers.
@@ -280,4 +284,7 @@ At its worst the server spends about 8 ms of each 17 ms tick, and the match ran 
 >
 > ![A 253x253 map at the farthest zoom](img/megamap-253.jpg)
 >
-> TF's 253×253 maze test map on the development branch, at the launcher's farthest zoom: the construction yard, top right, is a speck beside the maze's water channels, and the view covers only a corner of the map. Inset: the lobby reads the map as 253x253, but draws its eight start markers bunched in the left half of the preview (observed once; how the lobby reads them is still open).
+> TF's 253×253 maze test map on the development branch, at the launcher's farthest zoom with the sidebar open: the
+> radar's green brackets show how little of the map the screen covers. The branch build's cameos draw blank. Inset: the
+> lobby reads the map as 253x253, but draws its eight start markers bunched in the left half of the preview (seen on two
+> machines; how the lobby reads them is still open).

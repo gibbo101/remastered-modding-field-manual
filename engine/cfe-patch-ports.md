@@ -1,6 +1,6 @@
 ---
 title: Porting CFE Patch Redux into your DLL
-description: CFE Patch Redux ships its own RedAlert.dll, so it can't run beside another DLL mod; a Vanilla Conquer mod can port its features and fixes instead. What's already upstream in Vanilla Conquer, how to find and transplant each change, why ported fields change your save version (Vanilla Conquer removed EA's save padding), and the features one mod ported, from pixel-perfect zoom to attack-move and rally points.
+description: CFE Patch Redux ships its own RedAlert.dll, so it can't run beside another DLL mod; a Vanilla Conquer mod can port its features and fixes instead. What's already upstream in Vanilla Conquer, how to find and transplant each change, why ported fields change your save version (Vanilla Conquer removed EA's save padding), and the features Tiberian Factions ported, from pixel-perfect zoom to attack-move and rally points.
 tags: [engine, dll, cfe, porting, multiplayer, saves]
 holds_for: Steam build 21590013
 status: verified
@@ -221,7 +221,7 @@ superweapons, instant capture) are design choices, not fixes.
   `Evaluate_Object`; no attack-move or rally point anywhere in EA's Red Alert; ore's `LAND_TIBERIUM`; `IsSelfHealing`
   in `TechnoClass::AI`. Each was read with `grep -a`. The stock zoom list is in `CONFIG.MEG`'s `GameConstants.xml`,
   and `[HARV]` with `SelfHealing=yes` is in the base game's `rules.ini`.
-- **A working mod** ported each feature in the table into a Vanilla Conquer DLL and played it in skirmish under
+- **Tiberian Factions** ported each feature in the table into a Vanilla Conquer DLL and played it in skirmish under
   Proton on Linux. Its port notes record the boat clock, the minelayer leak (with its `Can_Enter_Cell` test, the
   same in its ported `MinelayerFindSpot`), the build fix for the aircraft flags and the `624e391` dispute. LAN play
   of the ported features rests on CFE's own statement, not a test here.

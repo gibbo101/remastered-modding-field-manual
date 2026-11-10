@@ -98,13 +98,13 @@ cloaked ones attackable through the copy (the cell carries the attack action), a
   and `LEVEL_LEPTON_H / 2`, each created with `Random_Pick(0, 25)` as the `AnimClass` start delay), `builtype.cpp`
   (`Is_Mobile_Deployer`'s list) and `anim.cpp` (a `LoopCount` of -1 stored as 255, the count that never runs
   down); TS's `FIRESTRM.INI` (`IsCoreDefender=yes` on `[DEFENDER]` and `[DDEFD]`, both "Core Defender") and
-  `ART.INI` (`[EMP_FX01]` `LoopCount=-1`); and the working mod's pulse, which uses the same quarter-cell offset and
+  `ART.INI` (`[EMP_FX01]` `LoopCount=-1`); and Tiberian Factions' pulse, which uses the same quarter-cell offset and
   0 to 25 delay for its sparks. The aircraft pass is OpenTS's reading of TS, not tested in TS itself.
 - **What keeps running:** in OpenTS the pulse calls a building's `Power_Off`, which leaves `IsOn` set, and
   `Power_Output` and `Who_Can_Build_Me` (the factory and construction yard test) read `IsOn`, never the stun timer.
-- **The stun gates:** EA's `EVENT.CPP` (the `MEGAMISSION`, `IDLE`, `SCATTER` and `PRIMARY` orders), and the working
-  mod's code, which gates exactly those four.
-- **A working mod:** the E.M. Pulse Cannon, a Mobile EMP and the Mobile Sensor Array in its release, played under
+- **The stun gates:** EA's `EVENT.CPP` (the `MEGAMISSION`, `IDLE`, `SCATTER` and `PRIMARY` orders), and TF's code,
+  which gates exactly those four.
+- **TF:** the E.M. Pulse Cannon, a Mobile EMP and the Mobile Sensor Array in its release, played under
   Proton on Linux and on the Steam Deck.
 - **Unproven:** whether a TS pulse spares an aircraft parked on a helipad. The cell walk skips everything else in a
   building's cell, but the aircraft pass runs first with no building test, so a parked aircraft survives only if

@@ -109,9 +109,9 @@ need the DLL or a launcher patch:
 - **The game's files:** the stock `FACTIONS.XML` (the countries' entries, preloaded icons and both scene lists),
   and the three name strings per country in `MASTERTEXTFILE_EN-US.LOC`. The eleven entries, their icon numbers
   and their `TeamColorSettings` (ten player colours and an outpost neutral) were read from the stock file; the
-  countries' order matches `HousesType` in EA's `DEFINES.H`, and a working mod's same-size `FACTIONS.XML` edit
+  countries' order matches `HousesType` in EA's `DEFINES.H`, and Tiberian Factions' same-size `FACTIONS.XML` edit
   finds each entry's icon at that path.
-- **A working mod** using both routes: Spain and Greece remapped to `HOUSE_GOOD` and `HOUSE_BAD`, Germany
+- **TF** uses both routes: Spain and Greece remapped to `HOUSE_GOOD` and `HOUSE_BAD`, Germany
   decoupled into a side of its own. All of it played in skirmish and LAN, under Proton on Linux and on the Steam
   Deck.
 - Observed only: the picker's fixed order and the two boot crashes.

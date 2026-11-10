@@ -144,18 +144,18 @@ Alert's houses, and CFE Patch Redux's Tiberian Dawn copy rearranges TD's multipl
   credits list its TD colour rearrangement and eight-player TD.
 - **Loose files and the replacement archive:** a byte-identical repack of `CONFIG.MEG` with one string edited
   showed in the lobby when shipped in a mod folder. Loose `INSTANCES.XML`, `CNCMAPPREVIEWDATA.XML`, tileset, sound
-  and `.BUI` files all load in a shipped mod. The size-rule crash and its signature were hit, then fixed by padding.
+  and `.BUI` files all load in Tiberian Factions. The size-rule crash and its signature were hit, then fixed by padding.
 - **The startup movie:** `DATA\ART\MOVIES\RA\REDINTRO.BK2` listed in the stock `MOVIES_RA.MEG` for this page, both
-  Bink DLLs in the game folder and `bink2w32.dll`'s functions imported by `ClientG.exe`; a shipped mod's intro build
+  Bink DLLs in the game folder and `bink2w32.dll`'s functions imported by `ClientG.exe`; TF's intro build
   encodes Bink 1 and copies it to the `.BK2` name, and its intro plays in place of the stock one. The Theora hang is
-  that mod's record only.
-- **`GameConstants_Mod.xml`:** the path appears in `ClientG.exe`, and it's the only `_Mod` name there. A shipped mod
+  TF's record only.
+- **`GameConstants_Mod.xml`:** the path appears in `ClientG.exe`, and it's the only `_Mod` name there. TF
   uses it to lock out classic graphics, enable the mod hotkeys and add theatre slots, all working in play.
   Vanilla Conquer's TD sample uses the same file and `overwrite="true"`.
 - **The settings file:** read for this page (the nested `CH` header inside the first stream, the compressed length
   at `0x10` equal to the file's length less `0x24`) and listed in Steam's `remotecache.vdf` for the game; the value
-  at `0x08` was tested against those five algorithms over the compressed stream and the uncompressed data; a
-  working mod's notes on it match.
+  at `0x08` was tested against those five algorithms over the compressed stream and the uncompressed data;
+  TF's notes on it match.
 - **The member rule:** the stock archive's size read for this page. The MEG layout puts both tables ahead of the
   data (see [MEG and MIX archives](../formats/meg-and-mix-archives.md#meg)).
 - **The server:** `InstanceServerG.exe` carries its own `\XML\Instances.xml` path and the

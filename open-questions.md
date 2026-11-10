@@ -103,8 +103,8 @@ A unit that can be seen on the map but not on the enemy's minimap.
 
 - **Established:** in the stock mission files, only Red Alert's last Allied and Soviet missions (`RA_ALLIES_14`,
   `RA_USSR_14`) and TD's last Nod missions carry `MapStageUnlock` -1; the expansion and Ant finales carry none (see
-  [Custom campaigns](maps-and-lobby/custom-campaigns.md)). In one mod's development build, a campaign rolled the
-  credits after its last mission and skipped the map screen for a one-mission stage.
+  [Custom campaigns](maps-and-lobby/custom-campaigns.md)). In Tiberian Factions' development build, a campaign rolled
+  the credits after its last mission and skipped the map screen for a one-mission stage.
 - **Untested:** whether -1 is what ends a campaign and rolls the credits; whether a one-mission stage skips the map
   screen outside that build.
 - **The test:** give a reused stock slot's mission definition `MapStageUnlock` -1 in a loose mission file, finish
@@ -153,14 +153,6 @@ Team colours are the same kind of data, and published mods do change them (see
 
 - **Established:** six slots (0 to 5) work. Nothing found so far caps the list.
 - **Untested:** a seventh slot. See [Adding a theatre of your own](maps-and-lobby/custom-theatres.md).
-
-## Building placement on a 253×253 map
-
-- **Established:** a 253×253 skirmish loads and plays (see [Bigger maps](maps-and-lobby/bigger-maps.md)).
-- **Observed once:** in one headless run on a development build, the player's construction yard deployed but no
-  building could be placed: the cameo read Ready, and no placement footprint appeared.
-- **Untested:** whether that happens outside that run, and why.
-- **The test:** place a building on the same map on another machine.
 
 ## How it was verified
 

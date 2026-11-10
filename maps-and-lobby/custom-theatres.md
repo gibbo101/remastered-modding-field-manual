@@ -32,7 +32,7 @@ instead, which is proven and draws its art from the base game.
 The launcher draws terrain templates only from the base game's own art. Give a template a new name, ship its art
 loose, and register it in a tileset: the tileset loads, but the launcher crashes the moment a placed tile renders
 (`0xC0000005`, at its fatal-assert address, RVA `0x56A539`; see [Crash triage](../troubleshooting/crash-triage.md)).
-The DDS format, the mod's `CONFIG.MEG` and the file's load path were each ruled out as the cause. Your DLL can't
+Tiberian Factions ruled out the DDS format, its `CONFIG.MEG` and the file's load path as the cause. Your DLL can't
 fix this: it only hands the launcher each cell's template name and icon, and the art behind the name is the
 launcher's. EA's `CellClass::Get_Template_Info` gives the template's `IniName` and icon, and the DLL sends the
 cell as `<name>_i<icon>.tga`, both in the map it exports (`DLLInterface.cpp`) and in a cell update (`MAP.CPP`).
@@ -40,7 +40,7 @@ cell as `<name>_i<icon>.tga`, both in the map it exports (`DLLInterface.cpp`) an
 TD's theatres work because every TD template name is already in the base game. New *object* names (units,
 effects, trees with art of their own) are a different system, and they do render.
 
-**The wall is specific to templates.** Other new entries in a terrain tileset draw. A working mod's Red Alert
+**The wall is specific to templates.** Other new entries in a terrain tileset draw. TF's Red Alert
 temperate tileset adds one new name, its Tiberium overlay `TIB01`, which renders from a ZIP under the tileset's
 root. In Tiberian Dawn, new bib tiles draw from loose folders, though not from a ZIP. Only a new *template*, the
 ground a map is painted with, hits the crash.
@@ -51,8 +51,8 @@ ground a map is painted with, hits the crash.
 `Data/ART/TEXTURES/SRGB/RED_ALERT/TERRAIN/TEMPERATE/<NAME>.TEM/<NAME>.TEM-0000.DDS` shadows the base game's frame,
 with no DLL needed. The radar samples the new art too, so the minimap matches.
 
-- **Keep the stock path.** Shadow the frame where the base game has it, and leave the tileset XML alone. In a
-  working mod's test, an existing template (`S02`) whose `<Frame>` was repointed in the tileset XML to a loose file
+- **Keep the stock path.** Shadow the frame where the base game has it, and leave the tileset XML alone. In
+  Tiberian Factions' test, an existing template (`S02`) whose `<Frame>` was repointed in the tileset XML to a loose file
   crashed the same way as a new name, even with a DXT5 frame that draws from a stock path in another mod
   (observed once).
 
@@ -74,7 +74,7 @@ frame rate). Loose copies override them, with no size rule. **Unproven** as a ro
 ## Can there be a seventh theatre?
 
 **As a theatre, yes.** A slot is one more entry in the launcher's list, plus a matching `TheaterType` in your DLL
-(below). A working mod uses six slots, and nothing found so far caps the list there. Slots past 5 haven't been
+(below). Tiberian Factions uses six slots, and nothing found so far caps the list there. Slots past 5 haven't been
 tried, so that part is unproven.
 
 **What limits it is the art.** A seventh theatre has to draw with terrain the launcher can render:
@@ -134,25 +134,25 @@ size of the extra tiles, tilesets load whole. If it doesn't rise, only drawn til
 
 ## How it was verified
 
-- **The theatre steps:** TD's three theatres, proven in a shipped mod; see
+- **The theatre steps:** TD's three theatres, proven in Tiberian Factions; see
   [TD theatres in Red Alert](../using-what-the-player-owns/td-theatres-in-red-alert.md) for their three-way
-  checks. `TemplateType`'s width is in the mod's source.
-- **The wall:** a working mod's investigation, which hit the crash with several new template names and ruled out
+  checks. `TemplateType`'s width is in TF's source.
+- **The wall:** TF's investigation, which hit the crash with several new template names and ruled out
   the DDS format, a replacement `CONFIG.MEG` and the load path; the crash address disassembled from `ClientG.exe`
   on disk (a deliberate write after an assert flag test); and no published mod adding new terrain template names.
   EMC adds no terrain mechanism: the `CDATA.CPP` and `TDATA.CPP` in its source are byte for byte EA's. The `S02`
-  repoint is from the same mod's investigation, and was run once.
-- **Templates only:** a shipped Red Alert temperate tileset whose single new name, `TIB01`, draws; a working
-  mod's Tiberian Dawn asset packs, whose new bib tiles draw from loose folders but not from ZIPs; and Reilsss's
+  repoint is from the same investigation, and was run once.
+- **Templates only:** TF's Red Alert temperate tileset, whose single new name, `TIB01`, draws; TF's
+  Tiberian Dawn asset packs, whose new bib tiles draw from loose folders but not from ZIPs; and Reilsss's
   Tiberian Dawn in Red Alert (Workshop 2853520457), whose temperate and snow tilesets add `V20` to `V37` with loose
   art. Those are civilian buildings (`STRUCT_V20` to `STRUCT_V37` in EA's `DEFINES.H`), objects, not templates.
 - **The DLL's template steps:** EA's source: `TEMPLATE_HILL01` counted to 400 in `DEFINES.H` and listed as
   template 400 in EA's map editor (`TemplateTypes.cs`), `Set_Heap(TEMPLATE_COUNT)` in `INIT.CPP`, `Init_Heap`,
   `_Watcom_Ugh_Hack`, the iconset fetch and the `Land_Type` modulo in `CDATA.CPP`, and `Get_Template_Info` in
-  `CELL.CPP`. A working mod registered seven new templates at 401 to 407 this way, and they loaded unplaced; its
+  `CELL.CPP`. TF registered seven new templates at 401 to 407 this way, and they loaded unplaced; its
   converted TD iconsets crashed `Land_Type` until their header was rewritten in Red Alert's layout.
 - **Reskinning existing names:** Reilsss's Desert mod (Workshop 2833233740) ships 8,304 loose `.DDS` frames at
-  stock template paths and per-map `TILEPATCHES`, with no DLL. A shipped mod's tileset XML names `.tga` frames that
+  stock template paths and per-map `TILEPATCHES`, with no DLL. TF's tileset XML names `.tga` frames that
   ship only as `.DDS`, and they draw. The tile and name counts were read from the stock tilesets for this page.
 - **The tileset index:** the stock `TILESETS.XML` in `CONFIG.MEG`, read for this page.
 

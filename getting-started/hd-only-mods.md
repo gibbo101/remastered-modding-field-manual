@@ -80,14 +80,14 @@ add, and the last three points (shared shapes, HD-only art, and the DLL not know
 ## How it was verified
 
 - The constant, its default and its comment appear in the stock `GameConstants.xml` in `CONFIG.MEG`.
-- A shipped mod sets it to `True` this way. In play, the classic option and the spacebar toggle are gone.
+- Tiberian Factions sets it to `True` this way. In play, the classic option and the spacebar toggle are gone.
 - DontCryJustDie gave the same setting independently, for his own mod.
 - The classic-mode problems: the palette ranges in EA's TD source (the house-colour remap tables change exactly
   176–191) and in Red Alert's own `PALETTE.CPS` (row 0 is 80–95, read from the base game). The Obelisk beam indices
   (`0x7D`, `0x7F`) are in TD's `TECHNO.CPP`; their nearest Red Alert indices were computed from both games'
-  `TEMPERAT.PAL`, and match the ones a working mod draws its port's beam with. The shared `WEAP2.SHP` overlay and
+  `TEMPERAT.PAL`, and match the ones TF draws its port's beam with. The shared `WEAP2.SHP` overlay and
   the input handler are in EA's source. The remap rule (0 kept, 176–191 moved, the rest nearest by RGB) is the one
-  a working mod's build script applied to every TD shape. Each problem was also hit in a working mod, and another
+  TF's build script applied to every TD shape. Each problem was also hit in TF, and another
   TD-in-RA mod's changelog lists the same colour and laser problems.
 
 **Credit:** DontCryJustDie pointed out the setting.
@@ -99,3 +99,8 @@ add, and the last three points (shared shapes, HD-only art, and the DLL not know
 > colour, and gave the TD war factory its own overlay. That worked, but every new TD object needed the same work
 > again. Once TD's terrain and Tiberian Sun's units arrived with no classic art at all, TF went HD-only. It now
 > switches the classic option off in the same file that adds its TD theatre slots.
+>
+> ![TD units in HD and in classic mode](img/hd-vs-classic-td-units.jpg)
+>
+> TF 4.0.0, the last release with classic mode, and the same GDI units at the same moment: HD on the left, classic
+> mode on the right.

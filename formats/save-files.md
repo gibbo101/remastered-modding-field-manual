@@ -68,7 +68,7 @@ load screen's own refusal for a missing custom map: see the fix on
   exactly as above: stream 1 inflated from its stored size, the index inflated (68 to 75 bytes, to 120 or 136), and
   the instance chunk inflated as raw deflate to 270 to 400 KB, with about 1.2 KB after it.
 - **The header:** the same `CH` and 2.1 version as the launcher's `.BUI` screens (see [BUI screens](../front-end/bui-screens.md)).
-- **In play:** a released mod's launcher patch reads saves this way, finds its marker and version in the DLL's data,
+- **In play:** Tiberian Factions' launcher patch reads saves this way, finds its marker and version in the DLL's data,
   and greys Load for saves it can't load.
 
 > [!TIP]

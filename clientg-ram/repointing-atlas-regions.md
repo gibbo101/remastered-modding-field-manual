@@ -167,13 +167,13 @@ same read. Without the container, the loop is untested.
 
 ## How it was verified
 
-Every finding here was made with that loop against the running client, before any DLL code was written. The shipped
-patch was then checked for each side in skirmish, under Proton on Linux and on the Steam Deck, and across a LAN game
-with a joiner.
+Every finding here was made with that loop against the running client, before any DLL code was written.
+Tiberian Factions' patch was then checked for each side in skirmish, under Proton on Linux and on the Steam Deck, and
+across a LAN game with a joiner.
 `ptrace_scope`: Wine's `server/ptrace.c` (`read_process_memory` and `write_process_memory` try
 `process_vm_readv`/`process_vm_writev`, then `PTRACE_ATTACH` with `/proc/<pid>/mem`) and `dlls/ntdll/unix/server.c`
 (`prctl(PR_SET_PTRACER, server_pid)` in `server_init_process`, commented "work around Ubuntu's ptrace breakage");
-the shipped patch works on a Linux desktop with `kernel.yama.ptrace_scope` set to 1. The quick test loop: at
+TF's patch works on a Linux desktop with `kernel.yama.ptrace_scope` set to 1. The quick test loop: at
 `ptrace_scope` 1, a same-user read of ClientG's `/proc/<pid>/mem` returned its `MZ` header, while the same read of
 the Steam client failed; `/proc/<pid>/ns/user` put ClientG and wineserver in a user namespace of their own (the
 container's, mapped to the same user) and the shell and the Steam client in the initial one.

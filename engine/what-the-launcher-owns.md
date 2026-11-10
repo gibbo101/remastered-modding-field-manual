@@ -52,7 +52,7 @@ cached records in memory, or through a patch to its code. This page lists each o
 | The launcher knowing any faction beyond Allied and Soviet | **Real wall** | The launcher knows only `ALLIED` and `SOVIET`. Faction-specific behaviour has to come from the DLL choosing names before they cross. |
 | Lobby picker: row order, hiding duplicate countries | **Real wall** (observed) | Tried: reordering `FACTIONS.XML` (no effect), commenting out an entry (a blank row that still selects that country), and changing `CampaignType` (crash at boot). |
 | A lobby picker emblem from an atlas region the launcher doesn't preload | **Real wall** (observed) | It crashes at boot. Repaint the preloaded slot icons in the UI atlas instead. |
-| New front-end screens and buttons | **Code-patch lever** + data | A screen of your own as a new `.BUI` on a registered screen class no stock screen uses (`SplashScreen`), with buttons and rows cloned from stock widgets. A launcher patch adds the menu button that opens it, and binds every widget's clicks. Shipped in a released mod. [New screens and buttons](../front-end/new-screens-and-buttons.md) |
+| New front-end screens and buttons | **Code-patch lever** + data | A screen of your own as a new `.BUI` on a registered screen class no stock screen uses (`SplashScreen`), with buttons and rows cloned from stock widgets. A launcher patch adds the menu button that opens it, and binds every widget's clicks. Shipped in Tiberian Factions. [New screens and buttons](../front-end/new-screens-and-buttons.md) |
 | The launcher's own co-op campaign mode | **Real wall** (a cut feature; finishing it is untried) | Code without content. `ClientG.exe` has a co-op campaign menu class and a hosting path (`CoordinatorMultiplayerManagerClass::Host_Coop_Campaign_Lobby`, with match-settings, ready and launch calls to EA's online coordinator), but every faction's `<CoopCampaignType>` in `FACTIONS.XML` is empty, and the screen its scene list names, `UI_CampaignMenu_CoOp`, has no `.BUI` in `CONFIG.MEG`. Hosting goes through the online service, and mods play over LAN only (see [LAN games](lan-games.md)), so even a working button would start an unmodded match. |
 | New widgets on the in-match HUD | **Open** | The `.BUI` alone can only reshape or hide existing widgets. The front-end route (a new scene and a patch that binds it) hasn't been tried on the in-match HUD. |
 | A new superweapon's sidebar cameo showing "Cost: $0" | **Open** | Observed: the stock superweapons' cameos show no cost line, and a new one shows "Cost: $0". EA's DLL sends a cost of 0 for every superweapon, so the launcher hides the line by some other test, not yet found. It isn't an asset-name list: `ClientG.exe`'s `SW_` names sit only in its build-command tables, beside command numbers. Not tried with a code patch. |
@@ -134,13 +134,13 @@ Each row was checked three ways where possible:
 - **The co-op campaign mode:** `ClientG.exe`'s strings (`CoopCampaignMenuImplementationClass`,
   `Host_Coop_Campaign_Lobby` and its coordinator messages, `Button_CoopCampaign`); `CONFIG.MEG` read for this page
   (11 empty `<CoopCampaignType>` elements, `UI_CampaignMenu_CoOp` only as a scene-list key, no such member among its
-  207 `.BUI` files); and a working mod's design notes, which reached the same verdict.
+  207 `.BUI` files); and Tiberian Factions' design notes, which reached the same verdict.
 - **EA's source:** the DLL interface (exports, the one callback, `CNCPlayerInfoStruct`'s house, the input handler
   that answers only Ctrl, Shift and Alt) and the 128×128 export buffer.
-- **A working mod**, which ships every data, RAM and code-patch route above, tested under Proton on Linux and on
+- **TF**, which ships every data, RAM and code-patch route above, tested under Proton on Linux and on
   the Steam Deck, LAN included.
 
-Rows marked "observed" rest on a working mod's records alone.
+Rows marked "observed" rest on TF's records alone.
 
 **Credit:** DontCryJustDie pointed out the classic-graphics constant.
 

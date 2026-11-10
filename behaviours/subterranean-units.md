@@ -96,22 +96,22 @@ tilt; hide the hull the moment the last step completes, while the mound is still
   `Dig=DIG`).
 - **The dig test's numbers:** OpenTS's `UnitClass::Is_Route_Broken` (`unit.cpp`: same `MZONE_NORMAL` zone, a
   distance of 1 never broken, `dist >= 12` or an end outside `In_Local_Radar` broken, otherwise broken when
-  `Test_Cell_Walk` returns more than 15). This is OpenTS's reading of TS, not measured in TS itself; the working mod
+  `Test_Cell_Walk` returns more than 15). This is OpenTS's reading of TS, not measured in TS itself; Tiberian Factions
   uses its own, shorter threshold.
 - **No dive art:** TS's `RULES.INI` `[Animations]` list, all 282 entries, names `DIG` (320) and `DIRTEXPL` (501)
   and nothing that dives, and Firestorm's `FIRESTRM.INI` adds 38 more with none either. Both units carry
   `IsTilter=yes`.
 - **The tilt's direction:** OpenTS's `TunnelLocomotionClass::Draw_Matrix` (`tunnel.cpp`) pitches by
   `DigTimer.Progress()` × 90° while digging in, from −90° back to 0 while emerging, and from 90° back to 0 while
-  aborting; the working mod's emerge ladder runs nose up, +40 to 0, in its frame packer and its unit code.
+  aborting; TF's emerge ladder runs nose up, +40 to 0, in its frame packer and its unit code.
 - **The surfacing search in Red Alert:** EA's `MapClass::Nearby_Location` (`MAP.CPP`) and `Is_Clear_To_Move`
-  (`CELL.CPP`, where a zone of `-1` matches any), and the working mod's code, which calls it with the unit's zone
+  (`CELL.CPP`, where a zone of `-1` matches any), and TF's code, which calls it with the unit's zone
   and then `-1`, and steps 19 leptons a tick underground.
 - **What the owner sees:** EA's `TechnoClass::Visual_Character` returns `VISUAL_SHADOWY` to a cloaked object's
-  owner, and `Techno_Draw_Object` draws that with `SHAPE_PREDATOR`; the working mod exports a digger as `CLOAKED`
+  owner, and `Techno_Draw_Object` draws that with `SHAPE_PREDATOR`; TF exports a digger as `CLOAKED`
   and returns the marker frame while it tunnels; in its screenshots (below, and on the stealth generator page)
   the owner's cloaked objects show faint.
-- **A working mod:** both TS digging units in its release, with the behaviour above, played under Proton on Linux
+- **TF:** both TS digging units in its release, with the behaviour above, played under Proton on Linux
   and on the Steam Deck.
 - **Unproven:** saving and loading with a unit underground.
 
@@ -122,6 +122,8 @@ tilt; hide the hull the moment the last step completes, while the mound is still
 > a Mobile Sensor Array shows them to its owner, and an E.M. pulse brings them up. The Devil's Tongue fires TS's own
 > fire stream, with TS's damage formula worked out for Red Alert's smaller cells.
 >
-> ![A Subterranean APC digging in](img/subterranean-apc-dive.jpg)
+> ![A Subterranean APC tunnelling](img/subterranean-apc-tunnel.gif)
 >
-> A Subterranean APC on a long move, left to right: on the surface, sinking into its dirt mound, then underground, its selection box still tracking it beyond the ring of dirt it left. Taken from TF's development build with TS Nod, where the APC is built at the Nod War Factory rather than found in crates.
+> A Subterranean APC on a long move: it digs into a dirt mound by the war factory, crosses underground with only its
+> selection box showing, and surfaces in another mound at the far end. Taken from TF's development build with TS Nod,
+> where the APC is built at the Nod War Factory rather than found in crates.

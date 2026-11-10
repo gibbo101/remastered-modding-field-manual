@@ -118,17 +118,17 @@ file**, header included, as raw MS-ADPCM bytes in read-write memory. So:
 
 ## How it was verified
 
-- **The nine lines:** their names in a working mod's generated table, the same lines in EA's `Speech[]` table
+- **The nine lines:** their names in Tiberian Factions' generated table, the same lines in EA's `Speech[]` table
   (`MISNWON1`, `NODEPLY1`, `BCT1` and the rest, in `AUDIO.CPP`), and the launcher's own announcement events in
   `ClientG.exe`.
 - **The sample format:** base `RA?_SFX_EVA_*` samples read from the base game's `SFX2D_EN-US.MEG`: MS-ADPCM (format
   tag 2), mono, `block_align` 70.
-- **The cache and the overwrite:** a probe found each cached sample as raw file bytes in read-write memory. The
-  shipped patch switched all the lines tested, in both directions within one session, with no crash. Tested under
+- **The cache and the overwrite:** a probe found each cached sample as raw file bytes in read-write memory. TF's
+  patch switched all the lines tested, in both directions within one session, with no crash. Tested under
   Proton on Linux and on the Steam Deck.
 - **Where the stale copies come from:** Wine's `copy_file` (`dlls/kernelbase/file.c`, behind `CopyFileW`,
   `CopyFileExW` and `CopyFile2`) takes its 65,536-byte buffer with `HeapAlloc(GetProcessHeap(), 0, …)` and returns
-  it with `HeapFree` uncleared; the working mod copies each recording with `CopyFileA` at match start from a thread inside the launcher, and
+  it with `HeapFree` uncleared; TF copies each recording with `CopyFileA` at match start from a thread inside the launcher, and
   its scans found partial copies in freed blocks.
 - **The crash and its fix:** traced to a whole-file write into a freed buffer. Fixed by the whole-recording compare,
   and not seen since.

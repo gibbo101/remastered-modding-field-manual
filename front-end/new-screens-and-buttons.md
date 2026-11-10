@@ -96,7 +96,7 @@ own refresh, such as a timer on the UI thread.
 **Leaving the skirmish lobby from your code,** say to send the player to a screen of your own, is the lobby's own
 Back handler, called on the lobby's behaviour object with data 0. The lobby binds it to its `Back_Button` widget
 (kept at `+0x5C` in that object) with the click event, so calling it does just what the button does: the lobby
-closes and the main menu underneath shows again. A working mod first checks the button is usable, and leaves the
+closes and the main menu underneath shows again. Tiberian Factions first checks the button is usable, and leaves the
 lobby alone when it isn't, and it calls the handler on the UI tick after the click that asked for it, not from
 inside that click.
 
@@ -107,10 +107,10 @@ inside that click.
 - five integers;
 - three empty MSVC `std::string`s.
 
-A stock two-button call (at `0x5A97C0`) passes `1, 0, 0, 0, 3`. A working mod passes the same for a box with an
+A stock two-button call (at `0x5A97C0`) passes `1, 0, 0, 0, 3`. TF passes the same for a box with an
 action button and OK, and `1, 1, 0, 2, 3` for OK alone; what each integer does wasn't worked out. Look button
 text up as the stock caller does: the text manager at `0x1FE4CE8` with `0x9C1590`, for example `TEXT_OK`. The box
-reports its first button as 2 and OK as 3 (observed in a working mod; no stock callback was read to confirm it).
+reports its first button as 2 and OK as 3 (observed in TF; no stock callback was read to confirm it).
 
 ## Switching mods on and off from your screen
 
@@ -161,23 +161,23 @@ player's.
 ## How it was verified
 
 - **The class:** `SplashScreen` is in `ClientG.exe`'s strings beside `Create_Scene_Instance`. None of the 207 stock
-  `.BUI` files uses it, and a shipped screen that does draws and works.
-- **The calls:** every address above was read from `ClientG.exe` on disk, and matched the opening bytes a working
-  patch checks before installing.
+  `.BUI` files uses it, and Tiberian Factions' screens, which do, draw and work.
+- **The calls:** every address above was read from `ClientG.exe` on disk, and matched the opening bytes that
+  TF's patch checks before installing.
 - **The handlers and the lobby's Back:** the lobby's set-up disassembled for this page finds `Back_Button` by name,
   keeps it at `+0x5C`, and binds `0x71C790` to it with event `0x21` and data 0, through a binder with the same
-  opening bytes as the one above; `0x71C790` takes the object in `ecx` and returns with `ret 4`. A working mod's
+  opening bytes as the one above; `0x71C790` takes the object in `ecx` and returns with `ret 4`. TF's
   handlers are declared that way, and its lobby pop-up leaves the lobby through that handler.
 - **Switching mods:** the toggle at `0x7BB7A0` disassembled for this page (it walks `0xBC`-byte records, compares
   the ID at `+0xA8` and writes the byte at `+0xB9`), the opening bytes above read from disk, and `0x1FE4C28` and
-  `0x20E0D88` referenced from the launcher's code. A released mod's add-ons screen switched a downloaded pack on
+  `0x20E0D88` referenced from the launcher's code. TF's add-ons screen switched a downloaded pack on
   by the ID worked out as above, restarted, and found the pack loaded. Per-account subscriptions: each account's
   `userdata/<id>/ugc/1213210_subscriptions.vdf` against the one shared `workshop/content/1213210/` folder.
   Observed only: the ID dropped after an update, and Steam holding a download while the game runs.
 - **The message box:** the stock call at `0x5A97C0` disassembled for this page: it looks its text up through the
-  text manager at `0x1FE4CE8` with `0x9C1590` and pushes `1, 0, 0, 0, 3` before the three empty strings. A released
-  mod's lobby pop-up runs its action on button 2, and its OK closes it.
-- **In play:** a released mod adds three main-menu buttons and three screens of its own this way (an add-ons
+  text manager at `0x1FE4CE8` with `0x9C1590` and pushes `1, 0, 0, 0, 3` before the three empty strings. TF's
+  lobby pop-up runs its action on button 2, and its OK closes it.
+- **In play:** TF adds three main-menu buttons and three screens of its own this way (an add-ons
   manager, a faction encyclopedia and a settings page), on Linux under Proton and on the Steam Deck.
 
 > [!TIP]

@@ -90,11 +90,11 @@ Both columns are zero on the same lands, so the two types can share one movement
   `TERRAIN.CPP`. Vanilla Conquer's copies match.
 - **The zone gates:** `grep -a` for `Zones[` over EA's Red Alert source gives the list in step 4, each reading the
   zone through the type's `MZone`, apart from the fixed `MZONE_NORMAL` in `HOUSE.CPP`'s `Where_To_Go` and
-  `MZONE_CRUSHER` in `TACTION.CPP`; Vanilla Conquer's copies match; the working mod's hover units pass all of them
+  `MZONE_CRUSHER` in `TACTION.CPP`; Vanilla Conquer's copies match; Tiberian Factions' hover units pass all of them
   through `MZONE_HOVER` with none of them changed.
 - **TS's model:** TS's `RULES.INI` (`[HVR]` `SpeedType=Hover`, `[APC]` `SpeedType=Amphibious` and
   `MovementZone=AmphibiousCrusher`, and the `Hover=` and `Amphibious=` columns in every land section).
-- **A working mod:** a Hover MLRS and an Amphibious APC built this way, with `MZONE_HOVER` shared by both, the new
+- **TF:** a Hover MLRS and an Amphibious APC built this way, with `MZONE_HOVER` shared by both, the new
   columns in its `rules.ini`, and `MZONEF_HOVER` added to every zone rebuild, played under Proton on Linux and on the
   Steam Deck.
 - **Unproven:** how far the skirmish AI makes use of water routes for its own hover units.

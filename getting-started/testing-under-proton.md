@@ -94,20 +94,20 @@ in one setup (**unproven** elsewhere):
 
 ## How it was verified
 
-- **The prefix path:** a Proton prefix on a Linux desktop, the target a working deploy script writes to on both
+- **The prefix path:** a Proton prefix on a Linux desktop, the target Tiberian Factions' deploy script writes to on both
   a desktop and a Steam Deck, and the `Mods\Red_Alert` folder name in `ClientG.exe`.
 - **Sync by checksum:** rsync's manual (its default "quick check" compares size and modification time only), a
   deploy script that uses `-ac --delete`, and a case where rebuilt sound files matched the old ones in size and
   time but not in content, so plain `-a` skipped them.
 - **Reading files at launch:** the DLL's load at start-up, the mods screen's restart to apply a change, and a UI
   atlas edit that showed only after a relaunch.
-- **Crash records:** a shipped mod's runbook, and `log/CrashLog.txt` in an install, whose lines name the crashing
+- **Crash records:** TF's runbook, and `log/CrashLog.txt` in an install, whose lines name the crashing
   process.
 - **Log paths:** the prefix's `user.reg`, whose documents folder is `%USERPROFILE%\Documents` and
-  `C:\users\steamuser\Documents`; a working mod's logging code, which opens its files under `getenv("USERPROFILE")`
-  plus `/Documents/CnCRemastered/`, and its porting notes; and that mod's logs in a prefix, under
+  `C:\users\steamuser\Documents`; TF's logging code, which opens its files under `getenv("USERPROFILE")`
+  plus `/Documents/CnCRemastered/`, and its porting notes; and TF's logs in a prefix, under
   `Documents/CnCRemastered/`, with the one log opened at `USERPROFILE` itself in `users/steamuser/`.
-- **Testing with no one at the screen:** one headless run of a working mod, recorded in its design notes and its
+- **Testing with no one at the screen:** one headless run of TF, recorded in its design notes and its
   session notes. **Unproven:** whether the pointer behaviour and the scores hold on other setups.
 
 > [!TIP]

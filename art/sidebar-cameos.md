@@ -86,21 +86,21 @@ with a locked picture, as above. (Observed.)
 ## How it was verified
 
 - **The lookup:** EA's sidebar export (`AssetName` from `IniName`) and the 16-byte field in `DLLInterface.h`; the
-  stock `RABUILDABLES.XML`; and a working mod's badge variants, which each draw their own cameo.
+  stock `RABUILDABLES.XML`; and Tiberian Factions' badge variants, which each draw their own cameo.
 - **Stock cameos:** the base game's `MT_COMMANDBAR_COMMON.MTD`, read for this page (`BUILDICON_*` regions,
   341 × 256), and the texture MEGs, which hold no separate cameo files.
 - **TD's cameos:** the `BUILDICON_TD_*` regions in the `.MTD` and the `<BuildIcon>` names in `CNCBUILDABLES.XML`,
-  both read for this page; a working mod's TD ports name them and ship none but the one it repaints.
+  both read for this page; TF's TD ports name them and ship none but the one it repaints.
 - **The cameo widget:** its quads read from the stock `UI_SIDEBAR_CONSTRUCTIONENTRY.BUI`, the eight
   `BuildIcon_RA_FakeText_*` names in `ClientG.exe`, and EA's `Fake` field in the sidebar entry struct.
-- **New cameos:** a working mod ships 552 loose DDS cameos (344 × 256, DXT1, 9 mip levels, read for this page),
+- **New cameos:** TF ships 552 loose DDS cameos (344 × 256, DXT1, 9 mip levels, read for this page),
   drawn in its sidebar and encyclopedia.
 - **Sides in multiples of 4:** all 51,748 DXT1 and DXT5 textures in the base game's five texture MEGs have both
   sides a multiple of 4 (headers read for this page).
 - **The entry's fields:** EA's `DLLInterface.h`; the launcher's cameo click tests four of the flags (see
   [Launcher key commands and superweapon clicks](../clientg-ram/launcher-key-commands-and-clicks.md)).
-- **`Busy`:** EA's sidebar export sets it from the factory and the object heap (`isbusy`, `DLLInterface.cpp`). A
-  working mod found that setting `Busy` changes nothing on the cameo, and swaps in locked variants by name
+- **`Busy`:** EA's sidebar export sets it from the factory and the object heap (`isbusy`, `DLLInterface.cpp`). TF
+  found that setting `Busy` changes nothing on the cameo, and swaps in locked variants by name
   instead (its sidebar export).
 - **Observed only:** that a loose DDS doesn't override a stock region, when a TGA does, and that `Busy` draws
   nothing.
@@ -108,11 +108,13 @@ with a locked picture, as above. (Observed.)
 > [!TIP]
 > **In Tiberian Factions**
 >
-> TF's sidebar marks which of a player's factions can build each entry. With two or more factions in one category,
-> the DLL appends one base-32 digit to the cameo's name (the entry's factions among the player's), and each variant
-> carries its owners' emblems baked in. A shared Tiberian Sun type shows Nod's own cameo to a Nod player. TF's one
-> stock-name cameo, `BuildIcon_TD_A10`, stays a TGA for the override rule above.
+> TF's sidebar marks which of a player's factions can build each entry. Once a player builds a category from two or
+> more factions (by holding two factions' construction yards, say), the DLL appends one base-32 digit to the cameo's
+> name (the entry's factions among the player's), and each variant carries its owners' emblems baked in. A player
+> setting turns the badges off. TF's one stock-name cameo, `BuildIcon_TD_A10`, stays a TGA for the override rule
+> above.
 >
-> ![A TS GDI sidebar column](img/sidebar-cameos.jpg)
+> ![A sidebar's buildings tab with faction emblems on each cameo](img/sidebar-cameos.jpg)
 >
-> A TS GDI sidebar column mixing TD and Tiberian Sun cameos.
+> A player building from all five factions: each cameo carries the emblems of the factions that can build it, three
+> on the Sandbags and one on the Allies' Naval Yard.

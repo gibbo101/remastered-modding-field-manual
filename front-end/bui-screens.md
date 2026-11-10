@@ -132,7 +132,7 @@ why per-faction crests come from [re-pointing records in memory](../clientg-ram/
   style `24 Point Regular Outline Red` appears in 19 stock Red Alert screens. Give your screen its own sets and
   styles rather than repainting shared ones.
 - **Paint menu art at the size it's drawn.** The stock main menu background, `RA_MAINMENUBG_02.DDS`, is a 2878 ×
-  1200 uncompressed 32-bit DDS with no mipmaps. A working mod's menu frame painted larger than its widget banded
+  1200 uncompressed 32-bit DDS with no mipmaps. Tiberian Factions' menu frame painted larger than its widget banded
   when scaled down on the Steam Deck's screen. That the launcher draws menu images without mipmaps is unproven:
   it was observed, not traced.
 - **Animations only play when the launcher starts them by name.** A keyframe animation you add won't run. Effects
@@ -144,29 +144,29 @@ why per-faction crests come from [re-pointing records in memory](../clientg-ram/
 ## How it was verified
 
 - **The format:** every one of the 207 stock `.BUI` files in `CONFIG.MEG` has the `CH`, 2.1, zlib header, and
-  parses exactly with the node grammar above (measured). A shipped mod's loose main menu keeps the stock hash over an
+  parses exactly with the node grammar above (measured). Tiberian Factions' loose main menu keeps the stock hash over an
   edited, larger payload and loads. The header and loader checks were also read from `ClientG.exe`'s ChunkFile
   reader. The fixed bytes (`ff ff ff` at `0x05`, 8 at `0x0C`, zeros from `0x14`) were measured in all 207 files
-  for this page, and in `GUIEFFECTS.CFX`; a shipped mod's BUI writer keeps them.
+  for this page, and in `GUIEFFECTS.CFX`; TF's BUI writer keeps them.
 - **Names and effects:** the stock main menu decompressed for this page (`Scanline_Sheen_Red` stored as
   `16000000 16000000 17 14 1200`, `24 Point Regular Outline Red` as `03000000 1e000000 1c00`, `ui_ra_mainlogo` under
   id 2, `TacticalSidebarSellRepairButton` as `0f 21 1f00`), and `GUIEFFECTS.CFX` decompressed (its nine effect
-  names); a shipped mod's BUI tools read and rewrite names in these forms, and its menus load.
+  names); TF's BUI tools read and rewrite names in these forms, and its menus load.
 - **The spinner:** `ANIM_LOADTWIDDLE_RA.DDS` read from `TEXTURES_SRGB.MEG` and decoded for this page (no mips,
   1360 × 1360 × 4 bytes, sixteen frames of a turning Soviet crest), the stock `RA_UI_LOADINGSCREEN.BUI` naming it,
-  and a shipped mod that repaints it in the same grid; the frame rate is that mod's observation.
+  and TF, which repaints it in the same grid; the frame rate is TF's observation.
 - **The tags:** read in the stock main menu (`Button_Exit`'s rect `02 10` sits before its name, with values in 0 to
-  1), and used by a shipped mod's menu, lobby, dialog, loading-screen and HUD edits.
-- **Screens by `FACTIONS.XML`:** the stock file's `GUIFileNames` entries, and a shipped mod that swaps its lobbies,
+  1), and used by TF's menu, lobby, dialog, loading-screen and HUD edits.
+- **Screens by `FACTIONS.XML`:** the stock file's `GUIFileNames` entries, and TF, which swaps its lobbies,
   LAN screens and HUD to TD's.
-- **Cloned widgets:** a shipped mod's main menu carries cloned buttons, and a HUD test with inserted widgets drew
+- **Cloned widgets:** TF's main menu carries cloned buttons, and a HUD test with inserted widgets drew
   normally.
 - **Menu art:** the stock `RA_MAINMENUBG_02.DDS` read from `TEXTURES_SRGB.MEG` for this page (no mip count, its
-  size exactly 2878 × 1200 × 4 bytes plus the header). The banding is one mod's observation.
+  size exactly 2878 × 1200 × 4 bytes plus the header). The banding is TF's observation.
 - **`Faction5`, the colour tag and the row height:** the stock `FACTIONS.XML` (only `Faction5`'s `GUIFileNames`
   holds the lobbies), the stock `FONTLIBRARY.BFD` (`0b 10` and four floats in each style), and the stock combo-box
-  screens (`05 04` and 0.0975 or 0.1711), all read for this page; a shipped mod edits all three and they hold in
-  game. The cloned-group tint is that mod's record only.
+  screens (`05 04` and 0.0975 or 0.1711), all read for this page; TF edits all three and they hold in
+  game. The cloned-group tint is TF's record only.
 
 > [!TIP]
 > **In Tiberian Factions**

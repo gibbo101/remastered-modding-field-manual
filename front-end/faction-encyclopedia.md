@@ -134,17 +134,17 @@ which it takes in `ecx`, not on the screen's. A click arrives as event 4 on the 
 
 ## How it was verified
 
-- **The screen and the list calls:** a shipped mod's encyclopedia, opened for every faction on the build before
-  release. Every address above was read from `ClientG.exe` on disk and matches the bytes that mod checks before
+- **The screen and the list calls:** Tiberian Factions' encyclopedia, opened for every faction on the build before
+  release. Every address above was read from `ClientG.exe` on disk and matches the bytes TF checks before
   calling, except the no-input call (`0xF80BC0`), which it calls without checking. Check it as well. The per-row
   steps were read for this page in the stock fill that names `MissionColumn`: add a row, clear `+0x71`, clone the
   sample, call the cell's `+0x78` with 0 and `+0x6C` with 1, then reach its scene at `+0x1F4`. Another stock list
-  binds event 4 on its rows; the mod's code does the same.
+  binds event 4 on its rows; TF's code does the same.
 - **The INIs:** EA's `INIT.CPP` (`AFTRMATH.INI` through `Rule.Process`), `SCENARIO.CPP` (the nine readers for
-  `MPLAYER.INI`) and `RULES.CPP` (`Heap_Maximums` rebuilding the warhead heap); the mod's code applies them as
+  `MPLAYER.INI`) and `RULES.CPP` (`Heap_Maximums` rebuilding the warhead heap); TF's code applies them as
   above.
 - **The rules inside the launcher:** the launcher names only `CNC_Version` among the DLL's exports (see
-  [Patching the launcher's code from your DLL](../clientg-ram/patching-the-launchers-code.md)), and the mod's code
+  [Patching the launcher's code from your DLL](../clientg-ram/patching-the-launchers-code.md)), and TF's code
   builds the heaps and processes its rules as described.
 - **House colour:** the two team-colour files in `CONFIG.MEG`, and EA's `TextureManager.cs`, which converts to
   linear light before recolouring.

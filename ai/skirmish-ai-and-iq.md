@@ -1,10 +1,10 @@
 ---
 title: The skirmish AI and its IQ levels
-description: "How Red Alert's computer player works in a Remastered skirmish (IQ levels from rules.ini's [IQ] section, difficulty as a stat handicap that stock skirmish never varies, the urgency checks and weighted dice that choose what to build, the attack timer) and the stock bugs and gaps every DLL mod inherits, from missing ships and superweapons to targets picked through the shroud, no gang-up, no threat map, empty teams and an enemy pick that almost never picks, confirmed in EA's source, with what one mod did about them."
+description: "How Red Alert's computer player works in a Remastered skirmish (IQ levels from rules.ini's [IQ] section, difficulty as a stat handicap that stock skirmish never varies, the urgency checks and weighted dice that choose what to build, the attack timer) and the stock bugs and gaps every DLL mod inherits, from missing ships and superweapons to targets picked through the shroud, no gang-up, no threat map, empty teams and an enemy pick that almost never picks, confirmed in EA's source, with what Tiberian Factions did about them."
 tags: [ai, skirmish, iq, difficulty, rules-ini, dll]
 holds_for: Steam build 21590013
 status: verified
-unproven: [the stock AI's behaviour on native Windows beyond what the source shows; how much each of one mod's changes helps against a human at Hard (measured AI against AI only); the chosen enemy staying unset in play (read from code and not watched)]
+unproven: [the stock AI's behaviour on native Windows beyond what the source shows; how much each of Tiberian Factions' changes helps against a human at Hard (measured AI against AI only); the chosen enemy staying unset in play (read from code and not watched)]
 ---
 
 > [!NOTE]
@@ -152,7 +152,7 @@ Each confirmed in EA's released source:
 
 ## What a mod can do about it
 
-These are methods one mod uses, each a DLL change:
+These are methods Tiberian Factions uses, each a DLL change:
 
 - **Make difficulty behavioural, not a stat bonus.** Map each difficulty to an IQ and to which behaviours run
   (scouting, attack-move waves, threat-aware defences), and leave firepower and cost alone.
@@ -160,7 +160,7 @@ These are methods one mod uses, each a DLL change:
   advantage and stops the factory pool running dry.
 - **Fair fog.** Route the AI's target picks, superweapon aim and attack destinations through what its own house has
   seen, instead of the whole map.
-- **Fix the bugs above,** and queue the radar dome once the economy stands: one working mod waits for two refineries
+- **Fix the bugs above,** and queue the radar dome once the economy stands: TF waits for two refineries
   (or a map short of ore), a war factory and full power.
 - **Keep the stock AI one switch away.** See [A player settings page](../structuring/player-settings-page.md): its
   "classic AI" switch puts every change back to EA's code path.
@@ -174,7 +174,7 @@ These are methods one mod uses, each a DLL change:
   `GAME_NORMAL` gate and `CNC_Set_Difficulty`, the unused `Assign_Houses` that reads `IsCompEasyBonus`
   (`SCENARIO.CPP`), `SellBack`'s whole test in `Repair_AI` (the same in Vanilla Conquer's `building.cpp`), where
   `IsTickedOff` is set (`TECHNO.CPP`, damage from a non-ally) and `CreditReserve` read into `RepairThreshhold`
-  (`RULES.CPP`), a working mod's
+  (`RULES.CPP`), Tiberian Factions'
   DLL, which keeps the same `Assign_Handicap(Scen.Difficulty)` call, and the stock `rules.ini` read from `REDALERT.MIX`
   (`[IQ]`, `[Easy]`, `[Normal]`, `[Difficult]`, `[AI]`).
 - **The build picks and attacks:** `AI_Unit`'s and `AI_Infantry`'s skirmish weights, `Check_Attack`, `AI_Attack` and
@@ -182,21 +182,21 @@ These are methods one mod uses, each a DLL change:
   stock `rules.ini`.
 - **The strategies:** the ten `STRATEGY_*` values in EA's `DEFINES.H`; `Expert_AI`'s two loops and its return value,
   and `HouseClass::AI` setting `AITimer` from it for a base-building house (`HOUSE.CPP`); `TICKS_PER_SECOND` 15
-  (`DEFINES.H`). Vanilla Conquer's `house.cpp` and a working mod's fork have the same loops, with `acted` never
-  read. A working mod's problem inventory counts the same ten pairs.
+  (`DEFINES.H`). Vanilla Conquer's `house.cpp` and TF's fork have the same loops, with `acted` never
+  read. TF's problem inventory counts the same ten pairs.
 - **The radar dome:** the air-defence block in EA's `AI_Building` (`HOUSE.CPP`: the `AARatio`/`AALimit` test, the
   `AScan` threat test, `STRUCT_RADAR` at `URGENCY_HIGH`), the only `STRUCT_RADAR` choice in that function; the same
   block in Vanilla Conquer; and the prerequisites in the base game's own `rules.ini`, `aftrmath.ini` and
   `mplayer.ini`, read from `REDALERT.MIX` and the expansion MIXes for this page (`DOME` for `SAM`, `AGUN`, `HPAD`,
-  `AFLD`, `ATEK`, `STEK`, `GAP`'s `atek`, and so on). A working mod's problem inventory found the gap, and its fix
+  `AFLD`, `ATEK`, `STEK`, `GAP`'s `atek`, and so on). TF's problem inventory found the gap, and its fix
   unlocked the tech tree.
 - **The ring scan:** the four `if (bestval < value)` blocks and the two passes that set `bestval` in EA's
   `TechnoClass::Greatest_Threat`, the same four in Vanilla Conquer's `techno.cpp`; `Target_Something_Nearby`
   keeping only `THREAT_RANGE | THREAT_AREA`, the guard missions' calls in `FOOT.CPP`, and
-  `BuildingClass::Greatest_Threat` adding `THREAT_RANGE`. A working mod found it and fixed it.
+  `BuildingClass::Greatest_Threat` adding `THREAT_RANGE`. TF found it and fixed it.
 - **The bugs:** each line in EA's source, as listed (`AI_Vessel`'s `GAME_NORMAL` gate, `AI_Building`'s full list,
   the four `Special_Weapon_AI` calls, the parabomb gate, `Evaluate_Object`'s visibility test, every
-  `MISSION_UNLOAD` assignment). A working mod's problem inventory found them, and its code fixes most of them (the
+  `MISSION_UNLOAD` assignment). TF's problem inventory found them, and its code fixes most of them (the
   ring scan's `bestval`, the radar dome, ships and shipyards, the repair bay, parabombs, fog in target and
   superweapon picks). **AI Boost**, an independent mod, adds the missing naval yards, superweapon buildings,
   Iron Curtain and Chronosphere calls, and spy, thief, chrono tank and MAD tank use, which agrees with each gap.
@@ -205,17 +205,17 @@ These are methods one mod uses, each a DLL change:
   `Cell_Threat` (`MAP.CPP`) and its two users (`TEAM.CPP`, `FINDPATH.CPP`), the recruit gate in `TeamClass::AI`
   (`TEAM.CPP`) and team creation in `HouseClass::AI`, `AI_Base_Defense` between `#ifdef NEVER` and its `#endif`
   with no other mention in the source, and `Area_Modify`'s four `Cell_Building()` tests and `IsSupressed` gate
-  (`TECHNO.CPP`); Vanilla Conquer's `house.cpp`, `object.cpp`, `team.cpp` and `techno.cpp` match line for line; a
-  working mod's fork carries the same code and its AI notes list each one; `Paranoid=yes`, `FireSupress=1`,
+  (`TECHNO.CPP`); Vanilla Conquer's `house.cpp`, `object.cpp`, `team.cpp` and `techno.cpp` match line for line;
+  TF's fork carries the same code and its AI notes list each one; `Paranoid=yes`, `FireSupress=1`,
   `DefenseRatio` and `[8Inch]`'s `Supress=yes` (the only one) in the stock `rules.ini` from `REDALERT.MIX`.
 - **The enemy pick and the build rules:** EA's `Expert_AI` (`int close = 0`, the score, `Enemy = enemy`),
   `MAP_CELL_W` 128 (`DEFINES.H`), `Distance` returning leptons (`COORD.CPP`), the `Enemy` set in
   `BuildingClass::Take_Damage` and read in `Evaluate_Object`; `Can_Build`'s `GAME_NORMAL` bypass (`HOUSE.CPP`),
   `FactoryClass::Start` and `FactoryClass::AI` (`FACTORY.CPP`), and the MCV's `Flush_For_Placement` call
-  (`UNIT.CPP`, with `BDATA.CPP`'s body scattering allied idle units). Vanilla Conquer's and a working mod's copies
+  (`UNIT.CPP`, with `BDATA.CPP`'s body scattering allied idle units). Vanilla Conquer's and TF's copies
   have the same lines. The enemy pick's outcome is read from code, not watched in play.
-- **The `Production` trap:** EA's base-building gate in `HouseClass::AI`, stock `Production=5`, and a working mod
-  that lowers it to 3 so its easiest AI still builds.
+- **The `Production` trap:** EA's base-building gate in `HouseClass::AI`, stock `Production=5`, and TF,
+  which lowers it to 3 so its easiest AI still builds.
 
 **Credit:** several of the methods above are ported from **AI Boost 3.2** by Bast75 and xXMini FrankiXx (GPL v3),
 including primary-factory production, the share of the army sent per attack, and scatter on launch.

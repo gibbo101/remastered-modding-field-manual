@@ -74,7 +74,7 @@ it.
   `SIDEBAR.CPP`), `HouseClass`'s per-type arrays (`HOUSE.H`) and the object export's buffer check
   (`DLLInterface.cpp`).
 - **The game's files:** stock `rules.ini`'s `[Maximums]`, from `REDALERT.MIX`.
-- **A working mod:** it hit the sidebar crash at 75 entries, and a misaligned weapon heap when its coded weapons
+- **Tiberian Factions:** it hit the sidebar crash at 75 entries, and a misaligned weapon heap when its coded weapons
   outgrew `[Maximums]`. Both are fixed as above, and its columns hold 120.
 
 > [!TIP]

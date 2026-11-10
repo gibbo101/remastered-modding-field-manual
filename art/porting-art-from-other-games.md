@@ -52,7 +52,7 @@ size, then scale down with a good filter.
 **Ships are different.** Red Alert picks a ship's body from **16 facings** (`VesselClass::Shape_Number`,
 `VESSEL.CPP`), and EA's HD ship tilesets match: `DD`, `CA`, `PT`, `SS` and `MSUB` each have shapes 0 to 15, and each
 shape is a loop of 8 frames played at 5 frames a second, 128 frames in all. **Unproven:** the camera angle EA's ships
-are drawn at. One working mod renders its ships at 54°, matched to the destroyer's proportions (bow-on, its drawn
+are drawn at. Tiberian Factions renders its ships at 54°, matched to the destroyer's proportions (bow-on, its drawn
 extent is about 0.81 of its side-on length), but a hull's height inflates that ratio, so it doesn't fix the angle.
 
 ## Tiberian Sun
@@ -66,10 +66,9 @@ extent is about 0.81 of its side-on length), but a hull's height inflates that r
   own files are in `expand01.mix`: its voxels and build-up SHPs at the top level, its other SHPs in the inner
   `ECACHE01.MIX` (the EMP cannon's cameo `MEMPICON.SHP` among them), the inner `E01SC01.MIX` holds just two entries
   (the Mobile War Factory's cameo `MWARICON.SHP` is one), and its rules are in `FIRESTRM.INI`. The Firestorm
-  Generator and its wall sections are the exception: they're base-game files in `TIBSUN.MIX`, not `expand01.mix`
-  (`GTFIRE.SHP` and `GTFSDF.SHP` in `TEMPERAT.MIX`, the build-up `GTFIREMK.SHP` in `ISOTEMP.MIX`, the field's
-  `FSIDLE.SHP` and the cameos `FSDICON.SHP` and `FSPICON.SHP` in `CONQUER.MIX`, its crackle `FIRSTRM1.AUD` in
-  `SOUNDS.MIX`).
+  Generator and its wall sections are in `TIBSUN.MIX`: `GTFIRE.SHP` and `GTFSDF.SHP` in `TEMPERAT.MIX`, the build-up
+  `GTFIREMK.SHP` in `ISOTEMP.MIX`, the field's `FSIDLE.SHP` and the cameos `FSDICON.SHP` and `FSPICON.SHP` in
+  `CONQUER.MIX`, its crackle `FIRSTRM1.AUD` in `SOUNDS.MIX`.
 - **Theatre letters in building names.** A building whose art changes by theatre (`NewTheater=yes` in `ART.INI`) is
   named for one theatre, and the game swaps the second letter: `ART.INI` names `GADEPT` (the Service Depot), and the
   files are `GTDEPT.SHP` in the temperate archives and `GADEPT.SHP` in the snow ones. The swap applies to names
@@ -161,32 +160,32 @@ The step-by-step recipe, written for an AI coding assistant to follow, is Tiberi
 - **The target:** EA's own HD Medium Tank frame, read for this page (canvas, crop, pure-green team colour, black
   shadow at alpha 191), and the classic-to-HD sizes on [HD tilesets and ZIPs](hd-tilesets-and-zips.md).
 - **The camera and facings:** compared with Red Alert's HD vehicle frames (frame 0 north, 8 west), and checked by
-  eye beside them in a working mod at 32° and 54°.
+  eye beside them in Tiberian Factions at 32° and 54°.
 - **Ships' facings:** EA's `DD.ZIP`, `CA.ZIP`, `PT.ZIP` and `SS.ZIP` (128 frames each, named shape then frame) and
   their entries in `RA_UNITS.XML` from `CONFIG.MEG` (16 shapes for each of these and `MSUB`, `FPS` 5), read for this
   page, against `Dir_To_16` in EA's `VesselClass::Shape_Number`. The destroyer's 0.81 is its frame-0 crop height
   over its west-facing crop width.
-- **Tiberian Sun:** `TIBSUN.MIX`'s header read for this page, and a working mod's extractor and renderer, which ship
+- **Tiberian Sun:** `TIBSUN.MIX`'s header read for this page, and TF's extractor and renderer, which ship
   Tiberian Sun units built this way. The lighting tables come from TS's own `VOXELS.VPL`, cross-checked with
   OpenTS's source.
-- **Where TS keeps it:** `expand01.mix` and `TIBSUN.MIX` probed for this page with a working mod's extractor
+- **Where TS keeps it:** `expand01.mix` and `TIBSUN.MIX` probed for this page with TF's extractor
   (`M_EMP.VXL`, `MWARMK.SHP` at the top of `expand01.mix`, `MWAR.SHP` and `MEMPFX.SHP` in `ECACHE01.MIX`,
   `MWARICON.SHP` in `E01SC01.MIX`; `NAPULS.SHP` in `SNOW.MIX` and not `TEMPERAT.MIX`, `NAPULSMK.SHP` in `ISOSNOW.MIX`
   and not `ISOTEMP.MIX`; both palettes in `CACHE.MIX`), OpenTS's theatre table (`_theater.cpp`: snow's archives and
-  its `SNO` suffix), and the working mod's extraction script and EMP Cannon port.
+  its `SNO` suffix), and TF's extraction script and EMP Cannon port.
 - **Theatre letters and `Image=`:** OpenTS's `ObjectTypeClass` (the `NewTheater` swap of the second letter, for
   the six prefixes) and `Read_INI` (`Image=` sets the graphic name); TS's `ART.INI` (`[GADEPT]` `NewTheater=yes`,
   `[GADEPT_C1]` to `[GADEPT_C3]` each `Image=GADEPT_C`); and every MIX in a Tiberian Sun install searched for this
   page, nested ones included: `GTDEPT.SHP` and `GADEPT.SHP` sit in different theatre archives, `GTDEPT_C.SHP` and
-  `GADEPT_C.SHP` exist, and no `GADEPT_C1` to `C3` file does. A working mod's extractor takes temperate `GT` names.
+  `GADEPT_C.SHP` exist, and no `GADEPT_C1` to `C3` file does. TF's extractor takes temperate `GT` names.
 - **SHP layout and timing:** OpenTS's `techno.cpp`, `building.cpp` and `anim.cpp` (shadows drawn at
   `shapenum + Get_Count() / 2` with `SHAPE_DARKEN`), `building.cpp` `Shape_Number` (one frame on at or below
   `ConditionYellow`, and no path to frame 2), and `animtype.cpp` (`Delay = TICKS_PER_MINUTE / Rate`); TS's
-  `ART.INI` (`[GAFIRE_B]` `Rate=500` against `[GAFIRE_C]` `Rate=220`); and a working mod, whose extracted build-ups showed the purple second
+  `ART.INI` (`[GAFIRE_B]` `Rate=500` against `[GAFIRE_C]` `Rate=220`); and TF, whose extracted build-ups showed the purple second
   half (frames 20 to 39 of `GTPOWRMK.SHP`'s 40), whose buildings use frame 1 when damaged, and whose Firestorm
   Generator plays `GAFIRE_B` about twice as fast as `GAFIRE_C`. `GTPOWR.SHP`, `GTWEAP.SHP`, `GTRADR.SHP`,
   `GTDEPT.SHP` and `GTFIRE.SHP` each have six frames, and `GTPOWR.SHP`'s first three were decoded for this page:
-  healthy, damaged and a more wrecked third; the working mod's notes record the same.
+  healthy, damaged and a more wrecked third; TF's notes record the same.
 - **Walker frames, extra voxels and the Firestorm's files:** OpenTS's `unittype.cpp` (`FiringFrames`, the
   `StandingFrames = 1` it implies, and the start of each block), `unit.cpp` (the walk and firing frame sums, the SHP
   turret at `8 * WalkFrames`, the barrel voxel drawn under or over it, and `APC`'s water voxel on a water cell) and
@@ -197,22 +196,22 @@ The step-by-step recipe, written for an AI coding assistant to follow, is Tiberi
   `APCW.VXL` and their `.HVA`s found in `LOCAL.MIX`, and no `MMCHTUR.VXL`. Every Firestorm file named above was
   probed in `TIBSUN.MIX`'s inner archives and in none of `expand01.mix`'s, and TS's own `ART.INI` and `SOUND.INI`
   define `[GAFIRE]`, `[GAFSDF]`, `FSIDLE` and `FIRSTRM1`, which Firestorm's `ARTFS.INI` and `FIRESTRM.INI` don't.
-  A working mod's renderer and art extraction script use all of these.
+  TF's renderer and art extraction script use all of these.
 - **Damaged animation loops:** `ART.INI`'s `[GADEPT_A]` (`LoopStart=0`, `LoopEnd=4`) and `[GADEPT_AD]`
-  (`LoopStart=5`, `LoopEnd=9`, `Image=GADEPT_A`), against `GTDEPT_A.SHP`'s 20 frames, read for this page; a
-  working mod composes its damaged building runs this way.
+  (`LoopStart=5`, `LoopEnd=9`, `Image=GADEPT_A`), against `GTDEPT_A.SHP`'s 20 frames, read for this page;
+  TF composes its damaged building runs this way.
 - **Sound and music:** `15-I000.AUD`, `25-I000.AUD` and the other lines found in `SOUNDS.MIX`, `THEME.INI` in
   `LOCAL.MIX` and `THEME01.INI` in `expand01.mix`, and a score (`DUSKHOUR.AUD`) and two voice lines decoded, all
   for this page (header: 22,050 Hz, compression 99; ffprobe: `adpcm_ima_ws`, mono); `SCOMP_SOS=99` in EA's
-  `SOUNDINT.H`, used by OpenTS's `dsaudio.cpp`; the voice sets of every unit in TS's `RULES.INI`; and a working
-  mod's voice and music builders, which read the same archives and ship TS voices for its units.
+  `SOUNDINT.H`, used by OpenTS's `dsaudio.cpp`; the voice sets of every unit in TS's `RULES.INI`; and TF's
+  voice and music builders, which read the same archives and ship TS voices for its units.
 - **Dig anim, HVA, barrels, infantry order and railgun colours:** `DIG.SHP` (in `TIBSUN.MIX`'s `CONQUER.MIX`) and
   `SAPC.HVA` (in `LOCAL.MIX`) extracted and their headers read for this page; OpenTS's `builtype.cpp`
   (`StartPitch(DIR_E)`), `building.cpp` (`Barrel_Pitch`), `infantry.cpp` (`HumanShape`) and `partsys.cpp`
-  (`Railgun_AI`), against EA's `INFANTRY.CPP` `HumanShape` and TS's `RULES.INI` and `FIRESTRM.INI`; and a working
-  mod whose TS units use these: its dig anim's 37 frames, its infantry ported with no reordering, its barrels
+  (`Railgun_AI`), against EA's `INFANTRY.CPP` `HumanShape` and TS's `RULES.INI` and `FIRESTRM.INI`; and TF,
+  whose TS units use these: its dig anim's 37 frames, its infantry ported with no reordering, its barrels
   rendered level and its railguns in TS's colours.
-- **Command & Conquer 3:** `StaticStream.big`'s header read for this page (`BIG4`), and a working mod that ships over
+- **Command & Conquer 3:** `StaticStream.big`'s header read for this page (`BIG4`), and TF, which ships over
   fifteen C&C3 units built this way.
 
 > [!TIP]

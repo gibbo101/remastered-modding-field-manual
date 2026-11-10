@@ -4,7 +4,7 @@ description: Almost all of the launcher's 2D UI, menus and HUD alike, is drawn f
 tags: [front-end, ui, atlas, textures, dds, launcher]
 holds_for: Steam build 21590013
 status: verified
-unproven: [whether a loose .MTD is read at all (observed ignored once), adopting a grown atlas in a released mod]
+unproven: [whether a loose .MTD is read at all (observed ignored once), adopting a grown atlas in a Tiberian Factions release]
 ---
 
 > [!NOTE]
@@ -100,32 +100,32 @@ the new space filled, loads. The menus, lobby and HUD draw correctly, and a regi
 draws it. The `.MTD` holds only pixel boxes and no atlas size, so nothing else needs changing.
 
 But **the new space has no names**: a loose `.MTD` isn't read, so nothing can ask for a new region by name. The only
-way to show it is to re-point a cached region record in memory. Proven in a test, not adopted in a released mod. A
-grown TGA is about 268 MB, against 184 MB.
+way to show it is to re-point a cached region record in memory. Proven in a test, not adopted in a Tiberian Factions
+release. A grown TGA is about 268 MB, against 184 MB.
 
 ## How it was verified
 
 - **The atlas and table:** `TEXTURES_SRGB.MEG`'s listing (1,355 DDS plus the atlas TGA, `.MTD` and `.MTM`), the
   atlas's TGA header, and the whole stock `.MTD` parsed with the record layout above: 1,554 records, ending exactly
-  at the file's 110,654 bytes. The crest boxes, TD's included, match the ones a working mod's crest patch uses and
-  that mod's notes.
+  at the file's 110,654 bytes. The crest boxes, TD's included, match the ones Tiberian Factions' crest patch uses and
+  TF's notes.
 - **The picker, marker, small-logo and big-logo regions:** their boxes read from the `.MTD` for this page, and the stock
-  `FACTIONS.XML`, whose `SmallIconName`s run `_00`, `_01`, `_03` to `_10`. A shipped mod repaints all of them and
+  `FACTIONS.XML`, whose `SmallIconName`s run `_00`, `_01`, `_03` to `_10`. TF repaints all of them and
   each shows where the table says; that the map badges also draw on the loading screen is its record (observed).
 - **The title logo:** `UI_RA_MAINLOGO.DDS` read from `TEXTURES_SRGB.MEG` for this page (1948 × 552, 32-bit, no mip
   count, its size exactly that plus the header) and `UI_RA_MAINMENU_LOGO`'s box from the `.MTD`; the stock
-  `RA_MAIN_MENU.BUI` names the texture, `RA_CAMPAIGN_SELECT.BUI` the region, and `RA_UI_LOADINGSCREEN.BUI` both; a
-  shipped mod's title build paints both from one image.
+  `RA_MAIN_MENU.BUI` names the texture, `RA_CAMPAIGN_SELECT.BUI` the region, and `RA_UI_LOADINGSCREEN.BUI` both;
+  TF's title build paints both from one image.
 - **Editing in place:** the formula matches the stock file's size (18 + 6871 × 6716 × 4 = 184,582,562 bytes) and
-  the scripts a shipped mod paints its crests and emblems with.
-- **Loose TGA:** a shipped mod's repainted copy draws in menus and matches, and another mod's
+  the scripts TF paints its crests and emblems with.
+- **Loose TGA:** TF's repainted copy draws in menus and matches, and another mod's
   ([Reilsss's Command & Conquer in Red Alert](https://steamcommunity.com/sharedfiles/filedetails/?id=2853520457))
   ships one with descriptor `0x08` and a footer that also loads. It's the only loose atlas among the Workshop mods
   surveyed, and no mod surveyed ships an `.MTD`.
-- **DDS:** a shipped release carries the atlas as DXT5 with 13 mip levels at 6872 × 6716 (61.5 MB, measured). Its
+- **DDS:** a TF release carries the atlas as DXT5 with 13 mip levels at 6872 × 6716 (61.5 MB, measured). Its
   crest patch computes texture coordinates from that size, and draws correctly. `ClientG.exe` holds neither 6871
   nor 6716 as a float or a double (searched).
-- **Loose DDS tileset frames:** a shipped tileset XML names `.tga` frames that exist only as `.DDS` in the mod.
+- **Loose DDS tileset frames:** TF's tileset XML names `.tga` frames that exist only as `.DDS` in TF.
 - **Growing:** a probe build at 8192 × 8192, with region records read back as 8192 wide during a match, and a crest
   drawn from the new space. Observed in one test session.
 

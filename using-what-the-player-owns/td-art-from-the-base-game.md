@@ -87,18 +87,18 @@ added `<Tiles>` is not loaded.
 
 ## How it was verified
 
-Every TD unit, building and effect tile whose frames match the base game byte for byte was moved to openers in a
-shipped mod, and its copies were deleted from the mod. Medium Tank and MCV house colours and turrets, construction
+Every TD unit, building and effect tile whose frames match the base game byte for byte was moved to openers in
+Tiberian Factions, and TF's own copies were deleted. Medium Tank and MCV house colours and turrets, construction
 yard and power plant build-ups, and missile effects were checked by eye under Proton on Linux and on the Steam
 Deck, in skirmish and over LAN. Red Alert's own effects in the re-rooted tileset still drew.
 
 The fixed list is in `ClientG.exe`: the strings beside `CNCRendererClass::Recreate_Tile_Maps` and its log line are
 the three `Common_` names, the five `TD_` ones and the five `RA_` ones, and no other tileset name. Which names load
-for which game is a working mod's record, and the reason its TD art needs openers in a Red Alert tileset; the
+for which game is TF's record, and the reason its TD art needs openers in a Red Alert tileset; the
 choice itself wasn't disassembled for this page.
 
 **Measured once:** on a Linux desktop, a match on a TD map used the same video memory, 5,052 MiB, whether TD's
-unit art came from the base game or from the mod's copies. **Not measured yet:** load time, and memory on the Steam
+unit art came from the base game or from TF's copies. **Not measured yet:** load time, and memory on the Steam
 Deck.
 
 **Credit:** DontCryJustDie's [TD-Assets](https://steamcommunity.com/sharedfiles/filedetails/?id=3003163891) first

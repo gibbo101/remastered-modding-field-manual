@@ -34,7 +34,7 @@ flying soldier through:
 - **Move clicks get pulled back** into the unit's own zone. A flyer can cross zones, so don't.
 - **Anti-air only sees aircraft.** Defences that track aircraft need to count an airborne jumpjet as airborne.
 - **Ground weapons can't hit a flyer.** Only anti-air weapons should get an attack cursor over a jumpjet in the air.
-- **A flyer can reveal cloaked units below it,** as TS's jumpjets do. A working mod has it on a development branch
+- **A flyer can reveal cloaked units below it,** as TS's jumpjets do. Tiberian Factions has it on a development branch
   (built, not in a release).
 
 The flight itself can follow OpenTS's jumpjet: ease off near the destination, bob on a slow sine while hovering,
@@ -83,11 +83,11 @@ TS's Disc Thrower throws a disc that bounces (`Bouncy=yes`; OpenTS's `bounce.cpp
 
 - **Jumpjets:** EA's `MissionClass::AI` (`MISSION.CPP`, the `Height > 0` early return), TS's `RULES.INI`
   (`JumpJet=yes`) and OpenTS's `jumpjet.cpp`.
-- **Mines:** EA's mine buildings (`STRUCT_AVMINE`, `STRUCT_APMINE`), and a working mod's drone that settles into one.
+- **Mines:** EA's mine buildings (`STRUCT_AVMINE`, `STRUCT_APMINE`), and Tiberian Factions' drone that settles into one.
 - **The disc:** TS's `RULES.INI` (`Bouncy=yes`), OpenTS's `bounce.cpp`, and EA's `Distance()` in `COORD.CPP`.
 - **The fuse cap:** EA's `FUSE.CPP` (`Timer = min(timeto, 0xFF)`) and `FUSE.H` (`unsigned char Timer`), the same in
-  Vanilla Conquer, and the working mod's TS shells and drop pods, which end their flights without the fuse.
-- **A working mod:** jumpjet infantry, the mobile war factory and sensor, a deploy-to-fire walker, the limpet
+  Vanilla Conquer, and TF's TS shells and drop pods, which end their flights without the fuse.
+- **TF:** jumpjet infantry, the mobile war factory and sensor, a deploy-to-fire walker, the limpet
   drone and the disc thrower in its release, played under Proton on Linux and on the Steam Deck.
 
 > [!TIP]
@@ -97,6 +97,8 @@ TS's Disc Thrower throws a disc that bounces (`Bouncy=yes`; OpenTS's `bounce.cpp
 > came through these routes. The Juggernaut sets down to fire, the Limpet Drone settles into a mine any unit can drive
 > over, and the Disc Thrower's disc bounces as TS's does.
 >
-> ![Jumpjet Infantry beside a TS GDI base](img/jumpjet-infantry.jpg)
+> ![Jumpjet Infantry in flight](img/jumpjet-infantry-flight.gif)
 >
-> TF's Jumpjet Infantry, selected, beside a TS GDI base: three in flight with wings spread and one landed with them folded, each with the selection box and health bar the launcher places.
+> Four of TF's Jumpjet Infantry, ordered a long way across the map, take off by the barracks and fly over the TS GDI
+> base, past a power plant and over the radar and the trees, their shadows on the ground below. As in TS, a jumpjet
+> walks short trips and flies when the order is 12 cells or more away, across water, or a walk of over 15 steps.

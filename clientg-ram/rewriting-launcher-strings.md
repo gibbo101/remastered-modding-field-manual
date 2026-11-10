@@ -99,7 +99,7 @@ search `ClientG.exe`'s strings for the name family.**
   read-only section, at the addresses above. Both prefixes' tab regions are in the stock atlas map
   (`MT_COMMANDBAR_COMMON.MTD`), where every `UI_RA_SIDEBAR_TABICON_*` region is 130 × 64 and the TD ones are
   100 × 60, 122 × 60 and 127 × 60.
-- **The method:** a shipped mod rewrites the four prefixes at each match start, and was checked both ways in one
+- **The method:** Tiberian Factions rewrites the four prefixes at each match start, and was checked both ways in one
   launch: TD's tab art in every state on TD's scene, including placement, and Red Alert's art back again for an
   Allied player. Its doc records the two failed routes, and its history holds the twelve-record route's code.
 - **LAN:** each player's launcher runs the rewrite for itself. See

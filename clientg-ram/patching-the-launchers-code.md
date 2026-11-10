@@ -121,9 +121,9 @@ launcher may still be loading at the first.
 - **The two processes:** the exports each executable names (above), EA's `CNC_Version` in `DLLInterface.cpp`, and
   the DLL's own load seen inside ClientG.
 - **The fixed base:** `objdump -p ClientG.exe`: `ImageBase 00400000`, "relocations stripped", an empty base
-  relocation directory and `DllCharacteristics 0x8100` (no `DYNAMIC_BASE`). A working mod's hooks use the addresses
+  relocation directory and `DllCharacteristics 0x8100` (no `DYNAMIC_BASE`). Tiberian Factions' hooks use the addresses
   as constants, on Linux and on the Deck.
-- **The hooks:** each hook shape above runs in a shipped mod's release builds, against the client in the box, on
+- **The hooks:** each hook shape above runs in TF's release builds, against the client in the box, on
   Linux under Proton and on the Steam Deck. Both machines' `ClientG.exe` hash the same.
 - **Every LAN player patched:** checked in a LAN game, with a Deck hosting and a desktop joining. Each launcher's
   patches followed its own player.

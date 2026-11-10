@@ -1,6 +1,6 @@
 ---
 title: Harvesters
-description: "Why Red Alert's harvesters get stuck, queue at one refinery or drive into enemy bases (a latch that never resets, an overwritten idle order, zones that ignore buildings, a sticky refinery choice, ore picks with no sense of danger and, outside a campaign, no shroud), each confirmed in EA's source, the few rules.ini knobs, and the fixes one mod ships."
+description: "Why Red Alert's harvesters get stuck, queue at one refinery or drive into enemy bases (a latch that never resets, an overwritten idle order, zones that ignore buildings, a sticky refinery choice, ore picks with no sense of danger and, outside a campaign, no shroud), each confirmed in EA's source, the few rules.ini knobs, and the fixes Tiberian Factions ships."
 tags: [ai, harvesters, economy, pathfinding, dll]
 holds_for: Steam build 21590013
 status: verified
@@ -54,7 +54,7 @@ The stock column is the base game's `rules.ini`. A `rules.ini` of your own that 
 default instead (`RulesClass`'s constructor, `RULES.CPP`), and five of those differ: `OreFarScan` 32 cells
 (`0x2000` leptons), `GoldValue` 35, `GemValue` 110, `Harvester` 3 and `OreTruckRate` 2.
 
-## What one mod ships
+## What Tiberian Factions ships
 
 Each is a DLL change, behind one "harvesters" switch on a settings page that restores EA's code when it's off (see
 [A player settings page](../structuring/player-settings-page.md)).
@@ -95,19 +95,19 @@ Each is a DLL change, behind one "harvesters" switch on a settings page that res
 ## How it was verified
 
 - **The stock problems:** EA's `UNIT.CPP` (the `IsTiberiumShort` set, the `!House->IsHuman` re-queue, the
-  `GOINGTOIDLE` case, `Find_Best_Refinery`'s cache, `Tiberium_Check`'s score and its `GAME_NORMAL` fog gate, and `ArchiveTarget`; Vanilla Conquer's `unit.cpp` and a working mod's fork have the same `Tiberium_Check` lines) and `HOUSE.CPP` (the
+  `GOINGTOIDLE` case, `Find_Best_Refinery`'s cache, `Tiberium_Check`'s score and its `GAME_NORMAL` fog gate, and `ArchiveTarget`; Vanilla Conquer's `unit.cpp` and Tiberian Factions' fork have the same `Tiberium_Check` lines) and `HOUSE.CPP` (the
   latch's only initialisation, its use in refinery building and harvester replacement, and the `DIFF_HARD` check),
   each read with `grep -a`. Where a computer's `Difficulty` comes from: `HouseClass`'s constructor (`Scen.CDifficulty`), `CDifficulty`'s only writers in `INIT.CPP` and `NULLDLG.CPP` (the original menus, which the
   DLL never calls), and `GlyphX_Assign_Houses` (`DLLInterface.cpp`, `Assign_Handicap(Scen.Difficulty)`).
 - **The rules.ini knobs:** each key read in EA's `RULES.CPP` (`OreNearScan` and `OreFarScan` into `TiberiumShortScan`
   and `TiberiumLongScan`), used in `UNIT.CPP` (`Goto_Tiberium`, `Tiberium_Check`'s `GoldValue` and `GemValue*4`, the bail count) and
-  `HOUSE.CPP` (`RefineryRatio`, `RefineryLimit`), and the stock values in the base game's `rules.ini`. A working
-  mod's harvester notes list the same keys. The code defaults are `RulesClass`'s constructor initialisers
+  `HOUSE.CPP` (`RefineryRatio`, `RefineryLimit`), and the stock values in the base game's `rules.ini`. TF's
+  harvester notes list the same keys. The code defaults are `RulesClass`'s constructor initialisers
   (`TiberiumLongScan(0x2000)`, `GoldValue(35)`, `GemValue(110)`, `IQHarvester(3)`, `OreDumpRate(2)`), checked
-  against the `rules.ini` extracted from `REDALERT.MIX`; the mod's notes give the same 110 fallback for `GemValue`.
-- **The fixes:** a working mod's design notes and code: the no-progress detector, field blacklist, retreat, zone
+  against the `rules.ini` extracted from `REDALERT.MIX`; TF's notes give the same 110 fallback for `GemValue`.
+- **The fixes:** TF's design notes and code: the no-progress detector, field blacklist, retreat, zone
   gate, watchdog and field pick, shipped and tested in play. The refinery spreading is a CFE Patch Redux port.
-- **The zone trap:** EA's `Zone_Span` and `Is_Clear_To_Move` (the cleared building bit), and a working mod's failed
+- **The zone trap:** EA's `Zone_Span` and `Is_Clear_To_Move` (the cleared building bit), and TF's failed
   attempt to rebuild zones on placement.
 
 **Credit:** the refinery choice (CFE's Harvester Optimization, not its separate Harvester Load Balancing) and

@@ -111,7 +111,7 @@ base game's data, the same wall as new skirmish maps. There are two ways round:
   This is proven, and needs no launcher patch. The number of missions is limited to the stock slots.
 - **A mission carrier.** Launch your instance under a stock instance's name and hand the DLL your map, as
   [the skirmish carrier](new-maps-in-the-skirmish-list.md) does. **Unproven for general use:** the only working
-  version is one mod's development build, wired to one map.
+  version is Tiberian Factions' development build, wired to one map.
 
 Three data rules for a new instance:
 
@@ -220,12 +220,12 @@ campaign map; the Mission Select tabs come from the tab sort above.
   deliberately Tiberian Dawn name ID showing a placeholder.
 - **Unlocks, bases and the stock scenarios:** counted in the stock `INSTANCES.XML` for this page (every one of the
   34 instances on the four expansion bases sets `IsUnlockedAtStart` true; the Aftermath Allied base's three fields);
-  both `general.mix` archives listed by name hash for this page. A shipped mod's hijacked `SCG43EA.INI` started from
+  both `general.mix` archives listed by name hash for this page. Tiberian Factions' hijacked `SCG43EA.INI` started from
   the Aftermath copy.
 - **The movie and picture fields:** counted in the stock `INSTANCES.XML` (about 395 KB), in `CONFIG.MEG`
   itself, and written by EA's own instance export in `DLLInterfaceEditor.cpp` (TD), which prints
   `<BriefMovieName>`, `<ActionMovieName>` and `<WinMovieName>` from each scenario's movies.
-- **The scenario shadow:** `SCG43EA.INI` with every enemy removed and `[Digest]` deleted, shipped in a mod's
+- **The scenario shadow:** `SCG43EA.INI` with every enemy removed and `[Digest]` deleted, shipped in TF's
   `CCDATA/`, won itself in about 30 seconds from the Aftermath tab, on both machines. The mission is "ITALY: Harbor
   Reclamation"; all 90 enemy entries (USSR and BadGuy, across its units, ships, infantry and structures) were removed
   and the rest renumbered. On the win the DPTHCHRG movie played, the campaign advanced to "In the Nick of Time", and
@@ -235,23 +235,23 @@ campaign map; the Mission Select tabs come from the tab sort above.
   with `RELEASE_VERSION` defined in `DEFINES.H`; Vanilla Conquer's `scenario.cpp` and `defines.h` have the same.
   EA's map editor source has no digest code at all.
 - **Variant order:** observed as instances that listed nowhere until moved after their base. The stock file defines
-  every one of its 456 instances' variants before use, and a shipped mod's build appends its instances at the end.
+  every one of its 456 instances' variants before use, and TF's build appends its instances at the end.
 - **The campaign map:** the stock `RA_CAMPAIGNMAPS.XML` and `RA_ALLIES_MISSIONS.XML` read for this page (stages,
   movies, entries, `MapStageUnlock`, `RestoreAllUnits`), every `CampaignMapSelectMapClass` and its `GuiLayer` in
-  both campaign map files, found through `CONFIG.MEG`'s index, the movies listed in `MOVIES_RA.MEG`, and a working
-  mod that couldn't make a map of its own or a lasting branch.
+  both campaign map files, found through `CONFIG.MEG`'s index, the movies listed in `MOVIES_RA.MEG`, and TF,
+  which couldn't make a map of its own or a lasting branch.
 - **Tab sort:** the two side tests and their calls, and the tab numbers stored after each test in the tab sort,
-  were read from `ClientG.exe` on disk. A shipped mod's patch on them lists its GDI and Nod missions, and its notes
+  were read from `ClientG.exe` on disk. TF's patch on them lists its GDI and Nod missions, and its notes
   give the same tab numbers. The other sites: the row-style branch and the four style calls round it, and the
-  three function starts, read from the exe on disk; a shipped mod hooks all four, and its notes and code name
+  three function starts, read from the exe on disk; TF hooks all four, and its notes and code name
   them.
 - **The campaign files:** the stock manifests, campaign and mission files extracted from `CONFIG.MEG` for this page
-  (every `ProgressiveCampaignTypeClass`, every `MapStageUnlock`), checked against a working mod's campaign notes
+  (every `ProgressiveCampaignTypeClass`, every `MapStageUnlock`), checked against TF's campaign notes
   and the loose copies its CAMPAIGNS page ships. `PROGRESSIVECAMPAIGNMISSIONFILES.XML` lists TD's four mission
   files beside Red Alert's, each present in `CONFIG.MEG`'s index, and the same index holds the six Mission Select
-  screens, which the working mod's notes name; it ships Red Alert's Mission Select and its row as loose, restyled copies. The stock `INSTANCES.XML` has 456 instances: 22 on the Allied base,
+  screens, which TF's notes name; it ships Red Alert's Mission Select and its row as loose, restyled copies. The stock `INSTANCES.XML` has 456 instances: 22 on the Allied base,
   20 Soviet, 8 and 9 on the Allied Counterstrike and Aftermath bases, 4 Ant.
-- **No restart:** a working mod copied a changed scenario INI into the mod's `CCDATA/` on a Steam Deck with the game
+- **No restart:** TF copied a changed scenario INI into its `CCDATA/` on a Steam Deck with the game
   running, and the next Start played it.
 
 > [!TIP]

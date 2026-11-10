@@ -105,24 +105,24 @@ launcher happened to read first. See
 ## How it was verified
 
 - **The log line:** `CrashLog.txt` from an install, read for this page (its format only; no line is reproduced),
-  a working mod's crash runbook, and the launcher's own `ClientLauncher|Crash` entries for both processes.
-- **The minidumps:** dump files of both processes in a Proton prefix, named as above; a working mod's minidump
+  Tiberian Factions' crash runbook, and the launcher's own `ClientLauncher|Crash` entries for both processes.
+- **The minidumps:** dump files of both processes in a Proton prefix, named as above; TF's minidump
   walker, which reads the module list (stream 4), the exception and the faulting stack; and stack-overflow crashes
   diagnosed this way (`0xC00000FD`).
 - **The DLL's base and lines:** `objdump -p` on a mingw-built DLL (`ImageBase 6aa00000`, `DYNAMIC_BASE`), and
   `addr2line` on the unstripped build resolving a known function's address to its source line.
 - **The fatal-assert address:** the instruction at `0x96A539` disassembled from `ClientG.exe` on disk, and two
-  separate crash investigations in a working mod's notes that both stopped there, one of them traced to a wrong-size
+  separate crash investigations in TF's notes that both stopped there, one of them traced to a wrong-size
   `CONFIG.MEG` member and the assert text read from the stack.
 - **The DLL's imports:** `objdump -p` on the installed `RedAlert.dll` and `TiberianDawn.dll` and on a mingw-built
-  mod DLL, a shipped mod's crash runbook, and that mod's one Direct3D call, made on a texture it reads from the
+  mod DLL, TF's crash runbook, and its one Direct3D call, made on a texture it reads from the
   launcher's memory.
 - **Unproven:** whether every launcher assert goes through that one address.
 
 > [!TIP]
 > **In Tiberian Factions**
 >
-> TF triages every player report this way. The `CrashLog.txt` line decides which process to look at, a minidump
-> walker pulls the DLL's return addresses off the faulting stack, and the unstripped DLL of that release names
-> them. Its worst launcher crash, in 5.0.0, came from its own memory patch writing over heap headers, and the
-> crash surfaced on the next skirmish load.
+> TF triages its own crashes this way. The `CrashLog.txt` line decides which process to look at, a minidump walker
+> pulls the DLL's return addresses off the faulting stack, and the unstripped DLL of that build names them. Its
+> worst launcher crash, caught in its own testing before 5.0.0, came from its EVA patch writing a sound file over
+> the launcher's heap block headers, and the crash surfaced on a later skirmish load.

@@ -149,25 +149,25 @@ array in place.
 ## How it was verified
 
 - **That nothing passes the difficulty:** EA's `DLLInterface.h` (`CNC_Set_Difficulty(int)`, and no difficulty in
-  `CNCPlayerInfoStruct`); the values the launcher sent, logged by a mod's DLL across five skirmish lobbies (mixed,
-  all Easy twice, all Hard, and Hard in the campaign difficulty option) and in LAN games; DontCryJustDie's own
+  `CNCPlayerInfoStruct`); the values the launcher sent, logged by Tiberian Factions' DLL across five skirmish lobbies
+  (mixed, all Easy twice, all Hard, and Hard in the campaign difficulty option) and in LAN games; DontCryJustDie's own
   finding that the per-AI setting exists only on the launcher's side.
 - **The settings file:** decompressed and walked record by record for this page (the `CASUAL` record at tag `0x21`,
-  the counter at tag `0x31`); a mod's own measurements diffed the file, the Wine registry and the launcher's exit-time
+  the counter at tag `0x31`); TF's own measurements diffed the file, the Wine registry and the launcher's exit-time
   writes across launches with different picks: nothing tracked the picks, and the byte that moved at each launch
   was the counter.
 - **The name trap:** EA's `GlyphX_Assign_Houses` (the `IniName` copy, the `TXT_COMPUTER` overwrite for computer
   houses, `InitialName` under `#ifdef WOLAPI_INTEGRATION`), no `WOLAPI_INTEGRATION` define in `DEFINES.H` or the
-  project file, the same loop in Vanilla Conquer's `dllinterface.cpp`, and a shipped mod that hit it and now records
+  project file, the same loop in Vanilla Conquer's `dllinterface.cpp`, and TF, which hit it and now records
   each house's slot inside the loop.
-- **The record:** a shipped mod's reader and its field constants; live reads with colours, teams and countries
+- **The record:** TF's reader and its field constants; live reads with colours, teams and countries
   shuffled, random picks included; and DontCryJustDie's independent identification of the colour, team and country
   fields, and of the start-position field. The first reads, of a Hard, Medium, Easy, Hard lobby, gave 3, 2, 1, 3 at
   `+0x64`, and human records read 0. Countries decode through EA's `HousesType` order: an all-Soviet lobby read
   `4, 4, 4` (`HOUSE_USSR` + 2), and a mixed lobby `2, 9, 3` (Spain, Turkey, Greece). Teams read the lobby's team
   number minus 1, and a three-AI lobby with two AIs sharing a team read `0, 1, 1`.
 - **The rebuild window:** a mid-launch read caught returning a half-written array, and the shipped reader's retry,
-  which needs two agreeing reads; the mod's release notes record the fix for solo skirmish from the second match
+  which needs two agreeing reads; TF's release notes record the fix for solo skirmish from the second match
   of a session on.
 - **Stale copies and the resolver:** 28 ambiguous reproductions resolved with none wrong, and the compiled
   resolver run offline over 46 recorded cycles with none wrong. The steps, and the count over all candidates in

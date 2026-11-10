@@ -162,10 +162,10 @@ as `UGC_<a>_<b>_RADAR_SMALL.TGA`.
 - **The DLL side:** EA's `CNC_Start_Instance_Variation` plays `override_map_name` when an instance sets one.
 - **Where map files are read from:** EA's `Set_Content_Directory` searches the paths given to `CNC_Add_Mod_Path`
   first, then the official content directory; `InstanceServerG.exe` carries `\CCDATA` beside the base game's
-  `\DATA\CNCDATA\RED_ALERT\...` folders; and a working mod keeps its 189 scenario and rules INIs in its root
+  `\DATA\CNCDATA\RED_ALERT\...` folders; and Tiberian Factions keeps its 189 scenario and rules INIs in its root
   `CCDATA/`.
 - **The hooks:** every address and stock byte above was read from `ClientG.exe` on disk. The launch send pushes its
-  own name, `SkirmishGameManagerClass::Host_Game`, for a log line (`push 0x1C32054` at `0x7F1C9A`). A shipped mod
+  own name, `SkirmishGameManagerClass::Host_Game`, for a log line (`push 0x1C32054` at `0x7F1C9A`). TF
   lists and plays all 34 of TD's skirmish maps this way, from the skirmish screen and in LAN games, under Proton on
   Linux and on the Steam Deck.
 - **The server's refusal:** a new instance hitting the server's assert was observed in play, and the assert text
@@ -173,7 +173,7 @@ as `UGC_<a>_<b>_RADAR_SMALL.TGA`.
   hijacked community entry still loaded its stock map.
 - **Custom maps:** EA's map editor source (its save folder, `Local_Custom_Maps`, and the `.mpr`, `.tga` and `.json`
   it writes, with the JSON's fields), `CNC_Start_Custom_Instance` in EA's `DLLInterface.cpp`, a Proton prefix's
-  `Local_Custom_Maps\Red_Alert\` holding such triplets, and a working mod's notes, which found the same folder on a
+  `Local_Custom_Maps\Red_Alert\` holding such triplets, and TF's notes, which found the same folder on a
   Steam Deck.
 - **Workshop maps:** the `UGC_..._MAPDATA.MPR` files seen on a Steam Deck; EA's map editor publishing a
   `MAPDATA.PGM` (`SteamDialog.cs`); a Proton prefix's `Custom_Map_Previews\`, whose

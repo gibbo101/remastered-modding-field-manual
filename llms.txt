@@ -1,7 +1,7 @@
 # Remastered Modding Field Manual
 
-> Techniques and facts about modding the Command & Conquer Remastered Collection (Steam app 1213210), verified in a
-> working mod. Each page is self-contained and laid out the same way: when you need it, the fact or method, how it
+> Techniques and facts about modding the Command & Conquer Remastered Collection (Steam app 1213210), verified in
+> Tiberian Factions. Each page is self-contained and laid out the same way: when you need it, the fact or method, how it
 > was verified, the game build it holds for, and what is still unproven. Licensed CC BY 4.0. EA has not endorsed and
 > does not support this product.
 
@@ -301,10 +301,10 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 ## Open questions
 
 - [Open questions](open-questions.md): unproven research only, never a recipe. Scripted co-op missions, players
-  changing the rules, Tiberian Sun theatres, music built from the player's own copy, tileset video memory, which
-  mod's loose file wins, theatre slots past 5, building placement on a 253x253 map, hiding units from radar, how a
-  campaign ends, untouched launcher data (cursors, lobby lists, slash commands, CNCRULES.XML's difficulty table and
-  CNC_Config). Each entry links TF's design doc.
+  changing the rules, Tiberian Sun theatres, music built from the player's own copy, tileset video memory, which mod's
+  loose file wins, theatre slots past 5, hiding units from radar, how a campaign ends, untouched launcher data
+  (cursors, lobby lists, slash commands, CNCRULES.XML's difficulty table and CNC_Config). Each entry links TF's design
+  doc.
 
 ## Optional
 

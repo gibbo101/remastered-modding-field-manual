@@ -104,10 +104,10 @@ A post-build step copies `resources/remaster_mods/Vanilla_RA/` (your `ccmod.json
 - **The output layout:** the `POST_BUILD` copy in `redalert/CMakeLists.txt`, and a real build tree.
 - **The stale folder:** that `POST_BUILD` step, and a test project (CMake 3.28, Ninja) whose `POST_BUILD` command ran
   on the first build and after a source change but not on an up-to-date rebuild; `cmake -E copy_directory` run
-  twice, which left a file deleted from the source in the destination; and a shipped mod's deploy script, which
+  twice, which left a file deleted from the source in the destination; and Tiberian Factions' deploy script, which
   restages the folder from scratch for that reason.
 - **The imports, size and timestamp:** `objdump -p` and `strip` on a built DLL, compared with a shipped one.
-- A mod built this way ships on the Workshop, and is played under Proton on Linux and on the Steam Deck.
+- TF is built this way, ships on the Workshop, and is played under Proton on Linux and on the Steam Deck.
 
 > [!TIP]
 > **In Tiberian Factions**

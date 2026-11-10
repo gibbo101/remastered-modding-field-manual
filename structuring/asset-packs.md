@@ -86,12 +86,12 @@ Every player needs the same enabled mods, packs included, so an optional pack is
 
 ## How it was verified
 
-- **The layout and markers:** a shipped mod's packs on the Workshop and their source folders. The marker reader in
-  that mod's DLL, called from `CNC_Add_Mod_Path`. EA's `Add_Mod_Path`, which adds each path to `ModSearchPaths`.
+- **The layout and markers:** Tiberian Factions' packs on the Workshop and their source folders. The marker reader in
+  TF's DLL, called from `CNC_Add_Mod_Path`. EA's `Add_Mod_Path`, which adds each path to `ModSearchPaths`.
   The instance server names `CNC_Add_Mod_Path`.
-- **XML never loaded:** the stock `TILESETS.XML` in `CONFIG.MEG`, the packs' own files, and the mod's merged
+- **XML never loaded:** the stock `TILESETS.XML` in `CONFIG.MEG`, the packs' own files, and TF's merged
   copies working in play.
-- **Sharing:** the mod's build tooling and its shipped tilesets. The terrain placeholder and the preload trap were
+- **Sharing:** TF's build tooling and its shipped tilesets. The terrain placeholder and the preload trap were
   observed in play.
 - **Per-language audio:** the base game's `SFX2D_*` MEGs.
 - **Not checked:** Steam's own "required items" links on a Workshop page.

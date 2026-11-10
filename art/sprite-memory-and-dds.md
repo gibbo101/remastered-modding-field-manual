@@ -26,7 +26,7 @@ Steam Deck shares its memory with the system. A mod with a handful of new types 
 ## Everything loads at start-up
 
 At start-up the launcher uploads every texture of every enabled mod (the "splash preload"), whatever a match will
-use. It never unloads unit, building or effect art within a session. Measured on one desktop with a large mod and
+use. It never unloads unit, building or effect art within a session. Measured on one desktop with Tiberian Factions and
 one of its asset packs:
 
 | Build | Main menu | In play |
@@ -74,12 +74,12 @@ ZIPs.**
 
 ## How it was verified
 
-- **The preload:** the `NOSPLASHPRELOAD` option is in `ClientG.exe`; a working mod's art dropped to the frog
+- **The preload:** the `NOSPLASHPRELOAD` option is in `ClientG.exe`; Tiberian Factions' art dropped to the frog
   without it, and its memory fell as in the table. The test the launcher makes before the preload was read from
   `ClientG.exe` on disk.
-- **The memory figures:** measured by a working mod on one desktop (an RTX 5070) on the same map and start each
+- **The memory figures:** measured by TF on one desktop (an RTX 5070) on the same map and start each
   time. They show proportions; other cards and drivers will differ.
-- **The DDS rules:** a working mod's frames in each form, and its shipped loose DDS terrain frames, UI atlas and
+- **The DDS rules:** TF's frames in each form, and its shipped loose DDS terrain frames, UI atlas and
   cameos. The green shift was measured on the encoded frames before it was seen in game.
 
 > [!TIP]

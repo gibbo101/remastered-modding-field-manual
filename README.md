@@ -23,7 +23,7 @@ what it does with the technique.
 >
 > This manual is written and kept up to date with an AI assistant (Anthropic's Claude). It drafts each page from
 > Tiberian Factions' own notes and code. As work on the mod turns up new lessons, it adds them here and revises the
-> pages they affect. Gibbo101 reviews every change, and every claim is checked against a working mod or the game's
+> pages they affect. Gibbo101 reviews every change, and every claim is checked against Tiberian Factions or the game's
 > source before it goes in. Even so, mistakes can get through. If something here is wrong, please open an issue.
 >
 > Everything here is provided as-is, with no warranty. Back up your game and saves before you try anything,
@@ -199,7 +199,7 @@ trusted.
 - **Game-level facts only:** true for any Remastered mod, not just one.
 - **Written for HD graphics mode.** Pages about art and drawing describe the HD renderer, not classic mode.
 - **Each fact has one home.** It lives on one page, and other pages link to it.
-- **Every claim was checked** against a working mod or the game's source, and anything unproven is marked
+- **Every claim was checked** against Tiberian Factions or the game's source, and anything unproven is marked
   **Unproven**.
 - **Pages that patch the launcher's memory open with a fragility box:** the client build and hash they were
   verified against, what breaks if the client changes, and how to scan safely. Method first, offsets second.

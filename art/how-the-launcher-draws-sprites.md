@@ -94,8 +94,8 @@ the hull at every facing.
 
 Tiberian Sun's Disruptor fires a sonic wave: a shimmering band from the tank to its target. TS draws it by
 displacing screen pixels along the line (OpenTS's `wave.cpp`), and ships no art for it. The Remastered launcher has
-no per-pixel effect a mod can use for that, so the band has to be built from sprites. It took one mod weeks of
-builds, and it's a good map of the limits above:
+no per-pixel effect a mod can use for that, so the band has to be built from sprites. It took Tiberian Factions
+weeks of builds, and it's a good map of the limits above:
 
 | Tried | Result |
 |---|---|
@@ -138,30 +138,30 @@ line's colour. TD's Obelisk never hits this: its `LineMaxFrames` is 5. Lines can
 
 - **The `.meta` format and the baked shadow:** read from the base game's own `MTNK.ZIP`.
 - **EA's vehicle centring:** measured on the hull frames of 14 Red Alert and 13 Tiberian Dawn vehicles from
-  `TEXTURES_RA_SRGB.MEG` and `TEXTURES_TD_SRGB.MEG`, at 128/24 canvas pixels per classic pixel, matching a
-  working mod's earlier measurement of 21 of them, which its centring tool for voxel vehicles is built on.
+  `TEXTURES_RA_SRGB.MEG` and `TEXTURES_TD_SRGB.MEG`, at 128/24 canvas pixels per classic pixel, matching
+  Tiberian Factions' earlier measurement of 21 of them, which its centring tool for voxel vehicles is built on.
 - **Shadows only in the air, and three lines per object:** EA's released source (`BULLET.CPP`, `TECHNO.CPP`,
   `DLLInterface.h`). The Obelisk's 5 line frames are
   in EA's TD source.
 - **Lines in each game:** EA's TD `CONQUER.CPP` (`CC_Draw_Line`), `TECHNO.CPP` (`LineFrame`, `LineMaxFrames`) and
   TD's `DLLInterface.cpp` (the intercept); in EA's Red Alert source the only `NumLines` writes set it to 0, and no
-  `LineFrame` exists. A working mod's Red Alert DLL ports the TD path and draws TD's Obelisk beam with it.
+  `LineFrame` exists. TF's Red Alert DLL ports the TD path and draws TD's Obelisk beam with it.
 - **Free and delayed animations:** EA's export loop (`DLLInterface.cpp`, the layer loop around `Draw_It`) and
   `ANIM.CPP` (the `#ifdef VIC` check in `Render`, `Start()` deferred in `AI`); `VIC` is defined nowhere in the
-  released source. A working mod saw delayed animations drawn before they started, and stopped using the delay.
+  released source. TF saw delayed animations drawn before they started, and stopped using the delay.
 - **Height as a shift north:** EA's `AIRCRAFT.CPP`, `BULLET.CPP` and `TECHNO.CPP` (the `Lepton_To_Pixel(Height)`
   subtractions, and `BulletClass`'s `Coord_Move(Coord, DIR_N, Height)`), and the export, which sends the drawn
-  position. A working mod draws its missile trails north by the missile's height, and its drop pods fall in from
+  position. TF draws its missile trails north by the missile's height, and its drop pods fall in from
   the side because a fall from the south didn't read as one.
 - **The draw scale:** the `scale` default in EA's `TECHNO.H`, the `Scale` field the export fills
   (`DLLInterface.cpp`) and the atom blast's `0x300` in `ADATA.CPP`. The sheared turret and the unscaled box are
-  observed: a working mod scaled a unit this way and dropped it for a classic shape of the right size.
-- **The ground line:** a working mod's walker and its deployed building drew a hop until their art's lowest pixels
+  observed: TF scaled a unit this way and dropped it for a classic shape of the right size.
+- **The ground line:** TF's walker and its deployed building drew a hop until their art's lowest pixels
   matched, measured as above.
-- **Each rule:** found in a shipped mod's art, where a build drew wrong and the fix was confirmed in game. The
+- **Each rule:** found in TF's art, where a build drew wrong and the fix was confirmed in game. The
   canvas-centre anchor was also tested against the competing idea that the crop's centre is the anchor. A tall
   sprite placed by its content centre sank into its own platform, and placing it by the canvas centre fixed it.
-- **The beam example:** the attempts and their results recorded in a working mod's notes and history, OpenTS's
+- **The beam example:** the attempts and their results recorded in TF's notes and history, OpenTS's
   `wave.cpp` (TS's per-pixel displacement), and the vortex fields (`VortexActive`, `VortexX/Y`, `VortexWidth/Height`)
   in EA's `DLLInterface.h`, which EA's `DLLInterface.cpp` fills from `ChronalVortex` with the size fixed at
   `Pixel_To_Lepton(64)`. Each result was seen in play. The vortex was only ever sent EA's 64 px size, so whether
@@ -176,8 +176,9 @@ line's colour. TD's Obelisk never hits this: its `LineMaxFrames` is 5. Lines can
 > **In Tiberian Factions**
 >
 > TF's Tiberian Sun walkers taught most of these rules. The Titan ships exactly 128 shapes: 8 facings × 12 walk
-> frames, plus 32 turret frames. The railgun's beam drew giant white squares until its frame count dropped to 5.
-> Every TF vehicle is centred on its canvas after packing, and given a baked shadow fitted to EA's Mammoth tanks.
+> frames, plus 32 turret frames. The Mammoth Mk. II's railgun beam drew giant squares in its line colour until
+> its frame count dropped to 5. Every TF vehicle is centred on its canvas after packing, and given a baked shadow
+> fitted to EA's Mammoth tanks.
 >
 > ![A TS Titan, selected](img/ts-titan-selected.jpg)
 >

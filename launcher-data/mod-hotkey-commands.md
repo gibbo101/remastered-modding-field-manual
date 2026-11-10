@@ -79,9 +79,9 @@ Cloud and kept after the mod is removed, so a mod shouldn't write it even if it 
   keys and EA's comment, in the stock `CONFIG.MEG` (`GAMECONSTANTS.XML` and `INPUTTRANSLATORCONFIGURATIONS.XML`,
   extracted for this page, whose stock bindings name keys as `VIRTUAL_KEY_F3` and the like); the four `INPUT_REQUEST_MOD_GAME_COMMAND_*` values in `DLLInterface.h` and the
   placeholder in `DLLInterface.cpp`; the four command names in `ClientG.exe`.
-- **Turning them on:** a working mod sets the constant in `GameConstants_Mod.xml`, the commands appear in Options
+- **Turning them on:** Tiberian Factions sets the constant in `GameConstants_Mod.xml`, the commands appear in Options
   > Controls, and its DLL handles them, in skirmish and in LAN.
-- **No default bindings:** the four failed routes above, in a working mod; no input `_Mod` overlay in
+- **No default bindings:** the four failed routes above, in TF; no input `_Mod` overlay in
   `ClientG.exe`; and Kushan's guide on the PPM forums, which describes player-bound mod commands as the intended
   use.
 

@@ -99,7 +99,7 @@ rule above.
   turret frame and `Turret_Adjust` in `UnitClass::Draw_It`, the `FIRE_FACING` branch (`UNIT.CPP`), and
   `Fire_Coord` (`TECHNO.CPP`); the table order from `UnitTypeClass::Turret_Adjust` indexing by `Dir_To_32`
   (`UDATA.CPP`), `Facing32` (`CONST.CPP`, east = 8) and `TechnoClass::BodyShape` (`TECHNO.CPP`, 8 to frame 24).
-- **A working mod:** turreted vehicles laid out hull 0–31 and turret 32–63; a turret block placed from 120 that
+- **Tiberian Factions:** turreted vehicles laid out hull 0–31 and turret 32–63; a turret block placed from 120 that
   vanished until it moved under 128; and a hull-fixed gun unit that wouldn't turn to fire until `is_lock_turret`
   was set. Its art packer reorders each per-frame seat table clockwise before emitting it, and one hand-written
   table of its own is indexed through `BodyShape` instead.

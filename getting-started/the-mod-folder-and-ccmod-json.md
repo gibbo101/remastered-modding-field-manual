@@ -102,12 +102,12 @@ game's mods list. Switch it on there, and restart when the launcher asks.
 
 - **The field names, the version format and the folder names:** strings in `ClientG.exe` (`ccmod.json`, each
   field name, `%d.%d`, `Mods\Red_Alert`, `Mods\Tiberian_Dawn`), Vanilla Conquer's sample `ccmod.json` files and
-  README, and a shipped mod's `ccmod.json`.
-- **The local path:** the folders in a Proton prefix after launch, the path a working deploy script writes to,
+  README, and Tiberian Factions' `ccmod.json`.
+- **The local path:** the folders in a Proton prefix after launch, the path TF's deploy script writes to,
   and the `Mods\Red_Alert` string in `ClientG.exe`. The doubled path in Vanilla Conquer's README exists nowhere in
   that prefix.
 - **The Workshop layout and `game_type` values:** a survey of the `ccmod.json` files of every Workshop mod
-  installed on one machine, a shipped mod's packaging script, and its publishing runbook.
+  installed on one machine, TF's packaging script, and its publishing runbook.
 
 > [!TIP]
 > **In Tiberian Factions**

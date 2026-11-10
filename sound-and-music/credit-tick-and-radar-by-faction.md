@@ -87,7 +87,7 @@ sound needs a copy under a new name, because the stock *sample* is the one repla
 - **Who plays them:** EA's `RADAR.CPP` comment, Vanilla Conquer's `radar.cpp` (the same calls inside
   `#ifndef REMASTER_BUILD`, which its CMake defines for the remaster build), EA's `CreditClass` (`Graphic_Logic` holds the sound, and
   `HouseClass::AI` calls the roll logic-only), and the sample and event names in `ClientG.exe`.
-- **Silencing:** the stock events and samples read from `CONFIG.MEG` and `SFX3D.MEG`. A shipped mod silences the
+- **Silencing:** the stock events and samples read from `CONFIG.MEG` and `SFX3D.MEG`. Tiberian Factions silences the
   four credit-tick events with a silent ADPCM sample, and the two radar samples with 44-byte header-only WAVs.
 - **The DLL's sounds:** in play, GDI and Nod hear TD's credit tick and radar, Tiberian Sun's GDI hears its own, and
   Allies and Soviets keep Red Alert's, with no doubled sound. Tested under Proton on Linux and on the Steam Deck.

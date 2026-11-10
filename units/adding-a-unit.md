@@ -75,9 +75,9 @@ stock unit of similar size, then tune them by eye. For a turret, see [Turrets](t
 
 > [!WARNING]
 > **A registration out of order shifts every type after it,** with no error. Every later type then reads its
-> neighbour's data. In one mod, a helipad built a construction yard and an AI's MCV deployed a helipad, until the
-> registrations were moved to match the enum. Append new types at the end of both the enum and `Init_Heap`, in
-> the same order.
+> neighbour's data. In Tiberian Factions, a helipad built a construction yard and an AI's MCV deployed a helipad, until
+> the registrations were moved to match the enum. Append new types at the end of both the enum and `Init_Heap`, in the
+> same order.
 
 The same rule holds for every type heap, animations included: `AnimTypeClass::Init_Heap` (`ADATA.CPP`) carries EA's
 own warning that its types "must be allocated in the exact order that they are specified in the AnimType
@@ -114,7 +114,7 @@ donor draws at the donor's size (see [HD tilesets](../art/hd-tilesets-and-zips.m
 draw scale passed to `Techno_Draw_Object`: a scale shears the turret off the hull (see
 [How the launcher draws sprites](../art/how-the-launcher-draws-sprites.md#rules)).
 
-Three ways to supply one, each in use in a shipped mod:
+Three ways to supply one, each in use in Tiberian Factions:
 
 - **The original game's own shape.** A Tiberian Dawn unit can use TD's classic shape, copied from TD's MIX
   under your unit's art name.
@@ -160,7 +160,7 @@ A sound plays by name: add it to the DLL's sound table, and route it in the laun
   donor in `AnimTypeClass::Init` (`ADATA.CPP`); the smoke puffs in `BulletClass::AI` (`BULLET.CPP`); `Image=`
   (`TECHNO.CPP`), `Tracked=` (`UDATA.CPP`) and `Burst=` (`WEAPON.CPP`); and `new MFCD(...)` for EA's own MIXes.
 - **The game's files:** stock `rules.ini`'s land speeds, from `REDALERT.MIX`.
-- **A working mod:** dozens of added vehicles, each with a classic shape in its own MIX: TD's real shapes for TD
+- **Tiberian Factions:** dozens of added vehicles, each with a classic shape in its own MIX: TD's real shapes for TD
   units, transparent generated stubs sized to each unit for the rest, and donor images for some infantry. Also the
   heap-order bug and its fix, and the invisible unit and green placeholder seen before the shapes went in. The
   heap-order bug was hit for animations too: with a new animation out of order, an infantry death that asked for

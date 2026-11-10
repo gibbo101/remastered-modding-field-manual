@@ -113,7 +113,7 @@ breaks the screen.
   converted with the command above played in skirmish rotations and the jukebox.
 - **The DLL can't play music:** the remaster build compiles `soundio_null.cpp`, and EA's `DLLInterface.cpp` has its
   theme queueing commented out.
-- **The patch:** both call sites and their stock targets read from `ClientG.exe` on disk. In a shipped mod,
+- **The patch:** both call sites and their stock targets read from `ClientG.exe` on disk. In Tiberian Factions,
   each faction's choice plays in skirmish, including in LAN. The jukebox lists optional tracks only while they're
   installed. Tested under Proton on Linux and on the Steam Deck.
 - **Two sources only:** the lobby pick and track-list addresses (TF's notes and code). They're data, not code, so
