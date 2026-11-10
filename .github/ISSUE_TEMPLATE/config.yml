@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: How to contribute
+    url: https://github.com/gibbo101/remastered-modding-field-manual/blob/main/CONTRIBUTING.md
+    about: What makes a useful report, and how to add a finding of your own.

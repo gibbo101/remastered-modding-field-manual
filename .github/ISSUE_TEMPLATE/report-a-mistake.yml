@@ -1,0 +1,59 @@
+name: Report a mistake
+description: Something on a page is wrong, out of date, or didn't work for you.
+title: "Mistake: <page title>"
+labels: [mistake]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for checking the manual against reality. Leave out anything private: no Steam names, IDs or machine paths in text or screenshots.
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: A link to the page, or its title.
+      placeholder: https://gibbo101.github.io/remastered-modding-field-manual/...
+    validations:
+      required: true
+  - type: textarea
+    id: claim
+    attributes:
+      label: The claim
+      description: The sentence or step that's wrong. Quote it if you can.
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: What you saw instead
+      description: What happened when you tried it.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: How you checked
+      description: A test in game, the game's released source, the game's own files, or another modder's findings. Screenshots, logs and file names all help.
+  - type: input
+    id: build
+    attributes:
+      label: Game build
+      description: Steam's build ID, or the version on the launcher's main menu.
+      placeholder: "e.g. version 1.153"
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Windows
+        - Linux (Proton)
+        - Steam Deck
+        - Other
+  - type: dropdown
+    id: graphics
+    attributes:
+      label: Graphics mode
+      options:
+        - HD
+        - Classic
+        - Not relevant
