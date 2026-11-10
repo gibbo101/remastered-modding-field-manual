@@ -17,7 +17,7 @@ CONTENT="$QUARTZ/content"
 rm -rf "$CONTENT"
 mkdir -p "$CONTENT"
 rsync -a --exclude .git --exclude .github --exclude .obsidian --exclude .trash --exclude .quartz-build \
-  --exclude public --exclude site --exclude handoff --exclude HANDOFF.md --exclude CLAUDE.md --exclude README.md \
+  --exclude public --exclude site --exclude handoff --exclude HANDOFF.md --exclude CLAUDE.md --exclude CONTRIBUTING.md --exclude README.md \
   "$ROOT"/ "$CONTENT"/
 cp "$ROOT/README.md" "$CONTENT/index.md"
 

@@ -26,7 +26,9 @@ what it does with the technique.
 > This manual is written and kept up to date with an AI assistant (Anthropic's Claude). It drafts each page from
 > Tiberian Factions' own notes and code. As work on the mod turns up new lessons, it adds them here and revises the
 > pages they affect. Gibbo101 reviews every change, and every claim is checked against Tiberian Factions or the game's
-> source before it goes in. Even so, mistakes can get through. If something here is wrong, please open an issue.
+> source before it goes in. Even so, mistakes can get through. If something here is wrong, please
+> [open an issue](https://github.com/gibbo101/remastered-modding-field-manual/issues); [CONTRIBUTING.md](https://github.com/gibbo101/remastered-modding-field-manual/blob/main/CONTRIBUTING.md) says what helps, and how to add a
+> finding of your own.
 >
 > Everything here is provided as-is, with no warranty. Back up your game and saves before you try anything,
 > especially the pages that patch the launcher's memory. You use these techniques at your own risk.

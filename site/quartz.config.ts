@@ -15,7 +15,7 @@ const config: QuartzConfig = {
     analytics: null,
     locale: "en-US",
     baseUrl: "gibbo101.github.io/remastered-modding-field-manual",
-    ignorePatterns: ["private", "templates", ".obsidian", "handoff", "site", "HANDOFF.md", "CLAUDE.md"],
+    ignorePatterns: ["private", "templates", ".obsidian", "handoff", "site", "HANDOFF.md", "CLAUDE.md", "CONTRIBUTING.md"],
     defaultDateType: "modified",
     theme: {
       fontOrigin: "googleFonts",
