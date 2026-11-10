@@ -8,7 +8,7 @@ import * as Plugin from "./quartz/plugins"
  */
 const config: QuartzConfig = {
   configuration: {
-    pageTitle: "Remastered Modding Field Manual",
+    pageTitle: "Red Alert Remastered Modding Field Manual",
     pageTitleSuffix: "",
     enableSPA: true,
     enablePopovers: true,

@@ -1,13 +1,15 @@
 ---
-title: Remastered Modding Field Manual
+title: Red Alert Remastered Modding Field Manual
 ---
 
 > [!NOTE]
 > EA has not endorsed and does not support this product.
 
-# Remastered Modding Field Manual
+# Red Alert Remastered Modding Field Manual
 
-*What we learned modding C&C Remastered, building Tiberian Factions.*
+*Modding Command & Conquer Remastered, as learned building Tiberian Factions.*
+
+**Read it online:** https://gibbo101.github.io/remastered-modding-field-manual/
 
 Techniques and facts about modding the Command & Conquer Remastered Collection, written so any modder can use
 them. Each page covers one fact or technique: what's true, how it was verified, and which build of the game it holds
@@ -78,6 +80,8 @@ what it does with the technique.
 - [New maps in the skirmish Official list](maps-and-lobby/new-maps-in-the-skirmish-list.md): listing maps
   with data, and launching them under an entry the game already knows.
 - [Bigger maps](maps-and-lobby/bigger-maps.md): Red Alert maps up to 255×255, and what caps them there.
+- [A map editor for Linux and mods](maps-and-lobby/a-map-editor-for-linux-and-mods.md): editing Red Alert and
+  Tiberian Dawn maps on Linux, with a mod's own types learned from a manifest it ships.
 - [Adding a theatre of your own](maps-and-lobby/custom-theatres.md): custom terrain, and the wall that limits
   it to reskinning existing template names.
 - [Custom campaigns: replacing the official ones](maps-and-lobby/custom-campaigns.md): replacing or adding to the official campaigns, and
@@ -226,5 +230,5 @@ Each page that uses his findings says so.
 
 ## License
 
-Text is licensed [CC BY 4.0](LICENSE). Use it however you like, as long as you credit the Remastered Modding Field
-Manual. Command & Conquer is a trademark of Electronic Arts.
+Text is licensed [CC BY 4.0](LICENSE). Use it however you like, as long as you credit the Red Alert
+Remastered Modding Field Manual. Command & Conquer is a trademark of Electronic Arts.

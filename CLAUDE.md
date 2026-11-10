@@ -1,8 +1,8 @@
-# Remastered Modding Field Manual: rules for writing it
+# Red Alert Remastered Modding Field Manual: rules for writing it
 
 A public, openly licensed knowledge base on modding the C&C Remastered Collection, written as an Obsidian vault.
-Tagline: *What we learned modding C&C Remastered, building Tiberian Factions*. `HANDOFF.md` (local, gitignored) holds
-the scope and the open decisions.
+Tagline: *Modding Command & Conquer Remastered, as learned building Tiberian Factions*. `HANDOFF.md` (local,
+gitignored) holds the scope and the open decisions.
 
 ## Nothing private, ever
 This repo is public. No IPs, hostnames, Steam accounts or IDs, machine paths, emails, real names or notes on

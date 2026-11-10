@@ -177,11 +177,9 @@ A bigger grid is only half the job: someone has to make the maps. Today no map e
 - **EA's map editor**, in the released source, caps a Red Alert map at 128 × 128
   (`MaxSize = new Size(128, 128)` in `CnCTDRAMapEditor/RedAlert/Constants.cs`).
 - **Nyerguds' Mobius editor**, the community's fork of EA's, keeps the same cap.
-- **[cnc-map-editor](https://github.com/gibbo101/cnc-map-editor)**, by this manual's author, is a work in
-  progress. It's built on Nyerguds' Mobius editor: Mobius's core (formats, map model, renderer) with a rebuilt
-  interface, running natively on Linux. It's mod-aware, learning a mod's types and theatres from a manifest the mod
-  ships, and it has a headless command line that scripts and AI assistants can drive. It also stops at 128 × 128
-  for now. Because it learns a mod's grid from data, it's the natural place for 256-grid support to land.
+- **[cnc-map-editor](a-map-editor-for-linux-and-mods.md)**, by this manual's author, is a work in progress: Mobius's
+  core with a Linux-native interface, mod-aware through a manifest the mod ships, with a headless command line. It
+  also stops at 128 × 128 for now. Because it learns a mod's grid from data, it's the natural place for 256-grid support to land.
 
 Until then, big maps are written by script: a program that writes the format-4 scenario directly, cell numbers
 and MapPack included. That's fine for test maps, such as open ground, mazes and ore fields at each start, but not

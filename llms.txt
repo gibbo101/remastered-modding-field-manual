@@ -1,4 +1,4 @@
-# Remastered Modding Field Manual
+# Red Alert Remastered Modding Field Manual
 
 > Techniques and facts about modding the Command & Conquer Remastered Collection (Steam app 1213210), verified in
 > Tiberian Factions. Each page is self-contained and laid out the same way: when you need it, the fact or method, how it
@@ -96,6 +96,12 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
   offsets on the launcher's 128-wide grid, skip the legacy render. Byte cell fields cap it at 255; the engine survey:
   negative cell IDs, zone wrap, HIGH_COORD_MASK, the MapPack layout; MapPack framing: 0xFFFF clear, 8 KB LCW blocks
   behind two u16 counts, 70-character numbered CRLF lines, signed overlay bytes.
+- [A map editor for Linux and mods](maps-and-lobby/a-map-editor-for-linux-and-mods.md): cnc-map-editor, Mobius's
+  core on .NET 8 with an Avalonia window, for RA and TD on Linux and the Steam Deck; saves byte-identical to Mobius's
+  on all 230 official RA maps, render within 5 of Mobius's under partial-alpha sprites; mapeditor.json beside
+  ccmod.json (format 1: buildings, units, infantry, templates, resources; bad entries skipped with warnings; stock
+  then earlier mod wins); the cncmap CLI (info, validate, render, save, edit, new, generate, expand-mission, mods);
+  caps 128x128 RA, 64x64 TD.
 
 - [Adding a theatre of your own](maps-and-lobby/custom-theatres.md): slot and DLL steps are proven by TD's theatres,
   but a new terrain template name with loose art crashes the launcher; custom terrain reskins existing template names
