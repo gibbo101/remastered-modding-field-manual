@@ -135,7 +135,7 @@ extent is about 0.81 of its side-on length), but a hull's height inflates that r
   EA's guidelines don't license the music (see [Open questions](../open-questions.md#music-built-from-the-players-own-copy)).
 - **Buildings are isometric.** TS's building sprites are drawn for TS's isometric camera, and no re-render can
   change that, so they look tilted beside Red Alert's near-top-down buildings. Rebuilding them from 3D models in
-  Remastered's camera fixes it.
+  Remastered's camera fixes it: see [Rebuilding art as 3D models](rebuilding-art-as-3d-models.md).
 
 ## Command & Conquer 3
 

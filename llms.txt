@@ -259,6 +259,12 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
   DIG.SHP 37 frames and SAPC.HVA one; a building's frame 2 is never drawn; walker frames from WalkFrames and
   FiringFrames; <Image>BARL.VXL barrels even on SHP units, APC's water hull APCW.VXL; the Firestorm Generator's
   files are in TIBSUN.MIX.
+- [Rebuilding art as 3D models](art/rebuilding-art-as-3d-models.md): TS buildings and units rebuilt as 3D models
+  fitted to TS's sprites and voxels; TS's camera as maths (48x24 diamond, 0.2297 px per unit of height, the view-ray
+  slide, the foundation's north corner at the frame centre); shape from pixels and the MK build-up; heightfield plus
+  slabs; a ~0.9 silhouette shape check before materials; one light, house green (0,214,0) as albedo; TS voxel
+  normals capped at 25 degrees; overlays cut against their base frame; glTF export by marching cubes with a
+  house-colour vertex mask.
 - [Building selection boxes](art/building-selection-boxes.md): the launcher centres a building's selection box on
   its plot and takes only the size from the DLL; a misplaced box means the art is seated off the plot's centre.
 
