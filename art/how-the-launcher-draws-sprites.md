@@ -1,6 +1,6 @@
 ---
 title: How the launcher draws sprites
-description: The rules the HD renderer applies to unit, building, effect and beam art (canvas-centre anchoring and how EA centres its vehicles, height drawn as a shift north, the 128-shape limit on second draws, no rotation, draw scale about each draw's anchor, an alpha cutoff near half, baked shadows, beam frames 0 to 4), each one learned from a build that drew wrong.
+description: The rules the HD renderer applies to unit, building, effect and beam art (canvas-centre anchoring and how EA centres its vehicles, a unit's box sized from its reach and walkers centred for it, height drawn as a shift north, the 128-shape limit on second draws, no rotation, draw scale about each draw's anchor, an alpha cutoff near half, baked shadows, beam frames 0 to 4), each one learned from a build that drew wrong.
 tags: [art, sprites, hd, tilesets, launcher]
 holds_for: Steam build 21590013
 status: verified
@@ -50,6 +50,12 @@ deploys into, must share a ground line, or the sprite hops north or south when o
 
 Selection boxes follow the same logic: the launcher centres a unit's box on the unit and a building's on its plot,
 and takes only the size from the DLL. See [Building selection boxes](building-selection-boxes.md).
+
+**Size a unit's box from its reach.** The launcher centres a unit's box on the unit and draws the health bar above
+it, so make the box the art's width by twice the farther of its top and bottom from the canvas centre, or the bar
+cuts into the art. That makes centring matter most for tall units: a walker drawn with its feet at the canvas centre
+gets a box twice its height, half of it empty below its feet. Centre a walker's legs and body on the canvas the way a
+vehicle's hull is centred, its turret sticking up.
 
 ## Height is a shift north
 
@@ -158,6 +164,10 @@ line's colour. TD's Obelisk never hits this: its `LineMaxFrames` is 5. Lines can
   observed: TF scaled a unit this way and dropped it for a classic shape of the right size.
 - **The ground line:** TF's walker and its deployed building drew a hop until their art's lowest pixels
   matched, measured as above.
+- **Box size and tall units:** TF sizes every HD unit's box this way (`UnitTypeClass::Dimensions`). Its C&C3
+  Juggernaut and Avatar, packed with their feet at the canvas centre, drew boxes twice their height in game, with the
+  bar over empty ground. Centred as above, their boxes measure 39 × 55 and 32 × 40 classic pixels, the proportions of
+  its Tiberian Sun walkers' boxes (the Titan's 29 × 49), which sit right in game.
 - **Each rule:** found in TF's art, where a build drew wrong and the fix was confirmed in game. The
   canvas-centre anchor was also tested against the competing idea that the crop's centre is the anchor. A tall
   sprite placed by its content centre sank into its own platform, and placing it by the canvas centre fixed it.

@@ -237,7 +237,8 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 
 - [How the launcher draws sprites](art/how-the-launcher-draws-sprites.md): an HD frame's .meta is a canvas size plus a
   crop box, anchored by canvas centre; second draws use shapes 0-127; no rotation; alpha below ~128 discarded; ground
-  shadows are baked (black, alpha 191); beam line frames 0-4 only, 3 lines per object; only TD's DLL exports beam
+  shadows are baked (black, alpha 191); a unit's box is its art's width by twice its reach from centre, so tall walkers
+  are centred like hulls, not stood on the centre; beam line frames 0-4 only, 3 lines per object; only TD's DLL exports beam
   lines; delayed animations draw before they start; height draws as a shift north; a draw scale scales each draw about
   its anchor (the turret shears); EA's measured vehicle centring (Mammoths 2.5 px high, bottoms 6-14 px below); the
   vortex's fixed 64 px export, top-left anchor and ChronalVortex fields.
