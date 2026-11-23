@@ -107,6 +107,7 @@ what it does with the technique.
 - [Adding a faction](engine/adding-a-faction.md): a new playable side on Red Alert's eight country rows.
 - [LAN games](engine/lan-games.md): one simulation on the host, and what that means for per-player code.
 - [Save versions](engine/save-versions.md): keeping players' saves safe as your classes grow.
+- [Start-up time](engine/start-up-time.md): where the wait before the front end goes, and the part a mod can change.
 - [Porting CFE Patch Redux](engine/cfe-patch-ports.md): bringing CFE's features and fixes into a Vanilla Conquer DLL.
 
 ### Units and buildings

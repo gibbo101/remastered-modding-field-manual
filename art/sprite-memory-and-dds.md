@@ -36,6 +36,11 @@ one of its asset packs:
 | The same art, whole-canvas DDS frames | 4,246 MB | 4,284 MB |
 | DDS frames, preload off | 534 MB | 700 MB |
 
+**Mounting a ZIP unzips all of it.** When the launcher mounts an art ZIP it unzips every `.tga` member into memory
+at once, before any frame is asked for. With the preload on, every ZIP is mounted at start-up, so the time spent
+unzipping grows with the total size of a mod's art. In one measurement, unzipping was about two thirds of the art
+load (see [Start-up time](../engine/start-up-time.md)). Reading a frame later costs nothing extra.
+
 The launch option `NOSPLASHPRELOAD` turns the preload off, and each tile then loads when it's first drawn. **But a
 tile then opens only the ZIP that carries its own name.** A tile whose frames sit in another tile's ZIP draws as
 the missing-texture frog: shared art, and the opener tiles that draw
@@ -44,7 +49,9 @@ either needs the preload.
 
 ## What a ZIP frame costs
 
-The launcher holds a ZIP's frames uncompressed: four bytes a pixel of each frame's crop. Cropping each frame to its
+The launcher holds a ZIP's frames uncompressed: four bytes a pixel of each frame's crop. Each frame becomes its own
+texture, 8-bit RGBA in sRGB with no mipmaps, created on the launcher's main thread: the TGA is turned top-down and
+its BGRA bytes become RGBA. A 300 × 300 frame costs 360 KB of video memory, whatever its compression in the ZIP. Cropping each frame to its
 visible pixels (its `.meta` `crop`, see [How the launcher draws sprites](how-the-launcher-draws-sprites.md)) is the
 first saving. A finer canvas costs the square: art packed at 8 canvas pixels per classic pixel holds about 2.25
 times the pixels of EA's 5.33.
@@ -77,6 +84,8 @@ ZIPs.**
 - **The preload:** the `NOSPLASHPRELOAD` option is in `ClientG.exe`; Tiberian Factions' art dropped to the frog
   without it, and its memory fell as in the table. The test the launcher makes before the preload was read from
   `ClientG.exe` on disk.
+- **The unzip at mount and the texture format:** the launcher's code, and a DLL hook on the mount and on texture
+  creation that logged each ZIP's members and each texture's size and format as it was made.
 - **The memory figures:** measured by TF on one desktop (an RTX 5070) on the same map and start each
   time. They show proportions; other cards and drivers will differ.
 - **The DDS rules:** TF's frames in each form, and its shipped loose DDS terrain frames, UI atlas and

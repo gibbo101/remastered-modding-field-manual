@@ -147,6 +147,8 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [Save versions](engine/save-versions.md): SAVEGAME_VERSION is the sum of class sizes and DLLLoad runs before the
   version check, so lead the DLL's save data with your own marker and version; a launcher patch can reuse the load
   screen's missing-map refusal.
+- [Start-up time](engine/start-up-time.md): a fixed 4 s sleep before mods load, about 4 s of graphics start-up, a
+  1.2 s GPU benchmark and every save's preview unzipped each launch; the art load is the only large part a mod owns.
 - [Porting CFE Patch Redux into your DLL](engine/cfe-patch-ports.md): CFE ships its own RedAlert.dll, so port it
   instead; Vanilla Conquer already has some of its fixes; find changes by "Chthon CFE Note" and the INI keys; Vanilla
   Conquer removed EA's SaveLoadPadding, so ported fields change the save version; zoom is data only; attack-move

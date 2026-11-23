@@ -149,6 +149,21 @@ Team colours are the same kind of data, and published mods do change them (see
 - **The test:** two mods, each shipping a different copy of the same small loose file (one string in a text file
   is enough), swapped between `load_order` values.
 
+## BC7 sprite frames from a mod's DLL
+
+Holding a mod's sprite frames compressed in video memory, instead of as the launcher's uncompressed RGBA.
+
+- **Established:** a mod DLL loaded by the launcher can swap a sprite texture for a BC7 copy as it's created (the
+  launcher passes an explicit view format, which has to change with it), and can skip the unzip of a frame it holds
+  BC7 for at mount (see [Sprite memory and DDS](art/sprite-memory-and-dds.md)). Measured under Proton on a desktop:
+  video memory down about 60% for a large HD pack, start-up 26% faster, art identical at normal zoom with a full BC7
+  encoder. On a Steam Deck, BC7 for the mod's own art only: start-up 40 s to 34 s, graphics memory in a match
+  4.8 GB to 3.4 GB, the same 90 fps, and a player couldn't tell the two builds apart blind.
+- **Untested:** Windows. BC7 sizes that aren't a multiple of 4 may be refused there; padding the frame and its
+  `.meta` crop to a multiple of 4 avoids it.
+- **The test:** the same build on Windows, on the same map and start each time.
+- **Full context:** TF's [sprite memory design](https://github.com/gibbo101/cnc-ra-tiberian-factions/blob/main/docs/sprite-memory.md).
+
 ## Theatre slots past 5
 
 - **Established:** six slots (0 to 5) work. Nothing found so far caps the list.
