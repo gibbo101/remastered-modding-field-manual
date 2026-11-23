@@ -4,7 +4,7 @@ description: A custom terrain theatre for Red Alert. The slot and DLL steps are 
 tags: [maps, terrain, theatres, tilesets, dll]
 holds_for: Steam build 21590013
 status: verified
-unproven: [any route to new terrain template names (new names with loose art crash the launcher), a stock tileset copied under a new name and root folder with loose art, TILEPATCHES as a whole-theatre route, whether a terrain tileset costs video memory whole or per tile drawn, theatre slots past 5]
+unproven: [any route to new terrain template names (new names with loose art crash the launcher), a stock tileset copied under a new name and root folder with loose art, TILEPATCHES as a whole-theatre route, theatre slots past 5]
 ---
 
 > [!NOTE]
@@ -117,23 +117,21 @@ its index, `DATA\XML\TILESETS.XML`, lists (19 files). A published mod adds files
 indexes with loose copies, so a loose `TILESETS.XML` may work. **Unproven**, and under the wall above it wouldn't
 open new art anyway.
 
-## What's open: video memory
+## Video memory: per tile used
 
-The launcher keeps every texture it draws in video memory. Whether a terrain tileset costs memory as a whole, or
-only for the tiles a map draws, isn't settled. One desktop reading, one match each, saw 4,796 MiB on an interior
-map with the stock interior tileset and 4,812 MiB with 163 tiles added to it that the map never draws: too small a
-sample to tell a cost from noise. That decides how big a custom tileset can be:
+A terrain tileset costs video memory only for the tiles a map uses, and they load during the map's loading
+screen. A large tileset is fine: each map pays only for its own pieces, and no terrain loads while the map is
+played.
 
-- **Per tile drawn:** a large tileset is fine, and each map pays only for what it uses.
-- **Whole:** a large tileset costs every map that uses the theatre. Keep it small: a set of pieces that tile
-  together (ground textures, transitions by corner, cliffs, ramps) rather than every unique piece.
-
-**A test that settles it:** a data-only mod that ships one stock terrain tileset plus a few thousand extra tiles no
-map uses, with video memory read in the same match with the mod off and then on. If memory rises by roughly the
-size of the extra tiles, tilesets load whole. If it doesn't rise, only drawn tiles load.
+Measured with a data-only mod shipping Red Alert's stock Temperate tileset plus 4,000 tiles no map uses (loose
+256 x 256 DXT5 frames, 334 MiB), enabled alone, on Keep off the Grass on one desktop. Video memory was 2,554 MiB
+at the menu and 2,592 to 2,594 MiB in the match, with or without the mod. File read times showed the launcher
+never opened an unused tile. Loose copies of the clear tile's 20 frames showed the 16 frames the map uses read
+in one burst inside the loading screen, and none at the menu or later.
 
 ## How it was verified
 
+- **Terrain video memory:** the test above, on one desktop under Proton.
 - **The theatre steps:** TD's three theatres, proven in Tiberian Factions; see
   [TD theatres in Red Alert](../using-what-the-player-owns/td-theatres-in-red-alert.md) for their three-way
   checks. `TemplateType`'s width is in TF's source.

@@ -136,11 +136,6 @@ Team colours are the same kind of data, and published mods do change them (see
   `CNC_Config` and at match start, against a `rules.ini` with distinct difficulty values.
 - **Full context:** TF's [CONFIG.MEG lever audit](https://github.com/gibbo101/cnc-ra-tiberian-factions/blob/main/docs/config-meg-lever-audit.md).
 
-## Whether a terrain tileset costs video memory whole
-
-- **Established and untested:** see "What's open: video memory" on
-  [Adding a theatre of your own](maps-and-lobby/custom-theatres.md), which also describes the test.
-
 ## Which mod's loose file wins
 
 - **Established:** when two enabled mods ship the same loose file, the launcher reads one of them, not a merge (see

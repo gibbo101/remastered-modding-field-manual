@@ -4,7 +4,7 @@ description: "The launcher keeps every texture of every enabled mod in video mem
 tags: [art, video-memory, dds, zip, performance, hd]
 holds_for: Steam build 21590013
 status: verified
-unproven: [whether a terrain tileset costs memory whole or per tile drawn, the numbers on cards other than the one measured]
+unproven: [the numbers on cards other than the one measured]
 ---
 
 > [!NOTE]
@@ -40,6 +40,9 @@ one of its asset packs:
 at once, before any frame is asked for. With the preload on, every ZIP is mounted at start-up, so the time spent
 unzipping grows with the total size of a mod's art. In one measurement, unzipping was about two thirds of the art
 load (see [Start-up time](../engine/start-up-time.md)). Reading a frame later costs nothing extra.
+
+Terrain is the exception: a map's terrain tiles load during its loading screen, and only the tiles it uses (see
+[Adding a theatre of your own](../maps-and-lobby/custom-theatres.md#video-memory-per-tile-used)).
 
 The launch option `NOSPLASHPRELOAD` turns the preload off, and each tile then loads when it's first drawn. **But a
 tile then opens only the ZIP that carries its own name.** A tile whose frames sit in another tile's ZIP draws as
