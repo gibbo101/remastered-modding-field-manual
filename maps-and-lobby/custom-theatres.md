@@ -4,7 +4,7 @@ description: A custom terrain theatre for Red Alert. The slot and DLL steps are 
 tags: [maps, terrain, theatres, tilesets, dll]
 holds_for: Steam build 21590013
 status: verified
-unproven: [any route to new terrain template names (new names with loose art crash the launcher), a stock tileset copied under a new name and root folder with loose art, TILEPATCHES as a whole-theatre route, theatre slots past 5]
+unproven: [any route to new terrain template names (new names with loose art crash the launcher), a stock tileset copied under a new name and root folder with loose art, theatre slots past 5]
 ---
 
 > [!NOTE]
@@ -67,9 +67,8 @@ with no DLL needed. The radar samples the new art too, so the minimap matches.
 - **Frames can ship as loose DDS** at the same path, which keeps a reskin's video memory down: see
   [Sprite memory and DDS](../art/sprite-memory-and-dds.md).
 
-**Per-map art without new names:** `Data/XML/TILEPATCHES/` holds per-map cell placements
-(`MAPS/<game>/<MAP>_MAPPATCHES.XML`) and animated multi-cell texture blocks (`PATCHES/<name>_PATCH.XML`, with a
-frame rate). Loose copies override them, with no size rule. **Unproven** as a route for a whole custom theatre.
+**Per-map art under new names:** the launcher's tile patches draw textures of your own over a map's cells, under
+new names, and can cover a whole map. See [Per-map art with tile patches](per-map-art-with-tile-patches.md).
 
 ## Can there be a seventh theatre?
 
@@ -159,8 +158,6 @@ in one burst inside the loading screen, and none at the menu or later.
 > [!TIP]
 > **In Tiberian Factions**
 >
-> TF plays Red Alert maps in TD's three theatres, slots 3 to 5, through the steps above. Tiberian Sun theatres
-> are a parked design in TF's own docs: the template wall means their art would have to be drawn under existing
-> template names.
->
-> The memory test is built as a data-only mod and ready to run, but it hasn't been run yet.
+> TF plays Red Alert maps in TD's three theatres, slots 3 to 5, through the steps above. Tiberian Sun's maps go round
+> the template wall instead: each is drawn from TS's own picture of it with
+> [tile patches](per-map-art-with-tile-patches.md).

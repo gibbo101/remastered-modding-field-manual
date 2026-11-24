@@ -86,6 +86,8 @@ what it does with the technique.
   Tiberian Dawn maps on Linux, with a mod's own types learned from a manifest it ships.
 - [Adding a theatre of your own](maps-and-lobby/custom-theatres.md): custom terrain, and the wall that limits
   it to reskinning existing template names.
+- [Per-map art with tile patches](maps-and-lobby/per-map-art-with-tile-patches.md): textures of your own over a
+  map's cells under new names, up to a whole map drawn from a picture.
 - [Custom campaigns: replacing the official ones](maps-and-lobby/custom-campaigns.md): replacing or adding to the official campaigns, and
   what launches.
 - [Per-AI lobby difficulty](maps-and-lobby/per-ai-lobby-difficulty.md): honouring each AI's lobby difficulty by

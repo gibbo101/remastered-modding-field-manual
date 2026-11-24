@@ -125,7 +125,8 @@ Alert's houses, and CFE Patch Redux's Tiberian Dawn copy rearranges TD's multipl
   `GameConstants.xml` all along.
 - **One copy wins across mods.** When two enabled mods ship the same loose file, the launcher reads one of them
   and never merges the two. So an add-on can't add entries to a list file its parent mod also ships: the parent
-  has to own the list. **Unproven:** which mod's copy wins. Don't rely on load order for it.
+  has to own the list. In one test the parent's `INSTANCES.XML` (load order 1) won over an add-on's (load order 2);
+  **unproven** why, so don't rely on load order for it.
 - **A new file name isn't loaded.** The launcher loads only the files its index lists. For tilesets that's
   `DATA\XML\TILESETS.XML`, which names exactly 19 files: TD's, Red Alert's and the `Common_` ones. A
   `MY_UNITS.XML` beside them is never read, so put your entries into a copy of a listed file such as `RA_UNITS.XML`.

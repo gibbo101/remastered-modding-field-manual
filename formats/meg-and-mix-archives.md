@@ -54,8 +54,10 @@ u32  string table size
 - **Shipping a changed `CONFIG.MEG` in a mod has a hard rule:** every file inside must keep its exact size. Most
   of the time a loose file is the better route. See
   [Overriding the launcher's data](../launcher-data/overriding-launcher-data.md).
-- **Don't ship a texture MEG.** A mod's own `TEXTURES_SRGB.MEG` would replace the base one whole, all of its
-  thousands of textures. Ship loose texture files instead.
+- **At most 65,535 files.** The name index is 16 bits, so one archive names no more.
+- **Don't ship a texture MEG under a base name.** A mod's own `TEXTURES_SRGB.MEG` would replace the base one whole, all
+  of its thousands of textures. Ship loose texture files instead, or, for tens of thousands, archives of your own that
+  your DLL mounts: see [Per-map art with tile patches](../maps-and-lobby/per-map-art-with-tile-patches.md#many-textures-ship-them-in-archives).
 
 ## Classic MIX
 
