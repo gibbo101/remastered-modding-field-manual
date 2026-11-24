@@ -103,6 +103,13 @@ mission's map (`override_map_name` in `CNC_Start_Instance_Variation`).
 5. **Optional: thumbnails without shipping any.** Hook the GUI's set-texture call and swap in the base game's TD
    thumbnail for your TD entries.
 
+### Showing an entry only sometimes
+
+Every map list asks one function whether to show each entry, and in this client that function is a stub that
+always says yes. To hide entries under a condition of your own, such as maps whose add-on isn't loaded, redirect
+its calls to a function that asks the stub first and then your test. It is a `thiscall` on the list, with the
+entry's instance as its one argument (`ret 4`); the instance's `<Mission>` number is at `+0x48C`.
+
 ### Addresses in this client
 
 | What | Address | Stock bytes or target |
@@ -112,6 +119,7 @@ mission's map (`override_map_name` in `CNC_Start_Instance_Variation`).
 | Instance key lookup | `0x14FE820` | `55 8B EC 56 8B F1` |
 | GUI set-texture | `0xF604C0` | `55 8B EC 80 3D 68 84 FE 01 00` |
 | Launch message | vtable `0x1C055A4` | instance name string at `+0x30` |
+| Entry-listed test (stub) | `0x11875C0` | `B0 01 C2 04 00` (`mov al, 1; ret 4`), called from `0x68E3DA`, `0x690E89`, `0x6C1A6B`, `0x6C1B92`, `0x6CB669`, `0x6D466A`, `0x6D6519`, `0x719CDB`, `0x719E02`, `0x724C1A` |
 
 Each call site is `E8` + an offset to the function shown. All of these were read from the client file on disk.
 
@@ -168,6 +176,8 @@ as `UGC_<a>_<b>_RADAR_SMALL.TGA`.
   own name, `SkirmishGameManagerClass::Host_Game`, for a log line (`push 0x1C32054` at `0x7F1C9A`). TF
   lists and plays all 34 of TD's skirmish maps this way, from the skirmish screen and in LAN games, under Proton on
   Linux and on the Steam Deck.
+- **Hiding entries:** TF redirects the ten calls of the entry-listed stub and hides its Tiberian Sun maps while
+  their add-on is off; with the add-on on they are listed, and with it off the skirmish list skips them.
 - **The server's refusal:** a new instance hitting the server's assert was observed in play, and the assert text
   and its source file are in `InstanceServerG.exe`. The ignored `OverrideMapName` edit was observed once, when a
   hijacked community entry still loaded its stock map.
