@@ -43,14 +43,14 @@ Data/XML/TILEPATCHES/PATCHES/<PATCH>_PATCH.XML      a patch's cells and their te
 Data/ART/TEXTURES/SRGB/PATCHES/<PATCH>/<TEXTURE>-00.DDS
 ```
 
-The map file places patches at cells counted from the top-left of the map's bounds (its `[Map]` `X` and `Y`), not
-from the corner of the grid:
+The map file places patches at cells counted from one cell up and left of the map bounds' top-left (its `[Map]` `X`
+and `Y`), not from the corner of the grid: a patch at `X` 1, `Y` 1 starts on the bounds' first cell.
 
 ```xml
 <XML>
  <MapPatchingDataClass>
   <PatchPositions>
-   <Entry><X>0</X><Y>0</Y><PatchName>RA_MYMAP_0001</PatchName></Entry>
+   <Entry><X>1</X><Y>1</Y><PatchName>RA_MYMAP_0001</PatchName></Entry>
   </PatchPositions>
  </MapPatchingDataClass>
 </XML>
@@ -147,6 +147,10 @@ textures read in 2.6 seconds and 9,216 in 7 seconds. Terrain loads the same way:
 - **Loading:** the textures' file read times: each map's were read in its loading screen; an unplayed map's never were.
 - **Keying:** logging the name the launcher passes to its patch loader: an official map's file name, a carrier map's
   played file, and an empty name for a Custom-list map.
+- **Positions:** a whole-map picture placed from position 0 drew one cell up and left of its land: the camera's
+  top-left corner showed the picture's second cell, stock ground showed along the right and bottom edges, and the
+  move cursor refused open ground beside painted walls. Placed from position 1, the corner showed the first cell and
+  the cursor matched the picture.
 - **Land under the art:** a whole map drawn with patches over `CLEAR1`, `W1` and `B1` cells; units drove where the
   templates allowed and never through the cells marked rock. The land types are read from the stock iconsets' control
   maps.
