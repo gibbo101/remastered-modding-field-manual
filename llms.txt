@@ -250,7 +250,8 @@ offset from such a page, check the SHA-256 of the user's `ClientG.exe` against i
 - [HD tilesets and ZIPs](art/hd-tilesets-and-zips.md): a unit's art is a ZIP of <name>-NNNN.tga + .meta frames, one
   tile per shape in a patched copy of RA_UNITS/RA_STRUCTURES/RA_VFX.XML, a buildables entry named RA_<IniName>;
   TypeName = IniName, AssetName = graphic name; build-ups sized by BuildupData, overlays by their own shape; theatre
-  art (smudges, ore) in RA_TERRAIN_<theatre>; ground art (smudges) gets no house colour.
+  art (smudges, ore) in RA_TERRAIN_<theatre>; ground art (smudges) gets no house colour; a building drawn from a
+  terrain tileset gets one fixed red whoever owns it.
 - [Sprite memory and DDS](art/sprite-memory-and-dds.md): the launcher uploads every enabled mod's textures at
   start-up; ZIP frames cost 4 bytes a pixel of their crop; loose DDS frames about a quarter but need the whole
   canvas, and DXT shifts greys toward team-colour green.

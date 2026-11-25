@@ -127,6 +127,9 @@ type's `ImageData` as a donor, fixes it. The DLL side is on [Adding a unit](../u
   on a smudge such as a bib or apron, although EA's export sends each smudge with its cell's owner
   (`smudge_entry.Owner` in `DLLInterface.cpp`). Paint ground art in its final colours. (Observed; the launcher's
   side isn't traced.)
+- **Terrain-tileset art gets one fixed house colour.** Art drawn from a terrain tileset, even for a building with an
+  owner, has its team green painted the same red whoever owns it, and the object's `Owner` and `RemapColor` don't
+  change it. To show an owner's colour, bake one copy per colour and pick the frame in the DLL.
 - **Crop the frames, and describe them in `.meta`.** A frame's TGA is cropped to its visible pixels, and its
   `.meta` gives the canvas `size` and the `crop` box. A full-canvas TGA with a smaller `crop` is squeezed into
   the crop box.
@@ -135,6 +138,9 @@ type's `ImageData` as a donor, fixes it. The DLL side is on [Adding a unit](../u
 
 ## How it was verified
 
+- **Terrain-tileset art's house colour:** a building drawn from a terrain tileset with its house areas painted pure
+  green showed them red in play, empty (owner `Neutral`) and garrisoned by a yellow player, with a DLL log showing the
+  object's `Owner` and `RemapColor` changing to the player's.
 - **Infantry in the units tileset:** the 19 files in `CONFIG.MEG`'s `DATA\XML\TILESETS\` (none for infantry), the
   532 `E1` tiles counted in `RA_UNITS.XML`, and Tiberian Factions' infantry ports, registered there by its build tool.
 - **The pieces and the names:** the base game's `2TNK.ZIP`, `POWR.ZIP` and `WEAP.ZIP` (`TEXTURES_RA_SRGB.MEG`),
