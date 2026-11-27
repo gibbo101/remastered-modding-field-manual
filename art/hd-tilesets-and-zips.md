@@ -130,6 +130,11 @@ type's `ImageData` as a donor, fixes it. The DLL side is on [Adding a unit](../u
 - **Terrain-tileset art gets one fixed house colour.** Art drawn from a terrain tileset, even for a building with an
   owner, has its team green painted the same red whoever owns it, and the object's `Owner` and `RemapColor` don't
   change it. To show an owner's colour, bake one copy per colour and pick the frame in the DLL.
+- **A neutral object keeps raw house green.** The launcher paints an object's house green in its owner's team colour,
+  but leaves it unpainted for one owned by `Neutral`, whatever `CNCRATEAMCOLORS.XML` gives `NEUTRAL`. To show a
+  neutral object in a colour, export it as a house no skirmish uses, such as `JP` (the Special house), and give that
+  house's entry the colour. Tiberian Dawn's `BAD_UNIT` shift (`0.306, -0.655, 0`) gives a clean grey. The saturation
+  shift is added without clamping, so `-1` turns the paler greens pink.
 - **Crop the frames, and describe them in `.meta`.** A frame's TGA is cropped to its visible pixels, and its
   `.meta` gives the canvas `size` and the `crop` box. A full-canvas TGA with a smaller `crop` is squeezed into
   the crop box.
@@ -141,6 +146,10 @@ type's `ImageData` as a donor, fixes it. The DLL side is on [Adding a unit](../u
 - **Terrain-tileset art's house colour:** a building drawn from a terrain tileset with its house areas painted pure
   green showed them red in play, empty (owner `Neutral`) and garrisoned by a yellow player, with a DLL log showing the
   object's `Owner` and `RemapColor` changing to the player's.
+- **A neutral object's house green:** object-tileset buildings exported as `Neutral` showed raw green in play, before
+  and after a loose `CNCRATEAMCOLORS.XML` gave `NEUTRAL` a grey shift; the same file's grey shift on `MULTI2` turned
+  that player's units grey, so the file was read. Exported as `JP` with `BAD_UNIT`'s shift, the buildings drew grey;
+  with a saturation shift of `-1` they drew pink-white.
 - **Infantry in the units tileset:** the 19 files in `CONFIG.MEG`'s `DATA\XML\TILESETS\` (none for infantry), the
   532 `E1` tiles counted in `RA_UNITS.XML`, and Tiberian Factions' infantry ports, registered there by its build tool.
 - **The pieces and the names:** the base game's `2TNK.ZIP`, `POWR.ZIP` and `WEAP.ZIP` (`TEXTURES_RA_SRGB.MEG`),
